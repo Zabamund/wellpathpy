@@ -1,5 +1,6 @@
 **/.ipynb_checkpoints/
 /data/4metatvd.xlsx
+/.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
