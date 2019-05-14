@@ -95,10 +95,13 @@ def min_curve_method(md, inc, azi):
     
     northing = np.cumsum((md_lower - md_upper) / 2 * (np.sin(incl_upper) * np.cos(azi_upper) 
                                             + np.sin(incl_lower) * np.cos(azi_lower)) * rf)
+    northing = np.insert(northing, 0, 0)
     
     easting = np.cumsum((md_lower - md_upper) / 2 * (np.sin(incl_upper) * np.sin(azi_upper) 
                                             + np.sin(incl_lower) * np.sin(azi_lower)) * rf)
+    easting = np.insert(easting, 0, 0)
     
     tvd = np.cumsum((md_lower - md_upper) / 2 * (np.cos(incl_upper) + np.cos(incl_lower)) * rf)
-    
+    tvd = np.insert(tvd, 0, 0)
+
     return tvd, northing, easting
