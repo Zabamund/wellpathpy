@@ -24,6 +24,9 @@ def min_curve_method(md, inc, azi):
     Implement DLS
         Dogleg in degrees/100ft or degrees/30m
         Requires `.get_header()` ouput
+    Implement surface location
+        replace `np.insert([tvd, northing, easting], 0, 0)` with 
+        `np.insert([tvd, northing, easting], 0, <surface location>)`
     """
     # inputs are array-like
     try:
