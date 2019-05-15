@@ -2,7 +2,7 @@ import numpy as np
 
 def low_tan_method(md, inc, azi):
     """
-    Calculate TVD using minimum curvature method.
+    Calculate TVD using low tangential method.
 
     Parameters
     ----------
@@ -13,7 +13,7 @@ def low_tan_method(md, inc, azi):
     Returns
     -------
     Deviation converted to TVD, easting, northing
-        TVD in m or feet,
+        tvd in m or feet,
         northing in m or feet,
         easting in m or feet
 
