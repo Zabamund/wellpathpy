@@ -1,6 +1,6 @@
 import numpy as np
 
-def min_curve_method(md, inc, azi):
+def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     """
     Calculate TVD using minimum curvature method.
 
@@ -9,21 +9,23 @@ def min_curve_method(md, inc, azi):
     md: float, measured depth in m or ft
     inc: float, well deviation in degrees
     azi: float, well azimuth in degrees
+    md_units: str, measured depth units in m or ft
+        used for dogleg severity calculation
+    norm_opt: float, dogleg normalisation value,
+        if passed will override md_units
 
     Returns
     -------
     Deviation converted to TVD, easting, northing
-        TVD in m or feet,
+        tvd in m or feet,
         northing in m or feet,
         easting in m or feet
-    Dogleg
-        Dogleg angle in degrees
+    Dogleg severity
+        dls: dogleg severity angle in degrees per normalisation value
+            (normalisation value is deg/100ft, deg/30m or deg/<norm_opt>)
 
     ToDo
     ----
-    Implement DLS
-        Dogleg in degrees/100ft or degrees/30m
-        Requires `.get_header()` ouput
     Implement surface location
         replace `np.insert([tvd, northing, easting], 0, 0)` with
         `np.insert([tvd, northing, easting], 0, <surface location>)`
@@ -43,8 +45,22 @@ def min_curve_method(md, inc, azi):
     except ZeroDivisionError:
         raise ZeroDivisionError('md must have strictly increasing values')
 
-    # get units
-    #norm = 100 if units == 'm' else 30
+    # get units and normalising for dls
+    try:
+        norm_opt + 0
+    except TypeError:
+        raise TypeError('norm_opt must be a float')
+
+    if norm_opt != 0:
+        norm = norm_opt
+    else:
+        if md_units == 'm':
+            norm = 30
+        elif md_units == 'ft':
+            norm = 100
+        else:
+            raise ValueError('md_units must be either m or ft')
+
 
     # convert degrees to radians for numpy functions
     azi_r = np.deg2rad(azi)
@@ -61,7 +77,8 @@ def min_curve_method(md, inc, azi):
                                (1 - np.cos(azi_lower - azi_upper)))))
 
     # calculate dls
-    #dls = (dl * (norm / md_lower - md_upper))
+    dls = (dl * (norm / (md_lower - md_upper)))
+    dls = np.insert(dls, 0, 0)
 
     # ratio factor, correct for dl == 0 values
     rf = 2 / np.deg2rad(dl) * np.tan(np.deg2rad(dl)/2)
@@ -78,4 +95,4 @@ def min_curve_method(md, inc, azi):
     tvd = np.cumsum((md_lower - md_upper) / 2 * (np.cos(incl_upper) + np.cos(incl_lower)) * rf)
     tvd = np.insert(tvd, 0, 0)
 
-    return tvd, northing, easting
+    return tvd, northing, easting, dls
