@@ -38,9 +38,6 @@ def low_tan_method(md, inc, azi):
     except ZeroDivisionError:
         raise ZeroDivisionError('md must have strictly increasing values')
 
-    # get units
-    #norm = 100 if units == 'm' else 30
-
     # convert degrees to radians for numpy functions
     azi_r = np.deg2rad(azi)
     inc_r = np.deg2rad(inc)
