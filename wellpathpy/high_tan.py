@@ -24,20 +24,9 @@ def high_tan_method(md, inc, azi):
         `np.insert([tvd, northing, easting], 0, <surface location>)`
     """
     # inputs are array-like
-    try:
-        md = np.array(md) + 0
-    except TypeError:
-        raise TypeError('md must be array-like')
-
-    try:
-        inc = np.array(inc) + 0
-    except TypeError:
-        raise TypeError('inc must be array-like')
-
-    try:
-        azi = np.array(azi) + 0
-    except TypeError:
-        raise TypeError('azi must be array-like')
+    md = np.asarray(md, dtype = np.float)
+    inc = np.asarray(inc, dtype = np.float)
+    azi = np.asarray(azi, dtype = np.float)
 
     # inputs are same length
     try:
@@ -45,21 +34,6 @@ def high_tan_method(md, inc, azi):
     except ZeroDivisionError:
         raise ZeroDivisionError('md, incl and azi must be of same length')
 
-    # inputs dtype are int or float
-    try:
-        md += 0
-    except TypeError:
-        raise TypeError('md array must of dtype int or float')
-
-    try:
-        inc += 0
-    except TypeError:
-        raise TypeError('inc array must of dtype int or float')
-
-    try:
-        azi += 0
-    except TypeError:
-        raise TypeError('azi array must of dtype int or float')
 
     # md array increases strictly at each step
     try:
