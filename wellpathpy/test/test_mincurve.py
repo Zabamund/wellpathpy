@@ -18,7 +18,7 @@ def test_azi_throws():
 
 # inputs are same length
 def test_input_lengths_throws():
-    with pytest.raises(ZeroDivisionError):
+    with pytest.raises(ValueError):
         _ = min_curve_method(md=[1,2,3], inc=[1,2,3], azi=[1,2])
 
 # md array increases strictly at each step

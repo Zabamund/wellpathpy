@@ -33,11 +33,9 @@ def min_curve_method(md, inc, azi):
     inc = np.asarray(inc, dtype = np.float)
     azi = np.asarray(azi, dtype = np.float)
 
-    # inputs are same length
-    try:
-        1 / (md.shape == inc.shape == azi.shape)
-    except ZeroDivisionError:
-        raise ZeroDivisionError('md, incl and azi must be of same length')
+    # inputs are same shape
+    if not (md.shape == inc.shape == azi.shape):
+        raise ValueError('md, inc, and azi must be the same shape')
 
     # md array increases strictly at each step
     try:
