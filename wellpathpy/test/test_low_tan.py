@@ -23,5 +23,5 @@ def test_input_lengths_throws():
 
 # md array increases strictly at each step
 def test_increasing_md_throws():
-    with pytest.raises(ZeroDivisionError):
+    with pytest.raises(ValueError):
         _ = low_tan_method(md=[1,1,3], inc=[1,2,3], azi=[1,2,3])
