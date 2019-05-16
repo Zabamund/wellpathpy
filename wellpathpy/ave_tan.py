@@ -3,6 +3,9 @@ import numpy as np
 def ave_tan_method(md, inc, azi):
     """
     Calculate TVD using average tangential method.
+    This method averages the inclination and azimuth at the top and
+    bottom of the survey interval before taking their sine and cosine,
+    this average angle is used to estimate tvd.
 
     Parameters
     ----------

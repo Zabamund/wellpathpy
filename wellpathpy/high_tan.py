@@ -3,6 +3,11 @@ import numpy as np
 def high_tan_method(md, inc, azi):
     """
     Calculate TVD using high tangential method.
+    This method takes the sines and cosines of the inclination and azimuth
+    at the bottom of the survey interval to estimate tvd.
+
+    This method is not recommended as it can make gross tvd and offset
+    errors in typical deviated wells.
 
     Parameters
     ----------

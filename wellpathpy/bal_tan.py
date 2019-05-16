@@ -3,6 +3,12 @@ import numpy as np
 def bal_tan_method(md, inc, azi):
     """
     Calculate TVD using balanced tangential method.
+    This method takes the sines and cosines of the inclination and azimuth
+    at the top and bottom of the survey interval before averaging them,
+    this average angle is used to estimate tvd.
+
+    This will provide a smoother curve than the ave_tan method but requires
+    closely spaced survey stations to avoid errors.
 
     Parameters
     ----------
@@ -46,8 +52,6 @@ def bal_tan_method(md, inc, azi):
     md_upper, md_lower = md[:-1], md[1:]
     incl_upper, incl_lower = inc_r[:-1], inc_r[1:]
     azi_upper, azi_lower = azi_r[:-1], azi_r[1:]
-
-    #TVD = SUM ((MD2 - MD1) * (Cos WD2 + Cos WD1) / 2)
 
     northing = np.cumsum((md_lower - md_upper) * (np.sin(incl_upper) * np.cos(azi_upper)
                                                   + np.sin(incl_lower) * np.cos(azi_lower)) / 2)

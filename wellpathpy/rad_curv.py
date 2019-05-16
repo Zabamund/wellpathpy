@@ -6,6 +6,9 @@ def rad_curve_method(md, inc, azi):
     Caution: this will yield unreliable results when data are closely spaced
         or when the borehole is straight but deviated.
 
+    This method uses angles from upper and lower end of survey interval to
+    calculate a curve that passes through both survey points.
+
     Parameters
     ----------
     md: float, measured depth in m or ft

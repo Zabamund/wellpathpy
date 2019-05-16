@@ -4,6 +4,11 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     """
     Calculate TVD using minimum curvature method.
 
+    This method uses angles from upper and lower end of survey interval to
+    calculate a curve that passes through both survey points. This curve is
+    smoothed by use of the ratio factor defined by the tortuosity or dogleg
+    of the wellpath.
+
     Parameters
     ----------
     md: float, measured depth in m or ft
@@ -75,8 +80,6 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     dl = np.rad2deg(np.arccos(np.cos(incl_lower - incl_upper) -
                               (np.sin(incl_upper) * np.sin(incl_lower) *
                                (1 - np.cos(azi_lower - azi_upper)))))
-
-    # calculate dls
     dls = (dl * (norm / (md_lower - md_upper)))
     dls = np.insert(dls, 0, 0)
 
