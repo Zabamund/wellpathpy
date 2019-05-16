@@ -1,5 +1,7 @@
 import numpy as np
 
+from .checkarrays import checkarrays
+
 def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     """
     Calculate TVD using minimum curvature method.
@@ -35,20 +37,7 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
         replace `np.insert([tvd, northing, easting], 0, 0)` with
         `np.insert([tvd, northing, easting], 0, <surface location>)`
     """
-    # inputs are array-like
-    md = np.asarray(md, dtype = np.float)
-    inc = np.asarray(inc, dtype = np.float)
-    azi = np.asarray(azi, dtype = np.float)
-
-    # inputs are same shape
-    if not (md.shape == inc.shape == azi.shape):
-        raise ValueError('md, inc, and azi must be the same shape')
-
-    # md array increases strictly at each step
-    try:
-        1 / bool(np.all(md[1:] > md[:-1]))
-    except ZeroDivisionError:
-        raise ZeroDivisionError('md must have strictly increasing values')
+    md, inc, azi = checkarrays(md, inc, azi)
 
     # get units and normalising for dls
     try:

@@ -1,5 +1,7 @@
 import numpy as np
 
+from .checkarrays import checkarrays
+
 def high_tan_method(md, inc, azi):
     """
     Calculate TVD using high tangential method.
@@ -28,20 +30,7 @@ def high_tan_method(md, inc, azi):
         replace `np.insert([tvd, northing, easting], 0, 0)` with
         `np.insert([tvd, northing, easting], 0, <surface location>)`
     """
-    # inputs are array-like
-    md = np.asarray(md, dtype = np.float)
-    inc = np.asarray(inc, dtype = np.float)
-    azi = np.asarray(azi, dtype = np.float)
-
-    # inputs are same shape
-    if not (md.shape == inc.shape == azi.shape):
-        raise ValueError('md, inc, and azi must be the same shape')
-
-    # md array increases strictly at each step
-    try:
-        1 / bool(np.all(md[1:] > md[:-1]))
-    except ZeroDivisionError:
-        raise ZeroDivisionError('md must have strictly increasing values')
+    md, inc, azi = checkarrays(md, inc, azi)
 
     # convert degrees to radians for numpy functions
     azi_r = np.deg2rad(azi)
