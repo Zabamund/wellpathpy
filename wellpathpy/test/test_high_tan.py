@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from ..high_tan import high_tan_method
+from ..tan import high_tan_method
 
 # inputs are array-like
 def test_md_throws():
