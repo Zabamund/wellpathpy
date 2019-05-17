@@ -2,7 +2,7 @@ import numpy as np
 
 from .checkarrays import checkarrays
 
-def tan_method(md, inc, azi, choice = 'high'):
+def tan_method(md, inc, azi, choice = 'avg'):
     """
     ToDo
     ----
@@ -11,7 +11,7 @@ def tan_method(md, inc, azi, choice = 'high'):
         `np.insert([tvd, northing, easting], 0, <surface location>)`
     """
     if choice is None:
-        choice = 'high'
+        choice = 'avg'
 
     md, inc, azi = checkarrays(md, inc, azi)
 
@@ -23,12 +23,12 @@ def tan_method(md, inc, azi, choice = 'high'):
     md_upper, md_lower = md[:-1], md[1:]
 
     if choice == 'high':
-        # extract the upper survey stations
-        incl_choice = inc_r[1:]
+        # extract the lower survey stations
+        inc_choice = inc_r[1:]
         azi_choice = azi_r[1:]
     elif choice == 'low':
-        # extract the lower survey stations
-        incl_choice = inc_r[:-1]
+        # extract the upper survey stations
+        inc_choice = inc_r[:-1]
         azi_choice = azi_r[:-1]
     elif choice == 'avg':
         inc_choice = (inc_r[1:] + inc_r[:-1]) / 2
