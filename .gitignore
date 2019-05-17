@@ -1,6 +1,7 @@
 **/.ipynb_checkpoints/
 /data/4metatvd.xlsx
 /.vscode/
+/notebooks/mock_data_extraction.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
