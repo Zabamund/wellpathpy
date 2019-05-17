@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from ..bal_tan import bal_tan_method
+from ..tan import bal_tan_method
 
 # inputs are array-like
 def test_md_throws():
