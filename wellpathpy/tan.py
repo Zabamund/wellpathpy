@@ -170,9 +170,9 @@ def bal_tan_method(md, inc, azi):
 
     Formula
     -------
-    northing = sum(md_lower - md_upper) * ((sin(inc_upper) * cos(azi_upper) + sin(inc_lower) * cos(azi_lower)) / 2)
-    easting = sum(md_lower - md_upper) * ((sin(inc_upper) * sin(azi_upper) + sin(inc_lower) * sin(azi_lower)) / 2)
-    tvd = sum((md_lower - md_upper) * (cos(inc_lower) + cos(inc_upper)) / 2)
+    northing = sum((md_lower - md_upper) * ((sin(inc_upper) * cos(azi_upper) + sin(inc_lower) * cos(azi_lower)) / 2))
+    easting = sum((md_lower - md_upper) * ((sin(inc_upper) * sin(azi_upper) + sin(inc_lower) * sin(azi_lower)) / 2))
+    tvd = sum((md_lower - md_upper) * (cos(inc_lower) + cos(inc_upper)) / 2))
 
     where:
     md_upper: upper survey station depth MD

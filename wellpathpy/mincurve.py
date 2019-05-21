@@ -11,6 +11,24 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     smoothed by use of the ratio factor defined by the tortuosity or dogleg
     of the wellpath.
 
+    Formula
+    -------
+    dls = arccos(cos(inc_lower - inc_upper) - sin(inc_upper) * sin(inc_lower) * (1 - cos(azi_lower - azi_upper)))
+    rf = 2 / dls * (tan(dls/2))
+    northing = sum((md_lower - md_upper) * (sin(inc_upper) * cos(azi_upper) + sin(inc_lower) * cos(azi_lower) / 2) * cf)
+    easting = sum((md_lower - md_upper) *(sin(inc_upper) * sin(azi_upper) + sin(inc_lower) * sin(azi_lower) / 2) * cf)
+    tvd = sum((md_lower - md_upper) * (cos(inc_lower) + cos(inc_upper) / 2) * cf)
+
+    where:
+    dls: dog leg severity (degrees)
+    rf: ratio factor (radians)
+    md_upper: upper survey station depth MD
+    md_lower: lower survey station depth MD
+    inc_upper: upper survey station inclination in degrees
+    inc_lower: lower survey station inclination in degrees
+    azi_upper: upper survey station azimuth in degrees
+    azi_lower: lower survey station azimuth in degrees
+
     Parameters
     ----------
     md: float, measured depth in m or ft
