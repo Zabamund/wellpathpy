@@ -63,9 +63,9 @@ def test_avg_tan():
 
 def test_bal_tan():
     tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='bal')
-    np.testing.assert_allclose(tvd, true_bal_tan_TVD, atol=1)
-    np.testing.assert_allclose(mE, true_bal_tan_mE, atol=5)
-    np.testing.assert_allclose(mN, true_bal_tan_mN, atol=5)
+    np.testing.assert_allclose(tvd, true_bal_tan_TVD)
+    np.testing.assert_allclose(mE, true_bal_tan_mE)
+    np.testing.assert_allclose(mN, true_bal_tan_mN)
 
 def test_min_curve():
     tvd, mN, mE, dls = min_curve_method(mock_md, mock_inc, mock_azi, norm_opt=1)
