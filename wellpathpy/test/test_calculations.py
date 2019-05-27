@@ -45,15 +45,15 @@ true_rad_curve_TVD = mock_df['tvd_radc'].values
 # test methods
 def test_high_tan():
     tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='high')
-    np.testing.assert_allclose(tvd, true_high_tan_TVD, atol=1)
-    np.testing.assert_allclose(mE, true_high_tan_mE, atol=5)
-    np.testing.assert_allclose(mN, true_high_tan_mN, atol=5)
+    np.testing.assert_allclose(tvd, true_high_tan_TVD)
+    np.testing.assert_allclose(mE, true_high_tan_mE)
+    np.testing.assert_allclose(mN, true_high_tan_mN)
 
 def test_low_tan():
     tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='low')
-    np.testing.assert_allclose(tvd, true_low_tan_TVD, atol=1)
-    np.testing.assert_allclose(mE, true_low_tan_mE, atol=5)
-    np.testing.assert_allclose(mN, true_low_tan_mN, atol=5)
+    np.testing.assert_allclose(tvd, true_low_tan_TVD)
+    np.testing.assert_allclose(mE, true_low_tan_mE)
+    np.testing.assert_allclose(mN, true_low_tan_mN)
 
 def test_avg_tan():
     tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='avg')
@@ -63,9 +63,9 @@ def test_avg_tan():
 
 def test_bal_tan():
     tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='bal')
-    np.testing.assert_allclose(tvd, true_bal_tan_TVD, atol=1)
-    np.testing.assert_allclose(mE, true_bal_tan_mE, atol=5)
-    np.testing.assert_allclose(mN, true_bal_tan_mN, atol=5)
+    np.testing.assert_allclose(tvd, true_bal_tan_TVD)
+    np.testing.assert_allclose(mE, true_bal_tan_mE)
+    np.testing.assert_allclose(mN, true_bal_tan_mN)
 
 def test_min_curve():
     tvd, mN, mE, dls = min_curve_method(mock_md, mock_inc, mock_azi, norm_opt=1)
