@@ -52,14 +52,14 @@ def test_inter_dev_md_step_throws():
         _ = interpolate_deviation(md=np.array([1,2,3]),
                                 inc=np.array([1,2,3]),
                                 azi=np.array([1,2,3]),
-                                md_step=1.0)
+                                md_step='1')
 
 def test_inter_dev_tvd_step_throws():
     with pytest.raises(TypeError):
         _ = interpolate_position(tvd=np.array([1,2,3]),
                                 easting=np.array([1,2,3]),
                                 northing=np.array([1,2,3]),
-                                tvd_step=1.0)
+                                tvd_step='1')
 
 
 # interpolation is close to input data

@@ -32,10 +32,10 @@ def interpolate_deviation(md, inc, azi, md_step=1):
         if np.isnan(input_array).any():
             raise ValueError('md, inc and azi cannot contain NaN values.')
 
-    if not isinstance(md_step, int):
-        raise TypeError('md_step must be int')
-
-    new_md = np.arange(md.min(), md.max(), md_step)
+    try:
+        new_md = np.arange(md.min(), md.max(), md_step)
+    except TypeError:
+        raise TypeError('md_step must be int or float')
 
     f_inc = interpolate.interp1d(md, inc)
     new_inc = f_inc(new_md)
@@ -76,10 +76,10 @@ def interpolate_position(easting, northing, tvd, tvd_step=1):
         if np.isnan(input_array).any():
             raise ValueError('tvd, northing and easting cannot contain NaN values.')
 
-    if not isinstance(tvd_step, int):
-        raise TypeError('tvd_step must be int')
-
-    new_tvd = np.arange(tvd.min(), tvd.max(), tvd_step)
+    try:
+        new_tvd = np.arange(tvd.min(), tvd.max(), tvd_step)
+    except TypeError:
+        raise TypeError('tvd_step must be int or float')
 
     f_easting = interpolate.interp1d(tvd, easting)
     new_easting = f_easting(new_tvd)
