@@ -1,7 +1,10 @@
+# Notebooks and miscellaneous
 **/.ipynb_checkpoints/
 /data/4metatvd.xlsx
 /.vscode/
 /notebooks/mock_data_extraction.ipynb
+/notebooks/Test_well9_well10_deviations.ipynb
+/notebooks/Interpolate_attempt_BH_edits.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
