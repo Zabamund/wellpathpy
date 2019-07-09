@@ -19,6 +19,11 @@ def interpolate_deviation(md, inc, azi, md_step=1):
     -------
     Deviation intepolated to new md_step:
         md, inc, azi
+
+    Notes
+    -----
+    This function should not be used before md->tvd conversion.
+
     """
 
     md, inc, azi = checkarrays(md, inc, azi)
@@ -38,7 +43,8 @@ def interpolate_deviation(md, inc, azi, md_step=1):
 
 def interpolate_position(easting, northing, tvd, tvd_step=1):
     """
-    Interpolate a well positional log to a given step
+    Interpolate a well positional log to a given step.
+    Note that the input arrays must not contain NaN values.
 
     Parameters
     ----------
@@ -55,6 +61,11 @@ def interpolate_position(easting, northing, tvd, tvd_step=1):
     -------
     Deviation intepolated to new step:
         tvd, easting, northing
+
+    Notes
+    -----
+    This function should not be used before tvd->md conversion.
+
     """
     tvd, easting, northing = checkarrays(tvd, easting, northing)
 
