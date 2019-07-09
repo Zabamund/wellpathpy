@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import interpolate
 
-from .checkarrays import checkarrays
+from .checkarrays import checkarrays, checkarrays_tvd
 
 def interpolate_deviation(md, inc, azi, md_step=1):
     """
@@ -67,7 +67,7 @@ def interpolate_position(easting, northing, tvd, tvd_step=1):
     This function should not be used before tvd->md conversion.
 
     """
-    tvd, easting, northing = checkarrays(tvd, easting, northing)
+    tvd, easting, northing = checkarrays_tvd(tvd, easting, northing)
 
     for input_array in [tvd, northing, easting]:
         if np.isnan(input_array).any():
