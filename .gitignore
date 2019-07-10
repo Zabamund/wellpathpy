@@ -5,6 +5,7 @@
 /notebooks/mock_data_extraction.ipynb
 /notebooks/Test_well9_well10_deviations.ipynb
 /notebooks/Interpolate_attempt_BH_edits.ipynb
+/notebooks/DTW_test.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
