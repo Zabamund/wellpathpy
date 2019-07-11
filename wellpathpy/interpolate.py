@@ -44,7 +44,7 @@ def interpolate_deviation(md, inc, azi, md_step=1):
 
     return new_md, new_inc, new_azi
 
-def interpolate_position(easting, northing, tvd, tvd_step=1):
+def interpolate_position(tvd, easting, northing, tvd_step=1):
     """
     Interpolate a well positional log to a given step.
     Note that the input arrays must not contain NaN values.
