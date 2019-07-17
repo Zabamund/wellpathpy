@@ -5,6 +5,29 @@ from dtw import dtw
 
 from ..interpolate import interpolate_deviation, interpolate_position
 
+class Chest:
+    """A dumb object to just hold member varibles for the fixture
+    """
+    pass
+
+@pytest.fixture(params = ['9', '10'])
+def well(request):
+    # The tests should not depend on what file the data is from, because it
+    # tests round-trip properties and not specifically the data itself.
+    # Instead of writing every test twice, use a parametrised fixture [1]
+    #
+    # [1] https://docs.pytest.org/en/latest/fixture.html#parametrizing-fixtures
+    fname = 'wellpathpy/test/fixtures/well{}.csv'.format(request.param)
+    csv = pd.read_csv(fname, sep=',')
+    w = Chest()
+    w.md         = csv['Measured Depth ( ft )'].values
+    w.inc        = csv['Inclination ( deg )'].values
+    w.azi        = csv['Azimuth Grid ( deg )'].values
+    w.tvd        = csv['TVD ( ft )'].values
+    w.northing   = csv['Northing ( m )'].values
+    w.easting    = csv['Easting ( m )'].values
+    return w
+
 # input arrays contain no NaN values
 def test_inter_dev_md_throws():
     with pytest.raises(ValueError):
@@ -63,111 +86,47 @@ def test_inter_dev_tvd_step_throws():
                                 northing=np.array([1,2,3]),
                                 tvd_step='1')
 
-
-# interpolation is close to input data
-
-# import test well data
-well9 = pd.read_csv('./wellpathpy/test/fixtures/well9.csv', sep=",")
-well10 = pd.read_csv('./wellpathpy/test/fixtures/well10.csv', sep=",")
-
-# get data series
-well9_true_md = well9['Measured Depth ( ft )'].values
-well9_true_inc = well9['Inclination ( deg )'].values
-well9_true_azi = well9['Azimuth Grid ( deg )'].values
-well9_true_tvd = well9['TVD ( ft )'].values
-well9_true_northing = well9['Northing ( m )'].values
-well9_true_easting = well9['Easting ( m )'].values
-
-well10_true_md = well10['Measured Depth ( ft )'].values
-well10_true_inc = well10['Inclination ( deg )'].values
-well10_true_azi = well10['Azimuth Grid ( deg )'].values
-well10_true_tvd = well10['TVD ( ft )'].values
-well10_true_northing = well10['Northing ( m )'].values
-well10_true_easting = well10['Easting ( m )'].values
-
 def euclidean_norm(x, y):
     return np.abs(x - y)
 
-def test_w9_dev_md():
-    y = well9_true_md.reshape(-1,1)
-    x, _, _ = interpolate_deviation(well9_true_md, well9_true_inc, well9_true_azi, md_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=20)
-
-def test_w9_dev_inc():
-    y = well9_true_inc.reshape(-1,1)
-    _, x, _ = interpolate_deviation(well9_true_md, well9_true_inc, well9_true_azi, md_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=1)
-
-def test_w9_dev_azi():
-    y = well9_true_azi.reshape(-1,1)
-    _, _, x = interpolate_deviation(well9_true_md, well9_true_inc, well9_true_azi, md_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=2)
-
-def test_w9_pos_tvd():
-    y = well9_true_tvd.reshape(-1,1)
-    x, _, _ = interpolate_position(well9_true_tvd, well9_true_easting, well9_true_northing, tvd_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=16)
-
-def test_w9_pos_easting():
-    y = well9_true_easting.reshape(-1,1)
-    _, x, _ = interpolate_position(well9_true_tvd, well9_true_easting, well9_true_northing, tvd_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=2)
-
-def test_w9_pos_northing():
-    y = well9_true_northing.reshape(-1,1)
-    _, _, x = interpolate_position(well9_true_tvd, well9_true_easting, well9_true_northing, tvd_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=2)
-
-def test_w10_dev_md():
-    y = well10_true_md.reshape(-1,1)
-    x, _, _ = interpolate_deviation(well10_true_md, well10_true_inc, well10_true_azi, md_step=1)
+def test_dev_md(well):
+    y = well.md.reshape(-1,1)
+    x, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=22)
 
-def test_w10_dev_inc():
-    y = well10_true_inc.reshape(-1,1)
-    _, x, _ = interpolate_deviation(well10_true_md, well10_true_inc, well10_true_azi, md_step=1)
-    x = x.reshape(-1,1)
+def test_dev_inc(well):
+    y = well.inc.reshape(-1,1)
+    md, x, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
+    distance, *_ = dtw(y, y, dist = euclidean_norm)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=1)
 
-def test_w10_dev_azi():
-    y = well10_true_azi.reshape(-1,1)
-    _, _, x = interpolate_deviation(well10_true_md, well10_true_inc, well10_true_azi, md_step=1)
+def test_dev_azi(well):
+    y = well.azi.reshape(-1,1)
+    _, _, x = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=2)
 
-def test_w10_pos_tvd():
-    y = well10_true_tvd.reshape(-1,1)
-    x, _, _ = interpolate_position(well10_true_tvd, well10_true_easting, well10_true_northing, tvd_step=1)
+def test_pos_tvd(well):
+    y = well.tvd.reshape(-1,1)
+    x, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=20)
+    np.testing.assert_allclose(distance, 0, atol=18)
 
-def test_w10_pos_easting():
-    y = well10_true_easting.reshape(-1,1)
-    _, x, _ = interpolate_position(well10_true_tvd, well10_true_easting, well10_true_northing, tvd_step=1)
+def test_pos_easting(well):
+    y = well.easting.reshape(-1,1)
+    _, x, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=4)
 
-def test_w10_pos_northing():
-    y = well10_true_northing.reshape(-1,1)
-    _, _, x = interpolate_position(well10_true_tvd, well10_true_easting, well10_true_northing, tvd_step=1)
+def test_pos_northing(well):
+    y = well.northing.reshape(-1,1)
+    _, _, x = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=2)
