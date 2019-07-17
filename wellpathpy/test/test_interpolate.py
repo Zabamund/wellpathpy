@@ -89,42 +89,42 @@ def test_inter_dev_tvd_step_throws():
 def euclidean_norm(x, y):
     return np.abs(x - y)
 
-def test_dev_md(well):
+def test_equivalent_deviation_curve_after_interpolation_md(well):
     y = well.md.reshape(-1,1)
     x, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=22)
 
-def test_dev_inc(well):
+def test_equivalent_deviation_curve_after_interpolation_inc(well):
     y = well.inc.reshape(-1,1)
     md, x, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
     distance, *_ = dtw(y, y, dist = euclidean_norm)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=1)
 
-def test_dev_azi(well):
+def test_equivalent_deviation_curve_after_interpolation_azi(well):
     y = well.azi.reshape(-1,1)
     _, _, x = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=2)
 
-def test_pos_tvd(well):
+def test_equivalent_position_curve_after_interpolation_tvd(well):
     y = well.tvd.reshape(-1,1)
     x, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=18)
 
-def test_pos_easting(well):
+def test_equivalent_position_curve_after_interpolation_easting(well):
     y = well.easting.reshape(-1,1)
     _, x, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
     x = x.reshape(-1,1)
     distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
     np.testing.assert_allclose(distance, 0, atol=4)
 
-def test_pos_northing(well):
+def test_equivalent_position_curve_after_interpolation_northing(well):
     y = well.northing.reshape(-1,1)
     _, _, x = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
     x = x.reshape(-1,1)
