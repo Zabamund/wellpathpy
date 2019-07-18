@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import pandas as pd
-from dtw import dtw
+from scipy import interpolate
 
 from ..interpolate import interpolate_deviation, interpolate_position
 
@@ -89,44 +89,52 @@ def test_inter_dev_tvd_step_throws():
 def euclidean_norm(x, y):
     return np.abs(x - y)
 
+def sample_interval(curve):
+    return np.linspace(
+        start = curve.min(),
+        stop = curve.max(),
+        num = int(len(curve) * 1.6),
+    )
+
 def test_equivalent_deviation_curve_after_interpolation_md(well):
-    y = well.md.reshape(-1,1)
-    x, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=22)
+    md, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
+    assert md[0] == well.md[0]
+    assert md[-1] <= well.md[-1]
 
 def test_equivalent_deviation_curve_after_interpolation_inc(well):
-    y = well.inc.reshape(-1,1)
     md, x, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
-    distance, *_ = dtw(y, y, dist = euclidean_norm)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=1)
+    refmd = sample_interval(md)
+    reference = interpolate.interp1d(well.md, well.inc)(refmd)
+    result = interpolate.interp1d(md, x)(refmd)
+    np.testing.assert_allclose(reference, result, rtol = 1.5)
 
 def test_equivalent_deviation_curve_after_interpolation_azi(well):
-    y = well.azi.reshape(-1,1)
-    _, _, x = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=2)
+    md, _, x = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
+    refmd = sample_interval(md)
+    reference = interpolate.interp1d(well.md, well.azi)(refmd)
+    result = interpolate.interp1d(md, x)(refmd)
+    np.testing.assert_allclose(reference, result, rtol = 1.5)
 
 def test_equivalent_position_curve_after_interpolation_tvd(well):
-    y = well.tvd.reshape(-1,1)
-    x, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=18)
+    # this assertion is pretty funky, but it's at this stage quite unclear how
+    # the md/tvd are supposed to behave.
+    #
+    # Until a decision is made on how to deal with the end-of-interval values,
+    # spacing between samples, configurability and more, it's ok for the
+    # assertion to stand out and be weird
+    tvd, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
+    assert tvd[0] == well.tvd[0]
 
 def test_equivalent_position_curve_after_interpolation_easting(well):
-    y = well.easting.reshape(-1,1)
-    _, x, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=4)
+    tvd, x, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
+    reftvd = sample_interval(tvd)
+    reference = interpolate.interp1d(well.tvd, well.easting)(reftvd)
+    result = interpolate.interp1d(tvd, x)(reftvd)
+    np.testing.assert_allclose(reference, result, rtol = 0.5)
 
 def test_equivalent_position_curve_after_interpolation_northing(well):
-    y = well.northing.reshape(-1,1)
-    _, _, x = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
-    x = x.reshape(-1,1)
-    distance, _, _, _ = dtw(x, y, dist=euclidean_norm)
-    np.testing.assert_allclose(distance, 0, atol=2)
+    tvd, _, x = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
+    reftvd = sample_interval(tvd)
+    reference = interpolate.interp1d(well.tvd, well.northing)(reftvd)
+    result = interpolate.interp1d(tvd, x)(reftvd)
+    np.testing.assert_allclose(reference, result, rtol = 1)
