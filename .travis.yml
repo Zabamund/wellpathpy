@@ -1,11 +1,23 @@
 language: python
-
 python:
-  - 3.6-dev
+  - 3.6
+  - 3.7
+
+dist: xenial
 
 install:
   - pip install -r requirements-dev.txt
 
 script:
-  - export PYTHONPATH=.
   - pytest -vs wellpathpy/test
+
+deploy:
+  - provider: pypi
+    skip_existing: true
+    skip_upload_docs: true
+    distributions: sdist bdist_wheel
+    user: Zabamund
+    password:
+      secure: G7srXHportgXrQ5HRFtGTaScRQjo7+FNglbEYwWL7kqzdRPntqnf4x8Uub8uKz2e9Gqjp+nU/XkK25EfzovzvmcLWfv52vMbRIgmDh9XBn8R6BoIYK0QVqe7JnOGKkzWExK5l+QYf275Lvs4L+F+c+n21PBm4f0AjWwSJpk04+NOIvoOunSgFcqhmG+T0GsJaBD/gXB4kcgjVgtG6l1YCMcnTtN9OIWUhpduOBy8UbB+bxMNhy00bDG75VIix1fHa7tVBXFeho0f6vQwSYlOyRPVgsn5KnZqvD6DNXv+CGihqSMQlYcN5U2Iq+R+Qz05Pqt5rziKIJMdRSbXSKwKuF/NyY3+Rgag7dlxrCpuG5dtGYOILVojLThSppduK0ziOU/95WzxJy/pVsNFV/LMvcLqW8F7Z8xc3rVg+bT4JbxJ/jOebm/W+myYBFl1BMari+I6ByqbUzhyLW/9jIreflyvmJNm+BL4TfyANu38AjCxvcAZWSlDR3MVCDxle6FrAucuR0XBbA6bGmiWiJf/Ehq5fZuW+JQw+suQUX2Mno6FUaxQjxvwuydz5Zt8TfY30axKExCkjvba7dr4bZzEKIVaaT2lxzknRMz8MYi/ONitvLJiKPyS8GLpYBK7WzzVnWibIGS3mKB81JIgt6hiWzUEJp5Qxc1AN3iA+hRSEzE=
+    on:
+      tags: true
