@@ -5,81 +5,106 @@ import numpy as np
 from ..tan import tan_method
 from ..mincurve import min_curve_method
 from ..rad_curv import rad_curve_method
+from ..location import loc_to_wellhead
 
-# mock data set from Crain's Petrophysical handbook
-# https://www.spec2000.net/19-dip13.htm
+# import test well data
+well9 = pd.read_csv('./wellpathpy/test/fixtures/well9.csv', sep=",")
+well10 = pd.read_csv('./wellpathpy/test/fixtures/well10.csv', sep=",")
 
-# Make sure the relative path is set from location where `python setup.py test` is run
-mock_df = pd.read_csv('./wellpathpy/test/fixtures/mock_data_set.csv')
-mock_md = mock_df['md'].values
-mock_inc = mock_df['inc'].values
-mock_azi = mock_df['azi'].values
+# get data series
+well9_true_md_m = well9['Measured Depth ( ft )'].values * 0.3048 # converting feet to meters
+well9_true_inc = well9['Inclination ( deg )'].values
+well9_true_azi = well9['Azimuth Grid ( deg )'].values
+well9_true_tvd_m = well9['TVD ( ft )'].values * 0.3048 # converting feet to meters
+well9_true_northing = well9['Northing ( m )'].values
+well9_true_easting = well9['Easting ( m )'].values
+well9_true_dls = well9['DLS ( deg/100 ft )'].values
+well9_true_surface_northing = 39998.454
+well9_true_surface_easting = 655701.278
+well9_true_datum_elevation = 100 * 0.3048 # converting feet to meters
 
-# mock data solution from Crain's Petrophysical handbook
-# https://www.spec2000.net/19-dip13.htm
-true_high_tan_mN = mock_df['mN_ht'].values
-true_high_tan_mE = mock_df['mE_ht'].values
-true_high_tan_TVD = mock_df['tvd_ht'].values
-
-true_low_tan_mN = mock_df['mN_lt'].values
-true_low_tan_mE = mock_df['mE_lt'].values
-true_low_tan_TVD = mock_df['tvd_lt'].values
-
-true_avg_tan_mN = mock_df['mN_avg'].values
-true_avg_tan_mE = mock_df['mE_avg'].values
-true_avg_tan_TVD = mock_df['tvd_avg'].values
-
-true_bal_tan_mN = mock_df['mN_bal'].values
-true_bal_tan_mE = mock_df['mE_bal'].values
-true_bal_tan_TVD = mock_df['tvd_bal'].values
-
-true_min_curve_mN = mock_df['mN_minc'].values
-true_min_curve_mE = mock_df['mE_minc'].values
-true_min_curve_TVD = mock_df['tvd_minc'].values
-true_min_curve_dls = mock_df['dl'].values
-
-true_rad_curve_mN = mock_df['mN_radc'].values
-true_rad_curve_mE = mock_df['mE_radc'].values
-true_rad_curve_TVD = mock_df['tvd_radc'].values
+well10_true_md_m = well10['Measured Depth ( ft )'].values * 0.3048 # converting feet to meters
+well10_true_inc = well10['Inclination ( deg )'].values
+well10_true_azi = well10['Azimuth Grid ( deg )'].values
+well10_true_tvd_m = well10['TVD ( ft )'].values * 0.3048 # converting feet to meters
+well10_true_northing = well10['Northing ( m )'].values
+well10_true_easting = well10['Easting ( m )'].values
+well10_true_dls = well10['DLS ( deg/100 ft )'].values
+well10_true_surface_northing = 40004.564
+well10_true_surface_easting = 655701.377
+well10_true_datum_elevation = 100 * 0.3048 # converting feet to meters
 
 # test methods
 def test_high_tan():
-    tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='high')
-    np.testing.assert_allclose(tvd, true_high_tan_TVD)
-    np.testing.assert_allclose(mE, true_high_tan_mE)
-    np.testing.assert_allclose(mN, true_high_tan_mN)
+    tvd9, mN9, mE9 = tan_method(well9_true_md_m, well9_true_inc, well9_true_azi, choice='high')
+    tvd10, mN10, mE10 = tan_method(well10_true_md_m, well10_true_inc, well10_true_azi, choice='high')
+    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=12)
+    np.testing.assert_allclose(mE9, well9_true_easting, atol=12)
+    np.testing.assert_allclose(mN9, well9_true_northing, atol=12)
+    np.testing.assert_allclose(tvd10, well10_true_tvd_m, atol=12)
+    np.testing.assert_allclose(mE10, well10_true_easting, atol=15)
+    np.testing.assert_allclose(mN10, well10_true_northing, atol=12)
 
 def test_low_tan():
-    tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='low')
-    np.testing.assert_allclose(tvd, true_low_tan_TVD)
-    np.testing.assert_allclose(mE, true_low_tan_mE)
-    np.testing.assert_allclose(mN, true_low_tan_mN)
+    tvd9, mN9, mE9 = tan_method(well9_true_md_m, well9_true_inc, well9_true_azi, choice='low')
+    tvd10, mN10, mE10 = tan_method(well10_true_md_m, well10_true_inc, well10_true_azi, choice='low')
+    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=12)
+    np.testing.assert_allclose(mE9, well9_true_easting, atol=12)
+    np.testing.assert_allclose(mN9, well9_true_northing, atol=12)
+    np.testing.assert_allclose(tvd10, well10_true_tvd_m, atol=12)
+    np.testing.assert_allclose(mE10, well10_true_easting, atol=15)
+    np.testing.assert_allclose(mN10, well10_true_northing, atol=12)
 
 def test_avg_tan():
-    tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='avg')
-    np.testing.assert_allclose(tvd, true_avg_tan_TVD, atol=1)
-    np.testing.assert_allclose(mE, true_avg_tan_mE, atol=5)
-    np.testing.assert_allclose(mN, true_avg_tan_mN, atol=5)
+    tvd9, mN9, mE9 = tan_method(well9_true_md_m, well9_true_inc, well9_true_azi, choice='avg')
+    tvd10, mN10, mE10 = tan_method(well10_true_md_m, well10_true_inc, well10_true_azi, choice='avg')
+    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=10)
+    np.testing.assert_allclose(mE9, well9_true_easting, atol=10)
+    np.testing.assert_allclose(mN9, well9_true_northing, atol=10)
+    np.testing.assert_allclose(tvd10, well10_true_tvd_m, atol=10)
+    np.testing.assert_allclose(mE10, well10_true_easting, atol=10)
+    np.testing.assert_allclose(mN10, well10_true_northing, atol=10)
 
 def test_bal_tan():
-    tvd, mN, mE = tan_method(mock_md, mock_inc, mock_azi, choice='bal')
-    np.testing.assert_allclose(tvd, true_bal_tan_TVD)
-    np.testing.assert_allclose(mE, true_bal_tan_mE)
-    np.testing.assert_allclose(mN, true_bal_tan_mN)
+    tvd9, mN9, mE9 = tan_method(well9_true_md_m, well9_true_inc, well9_true_azi, choice='bal')
+    tvd10, mN10, mE10 = tan_method(well10_true_md_m, well10_true_inc, well10_true_azi, choice='bal')
+    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=10)
+    np.testing.assert_allclose(mE9, well9_true_easting, atol=10)
+    np.testing.assert_allclose(mN9, well9_true_northing, atol=10)
+    np.testing.assert_allclose(tvd10, well10_true_tvd_m, atol=10)
+    np.testing.assert_allclose(mE10, well10_true_easting, atol=10)
+    np.testing.assert_allclose(mN10, well10_true_northing, atol=10)
 
 def test_min_curve():
-    tvd, mN, mE, dls = min_curve_method(mock_md, mock_inc, mock_azi, norm_opt=1)
-    np.testing.assert_allclose(tvd, true_min_curve_TVD, atol=1)
-    np.testing.assert_allclose(mE, true_min_curve_mE, atol=5)
-    np.testing.assert_allclose(mN, true_min_curve_mN, atol=5)
-    np.testing.assert_allclose(dls, true_min_curve_dls, atol=1)
+    tvd9, mN9, mE9, dls9 = min_curve_method(well9_true_md_m, well9_true_inc, well9_true_azi, norm_opt=1)
+    tvd10, mN10, mE10, dls10 = min_curve_method(well10_true_md_m, well10_true_inc, well10_true_azi, norm_opt=1)
+    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=1)
+    np.testing.assert_allclose(mE9, well9_true_easting, atol=1)
+    np.testing.assert_allclose(mN9, well9_true_northing, atol=1)
+    #np.testing.assert_allclose(dls9, well9_true_dls, atol=1)
+    np.testing.assert_allclose(tvd10, well10_true_tvd_m, atol=1)
+    np.testing.assert_allclose(mE10, well10_true_easting, atol=1)
+    np.testing.assert_allclose(mN10, well10_true_northing, atol=1)
+    #np.testing.assert_allclose(dls10, well10_true_dls, atol=1)
 
 def test_rad_curve():
-    #tvd, mN, mE = rad_curve_method(mock_md, mock_inc, mock_azi)
-    #print(f'test_output:\ntvd:{tvd}\ntrue_rad_curve_TVD:{true_rad_curve_TVD}')
-    #np.testing.assert_allclose(tvd, true_rad_curve_TVD, atol=1)
-    #print(f'test_output:\nmE:{mE}\ntrue_rad_curve_mE:{true_rad_curve_mE}')
-    #np.testing.assert_allclose(mE, true_rad_curve_mE, atol=5)
-    #print(f'test_output:\nmN:{mN}\ntrue_rad_curve_mN:{true_rad_curve_mN}')
-    #np.testing.assert_allclose(mN, true_rad_curve_mN, atol=5)
-    pass
+    tvd9, mN9, mE9 = rad_curve_method(well9_true_md_m, well9_true_inc, well9_true_azi)
+    tvd10, mN10, mE10 = rad_curve_method(well10_true_md_m, well10_true_inc, well10_true_azi)
+    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=1)
+    np.testing.assert_allclose(mE9, well9_true_easting, atol=1)
+    np.testing.assert_allclose(mN9, well9_true_northing, atol=1)
+    np.testing.assert_allclose(tvd10, well10_true_tvd_m, atol=5)
+    np.testing.assert_allclose(mE10, well10_true_easting, atol=85)
+    np.testing.assert_allclose(mN10, well10_true_northing, atol=10)

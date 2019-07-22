@@ -66,10 +66,10 @@ def rad_curve_method(md, inc, azi):
     #2: East = SUM (MD2 - MD1) * (Cos WD1 - Cos WD2) * (Cos HAZ1 - Cos HAZ2) / ((WD2 - WD1) * (HAZ2 - HAZ1)}
     #3: TVD = SUM (MD2 - MD1) * (Sin WD2 - Sin WD1) / (WD2 - WD1)
 
-    northing = np.cumsum((md_lower - md_upper) * (np.cos(incl_upper) - np.cos(incl_lower)) * (np.sin(azi_lower) - np.sin(azi_upper)) / delta_inc * delta_azi)
+    northing = np.cumsum((md_lower - md_upper) * (np.cos(incl_upper) - np.cos(incl_lower)) * (np.sin(azi_lower) - np.sin(azi_upper)) / (delta_inc * delta_azi))
     northing = np.insert(northing, 0, 0)
 
-    easting = np.cumsum((md_lower - md_upper) * (np.cos(incl_upper) - np.cos(incl_lower)) * (np.cos(azi_upper) - np.cos(azi_lower)) / delta_inc * delta_azi)
+    easting = np.cumsum((md_lower - md_upper) * (np.cos(incl_upper) - np.cos(incl_lower)) * (np.cos(azi_upper) - np.cos(azi_lower)) / (delta_inc * delta_azi))
     easting = np.insert(easting, 0, 0)
 
     tvd = np.cumsum((md_lower - md_upper) * (np.sin(incl_lower) - np.sin(incl_upper)) / delta_inc)
