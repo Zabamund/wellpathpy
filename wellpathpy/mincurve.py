@@ -108,18 +108,18 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     Returns
     -------
     Deviation converted to TVD, easting, northing
-        tvd in m or feet,
-        northing in m or feet,
-        easting in m or feet
+        tvd in m,
+        northing in m,
+        easting in m
     Dogleg severity
         dls: dogleg severity angle in degrees per normalisation value
             (normalisation value is deg/100ft, deg/30m or deg/<norm_opt>)
 
-    ToDo
-    ----
-    Implement surface location
-        replace `np.insert([tvd, northing, easting], 0, 0)` with
-        `np.insert([tvd, northing, easting], 0, <surface location>)`
+    Notes
+    -----
+    Return units are in metres, regardless of input.
+    The user must convert to feet if required.
+
     """
 
     # get units and normalising for dls
@@ -135,6 +135,7 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
             norm = 30
         elif md_units == 'ft':
             norm = 100
+            md *= 0.3048
         else:
             raise ValueError('md_units must be either m or ft')
 
@@ -145,14 +146,18 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     md_diff = md[1:] - md[:-1]
     tvd, northing, easting, dogleg = minimum_curvature(md, inc, azi)
 
-    # TODO: replace with surface location which may be non-zero
     tvd = np.insert(tvd, 0, 0)
     northing = np.insert(northing, 0, 0)
     easting = np.insert(easting, 0, 0)
 
-    # calculate dogleg severity
+    # calculate dogleg severity, change md units if dls in ft is passed in
     dl = np.rad2deg(dogleg)
-    dls = dl * (norm / md_diff)
-    dls = np.insert(dls, 0, 0)
+    if md_units == 'ft':
+        dls = dl * (norm / (md[1:]/0.3048 - md[:-1]/0.3048))
+        dls = np.insert(dls, 0, 0)
+    else:
+        dls = dl * (norm / md_diff)
+        dls = np.insert(dls, 0, 0)
+
 
     return tvd, northing, easting, dls

@@ -84,18 +84,18 @@ def test_bal_tan():
     np.testing.assert_allclose(mN10, well10_true_northing, atol=10)
 
 def test_min_curve():
-    tvd9, mN9, mE9, dls9 = min_curve_method(well9_true_md_m, well9_true_inc, well9_true_azi, norm_opt=1)
-    tvd10, mN10, mE10, dls10 = min_curve_method(well10_true_md_m, well10_true_inc, well10_true_azi, norm_opt=1)
+    tvd9, mN9, mE9, dls9 = min_curve_method(well9_true_md_m, well9_true_inc, well9_true_azi, md_units='m')
+    tvd10, mN10, mE10, dls10 = min_curve_method(well10_true_md_m, well10_true_inc, well10_true_azi, md_units='m')
     tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
     tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
-    np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=1)
-    np.testing.assert_allclose(mE9, well9_true_easting, atol=1)
-    np.testing.assert_allclose(mN9, well9_true_northing, atol=1)
-    #np.testing.assert_allclose(dls9, well9_true_dls, atol=1)
-    np.testing.assert_allclose(tvd10, well10_true_tvd_m, atol=1)
-    np.testing.assert_allclose(mE10, well10_true_easting, atol=1)
-    np.testing.assert_allclose(mN10, well10_true_northing, atol=1)
-    #np.testing.assert_allclose(dls10, well10_true_dls, atol=1)
+    np.testing.assert_allclose(tvd9, well9_true_tvd_m)
+    np.testing.assert_allclose(mE9, well9_true_easting, atol=0.5)
+    np.testing.assert_allclose(mN9, well9_true_northing, atol=0.5)
+    np.testing.assert_allclose(dls9, well9_true_dls, atol=1)
+    np.testing.assert_allclose(tvd10, well10_true_tvd_m)
+    np.testing.assert_allclose(mE10, well10_true_easting, atol=0.5)
+    np.testing.assert_allclose(mN10, well10_true_northing, atol=0.5)
+    np.testing.assert_allclose(dls10, well10_true_dls, atol=1)
 
 def test_rad_curve():
     tvd9, mN9, mE9 = rad_curve_method(well9_true_md_m, well9_true_inc, well9_true_azi)
