@@ -13,7 +13,7 @@ def interpolate_deviation(md, inc, azi, md_step=1):
     md: float, measured depth (units not defined)
     inc: float, well inclination in degrees from vertical
     azi: float, well azimuth in degrees from North
-    md_step: (int) md increment to interpolate to
+    md_step: int or float, md increment to interpolate to
 
     Returns
     -------
@@ -33,7 +33,8 @@ def interpolate_deviation(md, inc, azi, md_step=1):
             raise ValueError('md, inc and azi cannot contain NaN values.')
 
     try:
-        new_md = np.arange(md.min(), md.max(), md_step)
+        new_md = np.arange(md.min(), md.max() + md_step, md_step)
+        new_md[-1] = md.max()
     except TypeError:
         raise TypeError('md_step must be int or float')
 
@@ -58,7 +59,7 @@ def interpolate_position(tvd, easting, northing, tvd_step=1):
     easting: float, east-offset from zero reference point
         the units should be the same as the input deviation
         or the results will be wrong
-    tvd_step: int, tvd increment to interpolate to
+    tvd_step: int or float, tvd increment to interpolate to
 
     Returns
     -------
@@ -77,7 +78,8 @@ def interpolate_position(tvd, easting, northing, tvd_step=1):
             raise ValueError('tvd, northing and easting cannot contain NaN values.')
 
     try:
-        new_tvd = np.arange(tvd.min(), tvd.max(), tvd_step)
+        new_tvd = np.arange(tvd.min(), tvd.max() + tvd_step, tvd_step)
+        new_tvd[-1] = tvd.max()
     except TypeError:
         raise TypeError('tvd_step must be int or float')
 

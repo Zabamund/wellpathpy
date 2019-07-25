@@ -97,9 +97,19 @@ def sample_interval(curve):
     )
 
 def test_equivalent_deviation_curve_after_interpolation_md(well):
-    md, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
-    assert md[0] == well.md[0]
-    assert md[-1] <= well.md[-1]
+    steps = [1,2,3,4,5]
+    for step in steps:
+        md, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=step)
+        assert md[0] == well.md[0]
+        assert md[-1] == well.md[-1]
+        np.testing.assert_almost_equal(md[1:-1] - md[:-2], step, decimal=1)
+    dec_steps = [.1,.2,.3,.4,.5]
+    for dec_step in dec_steps:
+        md, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=dec_step)
+        assert md[0] == well.md[0]
+        assert md[-1] == well.md[-1]
+        np.testing.assert_almost_equal(md[1:-1] - md[:-2], dec_step, decimal=2)
+
 
 def test_equivalent_deviation_curve_after_interpolation_inc(well):
     md, x, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
@@ -116,14 +126,18 @@ def test_equivalent_deviation_curve_after_interpolation_azi(well):
     np.testing.assert_allclose(reference, result, rtol = 1.5)
 
 def test_equivalent_position_curve_after_interpolation_tvd(well):
-    # this assertion is pretty funky, but it's at this stage quite unclear how
-    # the md/tvd are supposed to behave.
-    #
-    # Until a decision is made on how to deal with the end-of-interval values,
-    # spacing between samples, configurability and more, it's ok for the
-    # assertion to stand out and be weird
-    tvd, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
-    assert tvd[0] == well.tvd[0]
+    steps = [1,2,3,4,5]
+    for step in steps:
+        tvd, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=step)
+        assert tvd[0] == well.tvd[0]
+        np.testing.assert_allclose(tvd[-1], well.tvd[-1], rtol=0.5)
+        np.testing.assert_almost_equal(tvd[1:-1] - tvd[:-2], step, decimal=1)
+    dec_steps = [.1,.2,.3,.4,.5]
+    for dec_step in dec_steps:
+        tvd, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=dec_step)
+        assert tvd[0] == well.tvd[0]
+        np.testing.assert_allclose(tvd[-1], well.tvd[-1], rtol=0.5)
+        np.testing.assert_almost_equal(tvd[1:-1] - tvd[:-2], dec_step, decimal=2)
 
 def test_equivalent_position_curve_after_interpolation_easting(well):
     tvd, x, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
