@@ -80,7 +80,7 @@ def checkarrays_tvd(tvd, northing, easting):
     Raises
     ------
     ValueError
-        If md, inc, or azi, are of different shapes
+        If tvd, northing, or easting, are of different shapes
     """
     tvd = np.asarray(tvd, dtype = np.float)
     northing = np.asarray(northing, dtype = np.float)
@@ -88,5 +88,52 @@ def checkarrays_tvd(tvd, northing, easting):
 
     if not (tvd.shape == northing.shape == easting.shape):
         raise ValueError('tvd, northing, and easting must be the same shape')
+
+    return tvd, northing, easting
+
+def checkarrays_monotonic_tvd(tvd, northing, easting):
+    """
+    Assure basic preconditions are met, and convert input (tvd, northing, easting) to
+    numpy arrays.
+
+    This function will ensure that:
+
+    - All inputs are convertible to arrays-of-floats, and perform this
+      conversion
+    - All inputs are of the same shape
+    - tvd is strictly increasing
+
+    Parameters
+    ----------
+    tvd: array_like of float
+        true vertical depth
+    northing: array_like of float
+        north-offset
+    easting: array_like of float
+        east-offset
+
+    Returns
+    -------
+    tvd: array_like of float
+        true vertical depth
+    northing: array_like of float
+        north-offset
+    easting: array_like of float
+        east-offset
+
+    Raises
+    ------
+    ValueError
+        If tvd, northing, or easting, are of different shapes
+        If the tvd values are not strictly increasing
+    """
+    tvd = np.asarray(tvd, dtype = np.float)
+    northing = np.asarray(northing, dtype = np.float)
+    easting = np.asarray(easting, dtype = np.float)
+
+    if not (tvd.shape == northing.shape == easting.shape):
+        raise ValueError('tvd, northing, and easting must be the same shape')
+    if not np.all(tvd[1:] > tvd[:-1]):
+        raise ValueError('tvd must have strictly increasing values')
 
     return tvd, northing, easting

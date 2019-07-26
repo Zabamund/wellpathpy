@@ -1,12 +1,11 @@
 import numpy as np
 from scipy import interpolate
 
-from .checkarrays import checkarrays, checkarrays_tvd
+from .checkarrays import checkarrays, checkarrays_tvd, checkarrays_monotonic_tvd
 
 def interpolate_deviation(md, inc, azi, md_step=1):
     """
     Interpolate a well deviation to a given step.
-    Note that the input arrays must not contain NaN values.
 
     Parameters
     ----------
@@ -23,6 +22,7 @@ def interpolate_deviation(md, inc, azi, md_step=1):
     Notes
     -----
     This function should not be used before md->tvd conversion.
+    Note that the input arrays must not contain NaN values.
 
     """
 
@@ -48,7 +48,6 @@ def interpolate_deviation(md, inc, azi, md_step=1):
 def interpolate_position(tvd, easting, northing, tvd_step=1):
     """
     Interpolate a well positional log to a given step.
-    Note that the input arrays must not contain NaN values.
 
     Parameters
     ----------
@@ -69,17 +68,21 @@ def interpolate_position(tvd, easting, northing, tvd_step=1):
     Notes
     -----
     This function should not be used before tvd->md conversion.
+    Note that the input arrays must not contain NaN values.
+    The tvd values must be strictly increasing, i.e. this
+    method will not work on horizontal wells, use
+    `interpolate_deviation` for those wells.
 
     """
-    tvd, easting, northing = checkarrays_tvd(tvd, easting, northing)
+    tvd, easting, northing = checkarrays_monotonic_tvd(tvd, easting, northing)
 
     for input_array in [tvd, northing, easting]:
         if np.isnan(input_array).any():
             raise ValueError('tvd, northing and easting cannot contain NaN values.')
 
     try:
-        new_tvd = np.arange(tvd.min(), tvd.max() + tvd_step, tvd_step)
-        new_tvd[-1] = tvd.max()
+        new_tvd = np.arange(tvd[0], tvd[-1] + tvd_step, tvd_step)
+        new_tvd[-1] = tvd[-1]
     except TypeError:
         raise TypeError('tvd_step must be int or float')
 

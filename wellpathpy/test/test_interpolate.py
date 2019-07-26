@@ -86,6 +86,18 @@ def test_inter_dev_tvd_step_throws():
                                 northing=np.array([1,2,3]),
                                 tvd_step='1')
 
+def test_inter_pos_not_monotonic_throws():
+    with pytest.raises(ValueError):
+        _ = interpolate_position(tvd=np.array([1,2,4,4,5]),
+                                easting=np.array([1,2,3,4,5]),
+                                northing=np.array([1,2,3,4,5]),
+                                tvd_step=1)
+    with pytest.raises(ValueError):
+        _ = interpolate_position(tvd=np.array([1,2,6,4,5]),
+                                easting=np.array([1,2,3,4,5]),
+                                northing=np.array([1,2,3,4,5]),
+                                tvd_step=1)
+
 def euclidean_norm(x, y):
     return np.abs(x - y)
 
@@ -110,7 +122,6 @@ def test_equivalent_deviation_curve_after_interpolation_md(well):
         assert md[-1] == well.md[-1]
         np.testing.assert_almost_equal(md[1:-1] - md[:-2], dec_step, decimal=2)
 
-
 def test_equivalent_deviation_curve_after_interpolation_inc(well):
     md, x, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
     refmd = sample_interval(md)
@@ -126,20 +137,26 @@ def test_equivalent_deviation_curve_after_interpolation_azi(well):
     np.testing.assert_allclose(reference, result, rtol = 1.5)
 
 def test_equivalent_position_curve_after_interpolation_tvd(well):
+    well.tvd = well.tvd[:-40]
+    well.easting = well.easting[:-40]
+    well.northing = well.northing[:-40]
     steps = [1,2,3,4,5]
     for step in steps:
         tvd, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=step)
         assert tvd[0] == well.tvd[0]
-        np.testing.assert_allclose(tvd[-1], well.tvd[-1], rtol=0.5)
+        assert tvd[-1] == well.tvd[-1]
         np.testing.assert_almost_equal(tvd[1:-1] - tvd[:-2], step, decimal=1)
     dec_steps = [.1,.2,.3,.4,.5]
     for dec_step in dec_steps:
         tvd, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=dec_step)
         assert tvd[0] == well.tvd[0]
-        np.testing.assert_allclose(tvd[-1], well.tvd[-1], rtol=0.5)
+        assert tvd[-1] == well.tvd[-1]
         np.testing.assert_almost_equal(tvd[1:-1] - tvd[:-2], dec_step, decimal=2)
 
 def test_equivalent_position_curve_after_interpolation_easting(well):
+    well.tvd = well.tvd[:-40]
+    well.easting = well.easting[:-40]
+    well.northing = well.northing[:-40]
     tvd, x, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
     reftvd = sample_interval(tvd)
     reference = interpolate.interp1d(well.tvd, well.easting)(reftvd)
@@ -147,6 +164,9 @@ def test_equivalent_position_curve_after_interpolation_easting(well):
     np.testing.assert_allclose(reference, result, rtol = 0.5)
 
 def test_equivalent_position_curve_after_interpolation_northing(well):
+    well.tvd = well.tvd[:-40]
+    well.easting = well.easting[:-40]
+    well.northing = well.northing[:-40]
     tvd, _, x = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
     reftvd = sample_interval(tvd)
     reference = interpolate.interp1d(well.tvd, well.northing)(reftvd)
