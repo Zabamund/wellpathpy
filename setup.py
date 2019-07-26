@@ -2,9 +2,8 @@
 
 from setuptools import setup
 
-long_description = """
-To do
-"""
+with open("README.md", "r") as f:
+    long_description = f.read()
 
 setup(name='wellpathpy',
       description='Light package to load well deviations',
