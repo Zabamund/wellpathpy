@@ -8,6 +8,9 @@
 /notebooks/DTW_test.ipynb
 /notebooks/Similarity_measures_test.ipynb
 /notebooks/Curve_comparison.ipynb
+/notebooks/Wellpathpy_proto.ipynb
+/notebooks/Tan Method - Testing.ipynb
+/notebooks/Plot well trajectories.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
