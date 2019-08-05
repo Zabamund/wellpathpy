@@ -6,7 +6,7 @@ from ..header import get_header
 # defaults
 def test_defaults():
     v = get_header()
-    expected = { 'datum': 'kb', 'units': 'm', 'elevation': 0. }
+    expected = { 'datum': 'kb', 'units': 'm', 'elevation': 0., 'surface_easting': 0., 'surface_northing': 0. }
     assert v == expected
 
 # datum
@@ -57,3 +57,31 @@ def test_elevation_nan():
 def test_elevation_throws():
     with pytest.raises(TypeError):
         _ = get_header(elevation='0.0')
+
+# surface_easting
+def test_surface_easting_float():
+    v = get_header(surface_easting=0.0)
+    expected = 0.0
+    assert v['surface_easting'] == expected
+
+def test_surface_easting_nan():
+    v = get_header(surface_easting=np.nan)
+    assert np.isnan(v['surface_easting'])
+
+def test_surface_easting_throws():
+    with pytest.raises(TypeError):
+        _ = get_header(surface_easting='0.0')
+
+# surface_northing
+def test_surface_northing_float():
+    v = get_header(surface_northing=0.0)
+    expected = 0.0
+    assert v['surface_northing'] == expected
+
+def test_surface_northing_nan():
+    v = get_header(surface_northing=np.nan)
+    assert np.isnan(v['surface_northing'])
+
+def test_surface_northing_throws():
+    with pytest.raises(TypeError):
+        _ = get_header(surface_northing='0.0')
