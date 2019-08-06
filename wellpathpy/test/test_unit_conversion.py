@@ -20,3 +20,7 @@ def test_dst_throws():
 def test_ft_m():
     result = unit_convert(1, src='ft', dst='m')
     np.testing.assert_allclose(result, 0.3048)
+
+def test_ft_m_array():
+    result = unit_convert(np.arange(0,10,1), src='ft', dst='m')
+    np.testing.assert_allclose(result, np.arange(0,10,1) * 0.3048)
