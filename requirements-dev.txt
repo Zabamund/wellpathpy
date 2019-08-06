@@ -2,3 +2,4 @@ pytest
 pandas
 numpy
 scipy
+pint
