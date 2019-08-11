@@ -23,6 +23,5 @@ def unit_convert(data, src='m', dst='m'):
     ureg = pint.UnitRegistry()
 
     data = data * ureg(src)
-    converted_data = data.to(ureg(dst))
 
-    return converted_data
+    return data.to(ureg(dst))
