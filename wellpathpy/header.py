@@ -1,55 +1,66 @@
-def get_header(datum='kb', units='m', elevation=0., surface_easting=0., surface_northing=0.):
+import json
+
+def read_header_json(fname):
     """
-    Record deviation header information needed for depth
-    reference calculation into dict.
+    Read deviation header information needed for depth
+    reference calculation from *.json file into dict.
 
     Parameters
     ----------
-    datum: str, default 'kb', {'kb', 'dfe', 'rt'}
-        'kb' (kellybushing),
+    fname: str, path to a json file with this format:
+        {
+        "datum": "kb",
+        "elevation_units": "m",
+        "elevation": 100.0,
+        "surface_coordinates_units": "m",
+        "surface_easting": 1000.0,
+        "surface_northing": 2000.0
+        }
+
+    datum: str, usually one of 'kb', 'dfe', 'rt'
+        Not used in calculation
+        'kb' (kelly bushing),
         'dfe' (drill floor elevation),
         'rt' (rotary table)
-    units: str, default 'm', {'m', 'ft'}
+    elevation_units: str, for example 'm' or 'ft'
         'm' (metres),
         'ft' (feet)
-    elevation: float, default 0.,
-        <datum> <elevation> in <units>
-        above mean sea level
-    surface_easting: float, default 0.,
-        wellhead surface location in m east of reference
+    elevation: float,
+        datum elevation in units above mean sea level
+    surface_coordinates_units: str, for example 'm', 'ft'
+        'm' (metres),
+        'ft' (feet)
+    surface_easting: float,
+        wellhead surface location in <units> east of reference
     surface_northing: float, default 0.,
-        wellhead surface location in m north of reference
+        wellhead surface location in <units> north of reference
 
     Returns
     -------
     dict
         deviation header dictionnary
     """
-
-    if datum not in {'kb', 'dfe', 'rt'}:
-        raise ValueError('datum must be kb, dfe or rt')
-
-    if units not in {'m', 'ft'}:
-        raise ValueError('units must be m or ft')
-
     try:
-        elevation = float(elevation + 0)
-    except TypeError:
-        raise TypeError('elevation must be float')
+        header = json.load(fname)
+    except TypeError: # is a file object  already
+        with open(str(fname)) as f:
+            header = json.load(f)
 
-    try:
-        surface_easting = float(surface_easting + 0)
-    except TypeError:
-        raise TypeError('surface_easting must be a float')
+    good_keys = {
+        'datum',
+        'elevation_units',
+        'elevation',
+        'surface_coordinates_units',
+        'surface_easting',
+        'surface_northing'
+    }
 
-    try:
-        surface_northing = float(surface_northing + 0)
-    except TypeError:
-        raise TypeError('surface_northing must be a float')
+    missing_keys = good_keys.difference(header.keys())
+    if missing_keys:
+        raise ValueError('missing keys: {}'.format(', '.join(missing_keys)))
 
-    return {'datum': datum,
-            'units': units,
-            'elevation': elevation,
-            'surface_easting': surface_easting,
-            'surface_northing': surface_northing,
-            }
+    numeric_values = ['elevation', 'surface_easting', 'surface_northing']
+    for num_value in numeric_values:
+        header[num_value] = float(header[num_value])
+
+    return header

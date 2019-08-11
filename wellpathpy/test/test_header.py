@@ -1,87 +1,51 @@
 import pytest
 import numpy as np
+import json
+import io
 
-from ..header import get_header
+from ..header import read_header_json
 
-# defaults
-def test_defaults():
-    v = get_header()
-    expected = { 'datum': 'kb', 'units': 'm', 'elevation': 0., 'surface_easting': 0., 'surface_northing': 0. }
-    assert v == expected
+good_keys = ['datum', 'elevation_units', 'elevation', 'surface_coordinates_units', 'surface_easting', 'surface_northing']
+good_header = {'datum': 'kb',
+               'elevation_units': 'm',
+               'elevation': 100.0,
+               'surface_coordinates_units': 'm',
+               'surface_easting': 1000.0,
+               'surface_northing': 2000.0}
 
-# datum
-def test_datum_kb():
-    v = get_header(datum='kb')
-    expected = 'kb'
-    assert v['datum'] == expected
+def test_all_keys_present():
+    # first test the good_headerd
+    output = io.StringIO()
+    json.dump(good_header, output)
+    output.seek(0) # rewind read head
+    _ = read_header_json(output)
 
-def test_datum_dfe():
-    v = get_header(datum='dfe')
-    expected = 'dfe'
-    assert v['datum'] == expected
+def test_too_many_keys():
+    header = good_header.copy()
+    header['new_key'] = 100
+    output = io.StringIO()
+    json.dump(header, output)
+    output.seek(0)
+    _ = read_header_json(output)
 
-def test_datum_rt():
-    v = get_header(datum='rt')
-    expected = 'rt'
-    assert v['datum'] == expected
+def test_keys_missing():
+    # then remove keys one by one
+    for key in good_keys:
+        header = good_header.copy()
+        header.pop(key)
+        output = io.StringIO()
+        json.dump(header, output)
+        output.seek(0) # rewind read head
+        with pytest.raises(ValueError):
+            _ = read_header_json(output)
 
-def test_wrong_datum_throws():
-    with pytest.raises(ValueError):
-        _ = get_header(datum='kdjfkjdf')
-
-# units
-def test_units_m():
-    v = get_header(units='m')
-    expected = 'm'
-    assert v['units'] == expected
-
-def test_units_ft():
-    v = get_header(units='ft')
-    expected = 'ft'
-    assert v['units'] == expected
-
-def test_units_throws():
-    with pytest.raises(ValueError):
-        _ = get_header(units='adaswesf')
-
-# elevation
-def test_elevation_float():
-    v = get_header(elevation=0.0)
-    expected = 0.0
-    assert v['elevation'] == expected
-
-def test_elevation_nan():
-    v = get_header(elevation=np.nan)
-    assert np.isnan(v['elevation'])
-
-def test_elevation_throws():
-    with pytest.raises(TypeError):
-        _ = get_header(elevation='0.0')
-
-# surface_easting
-def test_surface_easting_float():
-    v = get_header(surface_easting=0.0)
-    expected = 0.0
-    assert v['surface_easting'] == expected
-
-def test_surface_easting_nan():
-    v = get_header(surface_easting=np.nan)
-    assert np.isnan(v['surface_easting'])
-
-def test_surface_easting_throws():
-    with pytest.raises(TypeError):
-        _ = get_header(surface_easting='0.0')
-
-# surface_northing
-def test_surface_northing_float():
-    v = get_header(surface_northing=0.0)
-    expected = 0.0
-    assert v['surface_northing'] == expected
-
-def test_surface_northing_nan():
-    v = get_header(surface_northing=np.nan)
-    assert np.isnan(v['surface_northing'])
-
-def test_surface_northing_throws():
-    with pytest.raises(TypeError):
-        _ = get_header(surface_northing='0.0')
+def test_non_floats_raise():
+    numeric_values = ['elevation', 'surface_easting', 'surface_northing']
+    for num_value in numeric_values:
+        header = good_header.copy()
+        header[num_value] = 'hundred'
+        output = io.StringIO()
+        json.dump(header, output)
+        output.seek(0)
+        with pytest.raises(ValueError):
+            _ = read_header_json(output)
