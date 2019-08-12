@@ -42,7 +42,7 @@ def read_header_json(fname):
     """
     try:
         header = json.load(fname)
-    except TypeError: # is a file object  already
+    except TypeError: # is a file object already
         with open(str(fname)) as f:
             header = json.load(f)
 

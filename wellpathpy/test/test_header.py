@@ -5,19 +5,27 @@ import io
 
 from ..header import read_header_json
 
-good_keys = ['datum', 'elevation_units', 'elevation', 'surface_coordinates_units', 'surface_easting', 'surface_northing']
-good_header = {'datum': 'kb',
-               'elevation_units': 'm',
-               'elevation': 100.0,
-               'surface_coordinates_units': 'm',
-               'surface_easting': 1000.0,
-               'surface_northing': 2000.0}
+good_keys = [
+    'datum',
+    'elevation_units',
+    'elevation',
+    'surface_coordinates_units',
+    'surface_easting',
+    'surface_northing'
+    ]
+good_header = {
+    'datum': 'kb',
+    'elevation_units': 'm',
+    'elevation': 100.0,
+    'surface_coordinates_units': 'm',
+    'surface_easting': 1000.0,
+    'surface_northing': 2000.0
+    }
 
 def test_all_keys_present():
-    # first test the good_headerd
     output = io.StringIO()
     json.dump(good_header, output)
-    output.seek(0) # rewind read head
+    output.seek(0)
     _ = read_header_json(output)
 
 def test_too_many_keys():
@@ -29,13 +37,12 @@ def test_too_many_keys():
     _ = read_header_json(output)
 
 def test_keys_missing():
-    # then remove keys one by one
     for key in good_keys:
         header = good_header.copy()
         header.pop(key)
         output = io.StringIO()
         json.dump(header, output)
-        output.seek(0) # rewind read head
+        output.seek(0)
         with pytest.raises(ValueError):
             _ = read_header_json(output)
 
