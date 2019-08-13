@@ -11,6 +11,7 @@ def checkarrays(md, inc, azi):
       conversion
     - All inputs are of the same shape
     - md is strictly increasing
+    - There are no NaN values in the data
 
     Parameters
     ----------
@@ -40,6 +41,16 @@ def checkarrays(md, inc, azi):
     inc = np.asarray(inc, dtype = np.float)
     azi = np.asarray(azi, dtype = np.float)
 
+    for prop, arr in {'md': md, 'inc': inc, 'azi': azi}.items():
+        if np.isnan(arr).any():
+            raise ValueError('{} cannot contain nan values'.format(prop))
+
+    if not ((0 <= inc) & (inc <= 180)).all():
+        raise ValueError('all inc values must be in range 0-90')
+
+    if not ((0 <= azi) & (azi <= 360)).all():
+        raise ValueError('all azi values must be in range 0-360')
+
     if not (md.shape == inc.shape == azi.shape):
         raise ValueError('md, inc, and azi must be the same shape')
 
@@ -58,6 +69,7 @@ def checkarrays_tvd(tvd, northing, easting):
     - All inputs are convertible to arrays-of-floats, and perform this
       conversion
     - All inputs are of the same shape
+    - There are no NaN values in the data
 
     Parameters
     ----------
@@ -86,6 +98,10 @@ def checkarrays_tvd(tvd, northing, easting):
     northing = np.asarray(northing, dtype = np.float)
     easting = np.asarray(easting, dtype = np.float)
 
+    for prop, arr in {'tvd': tvd, 'northing': northing, 'easting': easting}.items():
+        if np.isnan(arr).any():
+            raise ValueError('{} cannot contain nan values'.format(prop))
+
     if not (tvd.shape == northing.shape == easting.shape):
         raise ValueError('tvd, northing, and easting must be the same shape')
 
@@ -102,6 +118,7 @@ def checkarrays_monotonic_tvd(tvd, northing, easting):
       conversion
     - All inputs are of the same shape
     - tvd is strictly increasing
+    - There are no NaN values in the data
 
     Parameters
     ----------
@@ -130,6 +147,10 @@ def checkarrays_monotonic_tvd(tvd, northing, easting):
     tvd = np.asarray(tvd, dtype = np.float)
     northing = np.asarray(northing, dtype = np.float)
     easting = np.asarray(easting, dtype = np.float)
+
+    for prop, arr in {'tvd': tvd, 'northing': northing, 'easting': easting}.items():
+        if np.isnan(arr).any():
+            raise ValueError('{} cannot contain nan values'.format(prop))
 
     if not (tvd.shape == northing.shape == easting.shape):
         raise ValueError('tvd, northing, and easting must be the same shape')
