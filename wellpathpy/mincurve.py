@@ -2,14 +2,14 @@ import numpy as np
 
 from .checkarrays import checkarrays
 
-def minimum_curvature(md, inc, azi):
+def minimum_curvature_inner(md, inc, azi):
     """Minimum curvature
 
     Calculate TVD, northing, easting, and dogleg, using the minimum curvature
     method.
 
-    This is the inner workhorse of the min_curve_method, and only implement the
-    pure mathematics. As a user, you should probably use the min_curve_method
+    This is the inner workhorse of the minimum_curvature, and only implement the
+    pure mathematics. As a user, you should probably use the minimum_curvature
     function.
 
     This function considers md unitless, and assumes inc and azi are in
@@ -37,7 +37,6 @@ def minimum_curvature(md, inc, azi):
     This function does not insert surface location
     """
     md, inc, azi = checkarrays(md, inc, azi)
-
 
     # extract upper and lower survey stations
     md_upper, md_lower = md[:-1], md[1:]
@@ -68,7 +67,7 @@ def minimum_curvature(md, inc, azi):
 
     return tvd, northing, easting, dogleg
 
-def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
+def minimum_curvature(md, inc, azi, md_units='m', course_length=0):
     """
     Calculate TVD using minimum curvature method.
 
@@ -102,7 +101,7 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     azi: float, well azimuth in degrees
     md_units: str, measured depth units in m or ft
         used for dogleg severity calculation
-    norm_opt: float, dogleg normalisation value,
+    course_length: float, dogleg normalisation value,
         if passed will override md_units
 
     Returns
@@ -113,7 +112,7 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
         easting in m
     Dogleg severity
         dls: dogleg severity angle in degrees per normalisation value
-            (normalisation value is deg/100ft, deg/30m or deg/<norm_opt>)
+            (normalisation value is deg/100ft, deg/30m or deg/<course_length>)
 
     Notes
     -----
@@ -124,12 +123,12 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
 
     # get units and normalising for dls
     try:
-        norm_opt + 0
+        course_length + 0
     except TypeError:
-        raise TypeError('norm_opt must be a float')
+        raise TypeError('course_length must be a float')
 
-    if norm_opt != 0:
-        norm = norm_opt
+    if course_length != 0:
+        norm = course_length
     else:
         if md_units == 'm':
             norm = 30
@@ -144,7 +143,7 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     azi = np.deg2rad(azi)
 
     md_diff = md[1:] - md[:-1]
-    tvd, northing, easting, dogleg = minimum_curvature(md, inc, azi)
+    tvd, northing, easting, dogleg = minimum_curvature_inner(md, inc, azi)
 
     tvd = np.insert(tvd, 0, 0)
     northing = np.insert(northing, 0, 0)
@@ -158,6 +157,5 @@ def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
     else:
         dls = dl * (norm / md_diff)
         dls = np.insert(dls, 0, 0)
-
 
     return tvd, northing, easting, dls
