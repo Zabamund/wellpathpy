@@ -1,5 +1,8 @@
 # README
 
+[wellpathpy/master](https://github.com/Zabamund/wellpathpy/tree/master):[![Build Status](https://travis-ci.com/Zabamund/wellpathpy.svg?branch=master)](https://travis-ci.com/Zabamund/wellpathpy)
+[wellpathpy/api_models](https://github.com/Zabamund/wellpathpy/tree/api_models):[![Build Status](https://travis-ci.com/Zabamund/wellpathpy.svg?branch=api_models)](https://travis-ci.com/Zabamund/wellpathpy)
+
 ## Contributors:
 
 - [Robert Leckenby](https://github.com/Zabamund)
@@ -40,10 +43,11 @@ From [pypi](https://pypi.org/project/wellpathpy/) with:
 - [numpy](https://numpy.org/) version 1.16.2 or greater
 - [scipy](https://www.scipy.org/) version 1.2.1 or greater
 - [pytest](https://pytest.org/) version 4.3.1 or greater
+- [pint](https://github.com/hgrecco/pint) version 0.9 or greater
 
 ## Tutorials
 
-ToDo
+Currently work-in-progress in [branch:api_models](https://github.com/Zabamund/wellpathpy/tree/api_models).
 
 ## Contributing
 
