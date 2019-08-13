@@ -2,7 +2,7 @@ import numpy as np
 
 from .checkarrays import checkarrays
 
-def rad_curve_method(md, inc, azi):
+def radius_curvature(md, inc, azi):
     """
     Calculate TVD using radius or curvature method.
     Caution: this will yield unreliable results when data are closely spaced

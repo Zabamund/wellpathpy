@@ -4,7 +4,7 @@ import numpy as np
 
 from ..tan import tan_method
 from ..mincurve import min_curve_method
-from ..rad_curv import rad_curve_method
+from ..rad_curv import radius_curvature
 from ..location import loc_to_wellhead
 
 # import test well data
@@ -98,8 +98,8 @@ def test_min_curve():
     np.testing.assert_allclose(dls10, well10_true_dls, atol=1)
 
 def test_rad_curve():
-    tvd9, mN9, mE9 = rad_curve_method(well9_true_md_m, well9_true_inc, well9_true_azi)
-    tvd10, mN10, mE10 = rad_curve_method(well10_true_md_m, well10_true_inc, well10_true_azi)
+    tvd9, mN9, mE9 = radius_curvature(well9_true_md_m, well9_true_inc, well9_true_azi)
+    tvd10, mN10, mE10 = radius_curvature(well10_true_md_m, well10_true_inc, well10_true_azi)
     tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
     tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
     np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=1)

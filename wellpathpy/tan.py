@@ -12,7 +12,7 @@ def tan_method(md, inc, azi, choice='avg'):
     """
 
     if choice == 'bal':
-        return bal_tan_method(md, inc, azi)
+        return balanced_tan(md, inc, azi)
 
     md, inc, azi = checkarrays(md, inc, azi)
 
@@ -50,7 +50,7 @@ def tan_method(md, inc, azi, choice='avg'):
 
     return tvd, northing, easting
 
-def high_tan_method(md, inc, azi):
+def high_tan(md, inc, azi):
     """
     Calculate TVD using high tangential method.
     This method takes the sines and cosines of the inclination and azimuth
@@ -86,7 +86,7 @@ def high_tan_method(md, inc, azi):
     """
     return tan_method(md, inc, azi, choice='high')
 
-def low_tan_method(md, inc, azi):
+def low_tan(md, inc, azi):
     """
     Calculate TVD using low tangential method.
     This method takes the sines and cosines of the inclination and azimuth
@@ -122,7 +122,7 @@ def low_tan_method(md, inc, azi):
     """
     return tan_method(md, inc, azi, choice='low')
 
-def ave_tan_method(md, inc, azi):
+def average_tan(md, inc, azi):
     """
     Calculate TVD using average tangential method.
     This method averages the inclination and azimuth at the top and
@@ -158,7 +158,7 @@ def ave_tan_method(md, inc, azi):
     """
     return tan_method(md, inc, azi, choice='avg')
 
-def bal_tan_method(md, inc, azi):
+def balanced_tan(md, inc, azi):
     """
     Calculate TVD using balanced tangential method.
     This method takes the sines and cosines of the inclination and azimuth
@@ -215,6 +215,7 @@ def bal_tan_method(md, inc, azi):
     northing = np.cumsum((md_lower - md_upper) * (np.sin(inc_upper) * np.cos(azi_upper)
                                                   + np.sin(inc_lower) * np.cos(azi_lower)) / 2)
     northing = np.insert(northing, 0, 0)
+
 
     easting = np.cumsum((md_lower - md_upper) * (np.sin(inc_upper) * np.sin(azi_upper)
                                                   + np.sin(inc_lower) * np.sin(azi_lower)) / 2)
