@@ -67,7 +67,7 @@ def minimum_curvature_inner(md, inc, azi):
 
     return tvd, northing, easting, dogleg
 
-def minimum_curvature(md, inc, azi, md_units='m', course_length=0):
+def minimum_curvature(md, inc, azi, course_length=30):
     """
     Calculate TVD using minimum curvature method.
 
@@ -99,8 +99,6 @@ def minimum_curvature(md, inc, azi, md_units='m', course_length=0):
     md: float, measured depth in m or ft
     inc: float, well deviation in degrees
     azi: float, well azimuth in degrees
-    md_units: str, measured depth units in m or ft
-        used for dogleg severity calculation
     course_length: float, dogleg normalisation value,
         if passed will override md_units
 
@@ -116,8 +114,14 @@ def minimum_curvature(md, inc, azi, md_units='m', course_length=0):
 
     Notes
     -----
-    Return units are in metres, regardless of input.
-    The user must convert to feet if required.
+    course_length is set to 30 by default, assuming that md units are in meters.
+    The user must change course_length if md units are feet.
+    Typical values are:
+    m: course_length = 30
+    ft: course_length = 100
+
+    Other values can be passed, but they are non-standard and therefore not
+    explicitely supported.
 
     """
 
@@ -126,17 +130,6 @@ def minimum_curvature(md, inc, azi, md_units='m', course_length=0):
         course_length + 0
     except TypeError:
         raise TypeError('course_length must be a float')
-
-    if course_length != 0:
-        norm = course_length
-    else:
-        if md_units == 'm':
-            norm = 30
-        elif md_units == 'ft':
-            norm = 100
-            md *= 0.3048
-        else:
-            raise ValueError('md_units must be either m or ft')
 
     md, inc, azi = checkarrays(md, inc, azi)
     inc = np.deg2rad(inc)
@@ -149,13 +142,8 @@ def minimum_curvature(md, inc, azi, md_units='m', course_length=0):
     northing = np.insert(northing, 0, 0)
     easting = np.insert(easting, 0, 0)
 
-    # calculate dogleg severity, change md units if dls in ft is passed in
     dl = np.rad2deg(dogleg)
-    if md_units == 'ft':
-        dls = dl * (norm / (md[1:]/0.3048 - md[:-1]/0.3048))
-        dls = np.insert(dls, 0, 0)
-    else:
-        dls = dl * (norm / md_diff)
-        dls = np.insert(dls, 0, 0)
+    dls = dl * (course_length / md_diff)
+    dls = np.insert(dls, 0, 0)
 
     return tvd, northing, easting, dls

@@ -27,9 +27,9 @@ def test_increasing_md_throws():
         _ = minimum_curvature(md=[1,1,3], inc=[1,2,3], azi=[1,2,3])
 
 # get units for dls
-def test_wrong_units_throws():
-    with pytest.raises(ValueError):
-        _ = minimum_curvature(md=[1,2,3], inc=[1,2,3], azi=[1,2,3], md_units='feet')
+# def test_wrong_units_throws():
+#     with pytest.raises(ValueError):
+#         _ = minimum_curvature(md=[1,2,3], inc=[1,2,3], azi=[1,2,3], md_units='feet')
 
 # get normalising for dls
 def test_bad_normalising_throws():
