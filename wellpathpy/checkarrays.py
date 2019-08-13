@@ -36,6 +36,7 @@ def checkarrays(md, inc, azi):
     ValueError
         If md, inc, or azi, are of different shapes
         If the md values are not strictly increasing
+        If NaN values are included in md, inc or azi
     """
     md = np.asarray(md, dtype = np.float)
     inc = np.asarray(inc, dtype = np.float)
@@ -93,6 +94,7 @@ def checkarrays_tvd(tvd, northing, easting):
     ------
     ValueError
         If tvd, northing, or easting, are of different shapes
+        If NaN values are included in tvd, easting or northing
     """
     tvd = np.asarray(tvd, dtype = np.float)
     northing = np.asarray(northing, dtype = np.float)
@@ -143,6 +145,7 @@ def checkarrays_monotonic_tvd(tvd, northing, easting):
     ValueError
         If tvd, northing, or easting, are of different shapes
         If the tvd values are not strictly increasing
+        If NaN values are included in tvd, easting or northing
     """
     tvd = np.asarray(tvd, dtype = np.float)
     northing = np.asarray(northing, dtype = np.float)
