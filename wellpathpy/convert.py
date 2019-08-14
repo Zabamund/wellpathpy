@@ -1,7 +1,7 @@
 import numpy as np
 import pint
 
-def unit_convert(data, src='m', dst='m'):
+def unit_convert(data, src='m', dst='m', ureg=None):
     """
     Converts data from src units to dst units using pint
 
@@ -13,15 +13,27 @@ def unit_convert(data, src='m', dst='m'):
         the source unit: any units in `dir(pint.UnitRegistry())`
     dst: str
         the destination unit: any units in `dir(pint.UnitRegistry())`
+    ureg: an instance of pint.UnitRegistry(). If none is passed, the
+        default unit registry will be used.
+
+    Examples
+    --------
+    Convert units with a custom registry:
+
+    >>> import pint
+    >>> ureg = pint.UnitRegistry()
+    >>> ureg.define('ell = 0.6275 * meter = ell')
+    >>> result = unit_convert(data, src='ell', dst='m', ureg=ureg)
 
     Returns
     -------
     data: float or np.ndarray
         the data converted from src to dst
-
     """
-    ureg = pint.UnitRegistry()
+
+    if ureg is None:
+        ureg = pint.UnitRegistry()
 
     data = data * ureg(src)
 
-    return data.to(ureg(dst))
+    return data.to(ureg(dst)).magnitude
