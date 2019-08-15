@@ -9,8 +9,7 @@ def deviation_to_csv(fname, md, inc, azi):
     Parameters
     ----------
     fname: str or file handle
-        File path or object the CSV will be written to.
-
+        file path or object the CSV will be written to.
     md: array-like,
         measured depth, unit unaware
     inc: array-like,
@@ -50,8 +49,8 @@ def position_to_csv(fname, depth, northing, easting):
 
     Parameters
     ----------
-    fname: str, filename to write the CSV file
-
+    fname: str or file handle
+        file path or object the CSV will be written to.
     depth: array-like,
         true vertical depth (tvd) or
         true vertical depth subsea (tvdss),
