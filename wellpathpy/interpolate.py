@@ -3,9 +3,9 @@ from scipy import interpolate
 
 from .checkarrays import checkarrays, checkarrays_tvd, checkarrays_monotonic_tvd
 
-def interpolate_deviation(md, inc, azi, md_step=1):
+def resample_deviation(md, inc, azi, md_step=1):
     """
-    Interpolate a well deviation to a given step.
+    Resample a well deviation to a given step.
 
     Parameters
     ----------
@@ -16,7 +16,7 @@ def interpolate_deviation(md, inc, azi, md_step=1):
 
     Returns
     -------
-    Deviation intepolated to new md_step:
+    Deviation resampled to new md_step:
         md, inc, azi
 
     Notes
@@ -45,9 +45,9 @@ def interpolate_deviation(md, inc, azi, md_step=1):
 
     return new_md, new_inc, new_azi
 
-def interpolate_position(tvd, easting, northing, tvd_step=1):
+def resample_position(tvd, easting, northing, tvd_step=1):
     """
-    Interpolate a well positional log to a given step.
+    Resample a well positional log to a given step.
 
     Parameters
     ----------
@@ -58,11 +58,11 @@ def interpolate_position(tvd, easting, northing, tvd_step=1):
     easting: float, east-offset from zero reference point
         the units should be the same as the input deviation
         or the results will be wrong
-    tvd_step: int or float, tvd increment to interpolate to
+    tvd_step: int or float, tvd increment to resample to
 
     Returns
     -------
-    Deviation intepolated to new step:
+    Deviation resampled to new step:
         tvd, easting, northing
 
     Notes
@@ -71,7 +71,7 @@ def interpolate_position(tvd, easting, northing, tvd_step=1):
     Note that the input arrays must not contain NaN values.
     The tvd values must be strictly increasing, i.e. this
     method will not work on horizontal wells, use
-    `interpolate_deviation` for those wells.
+    `resample_deviation` for those wells.
 
     """
     tvd, easting, northing = checkarrays_monotonic_tvd(tvd, easting, northing)
