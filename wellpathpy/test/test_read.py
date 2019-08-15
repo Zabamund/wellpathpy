@@ -57,7 +57,7 @@ def test_missing_cols_raise():
             _ = read_csv(data)
 
 def test_inc_in_range_raise():
-    # should fail if inc values not within 0-90
+    # should fail if inc values not within 0-180
     inc_low = good_data.replace(',11,', ',-11,')
     data = io.StringIO(inc_low)
     with pytest.raises(ValueError):
