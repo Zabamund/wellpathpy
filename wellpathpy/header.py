@@ -7,6 +7,7 @@ def read_header_json(fname):
 
     Parameters
     ----------
+
     fname: str, path to a json file with this format:
         {
         "datum": "kb",
