@@ -41,11 +41,6 @@ def radius_curvature(md, inc, azi):
         northing in m or feet,
         easting in m or feet
 
-    ToDo
-    ----
-    Implement surface location
-        replace `np.insert([tvd, northing, easting], 0, 0)` with
-        `np.insert([tvd, northing, easting], 0, <surface location>)`
     """
     md, inc, azi = checkarrays(md, inc, azi)
 
@@ -61,10 +56,6 @@ def radius_curvature(md, inc, azi):
     # fix for delta_inc or delta_azi is zero
     delta_inc = np.where(incl_lower - incl_upper == 0., 0.000001, incl_lower - incl_upper)
     delta_azi = np.where(azi_lower - azi_upper == 0., 0.000001, azi_lower - azi_upper)
-
-    #1: North = SUM (MD2 - MD1) * (Cos WD1 - Cos WD2) * (Sin HAZ2 - Sin HAZ1) / ((WD2 - WD1) * (HAZ2 - HAZ1))
-    #2: East = SUM (MD2 - MD1) * (Cos WD1 - Cos WD2) * (Cos HAZ1 - Cos HAZ2) / ((WD2 - WD1) * (HAZ2 - HAZ1)}
-    #3: TVD = SUM (MD2 - MD1) * (Sin WD2 - Sin WD1) / (WD2 - WD1)
 
     northing = np.cumsum((md_lower - md_upper) * (np.cos(incl_upper) - np.cos(incl_lower)) * (np.sin(azi_lower) - np.sin(azi_upper)) / (delta_inc * delta_azi))
     northing = np.insert(northing, 0, 0)
