@@ -4,11 +4,21 @@ from .checkarrays import checkarrays
 
 def tan_method(md, inc, azi, choice='avg'):
     """
-    ToDo
-    ----
-    Implement surface location
-        replace `np.insert([tvd, northing, easting], 0, 0)` with
-        `np.insert([tvd, northing, easting], 0, <surface location>)`
+    Calculate TVD using one of the tangential method.
+
+    Parameters
+    ----------
+    md: float, measured depth in m or ft
+    inc: float, well deviation in degrees
+    azi: float, well azimuth in degrees
+    choice: str, choice of tangential method to run
+
+    Returns
+    -------
+    Deviation converted to TVD, easting, northing
+        tvd,
+        northing,
+        easting
     """
 
     if choice == 'bal':
@@ -195,11 +205,6 @@ def balanced_tan(md, inc, azi):
         northing in m or feet,
         easting in m or feet
 
-    ToDo
-    ----
-    Implement surface location
-        replace `np.insert([tvd, northing, easting], 0, 0)` with
-        `np.insert([tvd, northing, easting], 0, <surface location>)`
     """
     md, inc, azi = checkarrays(md, inc, azi)
 
