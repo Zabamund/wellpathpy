@@ -11,7 +11,6 @@ Welcome to wellpathpy's documentation!
    :caption: Contents:
 
    tutorial
-
    api
 
 Indices and tables
