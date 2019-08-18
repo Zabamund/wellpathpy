@@ -91,4 +91,4 @@ def resample_position(tvd, easting, northing, tvd_step=1):
     f_northing = interpolate.interp1d(tvd, northing)
     new_northing = f_northing(new_tvd)
 
-    return new_tvd, new_easting, new_northing
+    return new_tvd, new_northing, new_easting
