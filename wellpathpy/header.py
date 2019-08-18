@@ -27,30 +27,26 @@ def read_header_json(fname):
     required keys: datum, elevation_units, elevation, surface_coordinates_units, surface_easting, surface_northing
 
     datum : str
-        kb, dfe or rt
+        kb, dfe or rt. datum is not used in calculation
 
     elevation_units : str
+        datum elevation units
 
     elevation : float
         datum elevation in elevation_units above mean sea level
 
     surface_coordinates_units : str
+        surface coordinate units of wellhead
 
     surface_easting : float
-        wellhead surface location in surface_coordinates_units
-        east of reference
+        wellhead surface location in surface_coordinates_units east of reference
 
     surface_northing : float, optional
-        wellhead surface location in surface_coordinates_units
-        north of reference
-
-    datum is not used in calculation
+        wellhead surface location in surface_coordinates_units north of reference
 
     Glossary
     --------
-    kb (kelly bushing),
-    dfe (drill floor elevation),
-    rt (rotary table)
+    kb (kelly bushing), dfe (drill floor elevation), rt (rotary table)
 
     Returns
     -------
