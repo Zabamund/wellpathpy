@@ -1,40 +1,47 @@
 import json
 
 def read_header_json(fname):
-    """
-    Read deviation header information needed for depth
-    reference calculation from *.json file into dict.
+    """Read deviation header
+
+    The deviation header information is needed for surface
+    location and tvdss calculation.
+    This function loads data from a *.json file into a dict.
 
     Parameters
     ----------
-
-    fname: str, path to a json file with this format:
-        {
-        "datum": "kb",
+    fname: str,
+        path to a json file
+        the json file should have the following format:
+        {"datum": "kb",
         "elevation_units": "m",
         "elevation": 100.0,
         "surface_coordinates_units": "m",
         "surface_easting": 1000.0,
-        "surface_northing": 2000.0
-        }
+        "surface_northing": 2000.0}
 
-    datum: str, usually one of 'kb', 'dfe', 'rt'
-        Not used in calculation
-        'kb' (kelly bushing),
-        'dfe' (drill floor elevation),
-        'rt' (rotary table)
-    elevation_units: str, for example 'm' or 'ft'
-        'm' (metres),
-        'ft' (feet)
-    elevation: float,
+    datum: str
+        usually one of kb, dfe, rt
+    elevation_units: str
+        for example m or ft
+    elevation: float
         datum elevation in units above mean sea level
-    surface_coordinates_units: str, for example 'm', 'ft'
-        'm' (metres),
-        'ft' (feet)
-    surface_easting: float,
+    surface_coordinates_units: str
+        for example m, ft
+    surface_easting: float
         wellhead surface location in <units> east of reference
-    surface_northing: float, default 0.,
+    surface_northing: float, optional
         wellhead surface location in <units> north of reference
+
+    Notes
+    -----
+    Datum is not used in calculation
+    Abbreviations used:
+        kb (kelly bushing)
+        dfe (drill floor elevation)
+        rt (rotary table)
+        m (metres)
+        ft (feet)
+
 
     Returns
     -------
