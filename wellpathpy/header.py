@@ -5,7 +5,7 @@ def read_header_json(fname):
 
     The deviation header information is needed for surface
     location and tvdss calculation.
-    This function loads data from a *.json file into a dict.
+    This function loads data from a json file into a dict.
 
     Parameters
     ----------
@@ -26,32 +26,30 @@ def read_header_json(fname):
     -----
     json file keys are:
 
-    datum: str
-        usually one of kb, dfe, rt
-    elevation_units: str
-        for example m or ft
-    elevation: float
-        datum elevation in units above mean sea level
-    surface_coordinates_units: str
-        for example m, ft
-    surface_easting: float
-        wellhead surface location in <units> east of reference
-    surface_northing: float, optional
-        wellhead surface location in <units> north of reference
+    datum : str
+        kb, dfe or rt
+    elevation_units : str
+    elevation : float
+        datum elevation in elevation_units above mean sea level
+    surface_coordinates_units : str
+    surface_easting : float
+        wellhead surface location in surface_coordinates_units
+        east of reference
+    surface_northing : float, optional
+        wellhead surface location in surface_coordinates_units
+        north of reference
 
     datum is not used in calculation
 
-    Abbreviations used:
+    Glossary
+    --------
     kb (kelly bushing),
     dfe (drill floor elevation),
-    rt (rotary table),
-    m (metres),
-    ft (feet)
+    rt (rotary table)
 
     Returns
     -------
-    dict
-        deviation header dictionnary
+    header : dict
     """
     try:
         header = json.load(fname)
