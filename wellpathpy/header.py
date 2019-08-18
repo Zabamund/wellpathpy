@@ -9,7 +9,7 @@ def read_header_json(fname):
 
     Parameters
     ----------
-    fname: str
+    fname : str
         path to a json file
         the json file should have the following format:
 
