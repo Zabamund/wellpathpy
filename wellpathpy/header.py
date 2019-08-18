@@ -22,6 +22,10 @@ def read_header_json(fname):
         "surface_northing": 2000.0
         }
 
+    Notes
+    -----
+    json file keys are:
+
     datum: str
         usually one of kb, dfe, rt
     elevation_units: str
@@ -35,16 +39,15 @@ def read_header_json(fname):
     surface_northing: float, optional
         wellhead surface location in <units> north of reference
 
-    Notes
-    -----
-    Datum is not used in calculation
+
+    datum is not used in calculation
+
     Abbreviations used:
         kb (kelly bushing)
         dfe (drill floor elevation)
         rt (rotary table)
         m (metres)
         ft (feet)
-
 
     Returns
     -------
