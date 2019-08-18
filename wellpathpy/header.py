@@ -15,7 +15,7 @@ def read_header_json(fname):
     Notes
     -----
     required keys: elevation_units, elevation, surface_coordinates_units, surface_easting, surface_northing
-    
+
     optional key: datum
 
     datum : str
@@ -35,7 +35,7 @@ def read_header_json(fname):
     surface_easting : float
         wellhead surface location in surface_coordinates_units east of reference
 
-    surface_northing : float, optional
+    surface_northing : float
         wellhead surface location in surface_coordinates_units north of reference
 
     Returns
