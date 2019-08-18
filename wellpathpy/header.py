@@ -23,7 +23,7 @@ def read_header_json(fname):
 
     Notes
     -----
-    required keys: datum, elevation_units, elevation, surface_coordinates_units, surface_easting, surface_northing
+    required keys: elevation_units, elevation, surface_coordinates_units, surface_easting, surface_northing
 
     datum : str
         kb, dfe or rt. datum is not used in calculation
