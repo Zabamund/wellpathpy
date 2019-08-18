@@ -10,8 +10,7 @@ def read_header_json(fname):
     Parameters
     ----------
     fname : str
-        path to a json file
-        the json file should have the following format:
+        path to a json file with the following format:
 
         {
         "datum": "kb",
@@ -28,7 +27,7 @@ def read_header_json(fname):
 
     datum : str
         kb, dfe or rt. datum is not used in calculation
-        
+
         kb (kelly bushing), dfe (drill floor elevation), rt (rotary table)
 
     elevation_units : str
