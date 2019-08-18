@@ -4,7 +4,7 @@ def read_header_json(fname):
     """Read deviation header
 
     The deviation header information is needed for surface
-    location and tvdss calculation.
+    location and true vertical depth subsea calculations.
     This function loads data from a json file into a dict.
 
     Parameters
