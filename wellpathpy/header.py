@@ -10,20 +10,13 @@ def read_header_json(fname):
     Parameters
     ----------
     fname : str
-        path to a json file with the following format:
-
-        {
-        "datum": "kb",
-        "elevation_units": "m",
-        "elevation": 100.0,
-        "surface_coordinates_units": "m",
-        "surface_easting": 1000.0,
-        "surface_northing": 2000.0
-        }
+        json object or path to a json file
 
     Notes
     -----
     required keys: elevation_units, elevation, surface_coordinates_units, surface_easting, surface_northing
+    
+    optional key: datum
 
     datum : str
         kb, dfe or rt. datum is not used in calculation
