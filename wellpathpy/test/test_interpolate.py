@@ -157,7 +157,7 @@ def test_equivalent_position_curve_after_interpolation_easting(well):
     well.tvd = well.tvd[:-40]
     well.easting = well.easting[:-40]
     well.northing = well.northing[:-40]
-    tvd, x, _ = resample_position(well.tvd, well.easting, well.northing, tvd_step=1)
+    tvd, _, x = resample_position(well.tvd, well.easting, well.northing, tvd_step=1)
     reftvd = sample_interval(tvd)
     reference = interpolate.interp1d(well.tvd, well.easting)(reftvd)
     result = interpolate.interp1d(tvd, x)(reftvd)
@@ -167,7 +167,7 @@ def test_equivalent_position_curve_after_interpolation_northing(well):
     well.tvd = well.tvd[:-40]
     well.easting = well.easting[:-40]
     well.northing = well.northing[:-40]
-    tvd, _, x = resample_position(well.tvd, well.easting, well.northing, tvd_step=1)
+    tvd, x, _ = resample_position(well.tvd, well.easting, well.northing, tvd_step=1)
     reftvd = sample_interval(tvd)
     reference = interpolate.interp1d(well.tvd, well.northing)(reftvd)
     result = interpolate.interp1d(tvd, x)(reftvd)
