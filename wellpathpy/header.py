@@ -9,15 +9,18 @@ def read_header_json(fname):
 
     Parameters
     ----------
-    fname: str,
+    fname: str
         path to a json file
         the json file should have the following format:
-        {"datum": "kb",
+
+        {
+        "datum": "kb",
         "elevation_units": "m",
         "elevation": 100.0,
         "surface_coordinates_units": "m",
         "surface_easting": 1000.0,
-        "surface_northing": 2000.0}
+        "surface_northing": 2000.0
+        }
 
     datum: str
         usually one of kb, dfe, rt
