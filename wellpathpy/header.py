@@ -28,8 +28,9 @@ def read_header_json(fname):
 
     datum : str
         kb, dfe or rt. datum is not used in calculation
-        kb (kelly bushing), dfe (drill floor elevation), rt (rotary table)
         
+        kb (kelly bushing), dfe (drill floor elevation), rt (rotary table)
+
     elevation_units : str
         datum elevation units
 
