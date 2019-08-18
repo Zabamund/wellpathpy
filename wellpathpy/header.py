@@ -24,17 +24,22 @@ def read_header_json(fname):
 
     Notes
     -----
-    json file keys are:
+    required keys: datum, elevation_units, elevation, surface_coordinates_units, surface_easting, surface_northing
 
     datum : str
         kb, dfe or rt
+
     elevation_units : str
+
     elevation : float
         datum elevation in elevation_units above mean sea level
+
     surface_coordinates_units : str
+
     surface_easting : float
         wellhead surface location in surface_coordinates_units
         east of reference
+
     surface_northing : float, optional
         wellhead surface location in surface_coordinates_units
         north of reference
