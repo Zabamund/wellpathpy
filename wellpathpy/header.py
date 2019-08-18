@@ -9,7 +9,6 @@ def read_header_json(fname):
 
     Parameters
     ----------
-    
     fname: str
         path to a json file
         the json file should have the following format:
@@ -40,15 +39,14 @@ def read_header_json(fname):
     surface_northing: float, optional
         wellhead surface location in <units> north of reference
 
-
     datum is not used in calculation
 
     Abbreviations used:
-        kb (kelly bushing)
-        dfe (drill floor elevation)
-        rt (rotary table)
-        m (metres)
-        ft (feet)
+    kb (kelly bushing),
+    dfe (drill floor elevation),
+    rt (rotary table),
+    m (metres),
+    ft (feet)
 
     Returns
     -------
