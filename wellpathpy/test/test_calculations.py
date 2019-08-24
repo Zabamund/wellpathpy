@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 from ..tan import tan_method
-from ..mincurve import min_curve_method
+from ..mincurve import minimum_curvature
 from ..rad_curv import rad_curve_method
 from ..location import loc_to_wellhead
 
@@ -84,8 +84,8 @@ def test_bal_tan():
     np.testing.assert_allclose(mN10, well10_true_northing, atol=10)
 
 def test_min_curve():
-    tvd9, mN9, mE9, dls9 = min_curve_method(well9_true_md_m, well9_true_inc, well9_true_azi, md_units='m')
-    tvd10, mN10, mE10, dls10 = min_curve_method(well10_true_md_m, well10_true_inc, well10_true_azi, md_units='m')
+    tvd9, mN9, mE9, dls9 = minimum_curvature(well9_true_md_m, well9_true_inc, well9_true_azi)
+    tvd10, mN10, mE10, dls10 = minimum_curvature(well10_true_md_m, well10_true_inc, well10_true_azi)
     tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
     tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
     np.testing.assert_allclose(tvd9, well9_true_tvd_m)
