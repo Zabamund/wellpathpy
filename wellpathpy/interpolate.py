@@ -2,48 +2,7 @@ import numpy as np
 from scipy import interpolate
 
 from .checkarrays import checkarrays, checkarrays_tvd, checkarrays_monotonic_tvd
-
-def resample_deviation(md, inc, azi, md_step=1):
-    """
-    Resample a well deviation to a given step.
-
-    Parameters
-    ----------
-    md: float, measured depth (units not defined)
-    inc: float, well inclination in degrees from vertical
-    azi: float, well azimuth in degrees from North
-    md_step: int or float, md increment to interpolate to
-
-    Returns
-    -------
-    Deviation resampled to new md_step:
-        md, inc, azi
-
-    Notes
-    -----
-    This function should not be used before md->tvd conversion.
-    Note that the input arrays must not contain NaN values.
-
-    """
-
-    md, inc, azi = checkarrays(md, inc, azi)
-
-    for input_array in [md, inc, azi]:
-        if np.isnan(input_array).any():
-            raise ValueError('md, inc and azi cannot contain NaN values.')
-
-    try:
-        new_md = np.arange(md.min(), md.max() + md_step, md_step)
-        new_md[-1] = md.max()
-    except TypeError:
-        raise TypeError('md_step must be int or float')
-
-    f_inc = interpolate.interp1d(md, inc)
-    new_inc = f_inc(new_md)
-    f_azi = interpolate.interp1d(md, azi)
-    new_azi = f_azi(new_md)
-
-    return new_md, new_inc, new_azi
+from .arc2chord import toUnitDir, toSpherical
 
 def resample_position(tvd, easting, northing, tvd_step=1):
     """
@@ -51,7 +10,7 @@ def resample_position(tvd, easting, northing, tvd_step=1):
 
     Parameters
     ----------
-    tvd: float, true verical depth (units not defined)
+    tvd: float, true vertical depth (units not defined)
     northing: float, north-offset from zero reference point
         the units should be the same as the input deviation
         or the results will be wrong
@@ -92,3 +51,54 @@ def resample_position(tvd, easting, northing, tvd_step=1):
     new_northing = f_northing(new_tvd)
 
     return new_tvd, new_northing, new_easting
+
+def resample_balanced_tangential(md, inc, azi, md_step=1):
+    """
+    Resample a wellbore path developed using a balanced tangential model to a given depth step.
+
+    Parameters
+    ----------
+    md: float, measured depth (units not defined)
+    inc: float, well inclination in degrees from vertical
+    azi: float, well azimuth in degrees from North
+    md_step: int or float, md increment to interpolate to
+
+    Returns
+    -------
+    Deviation resampled to new md_step:
+        md, inc, azi, tvd, easting, northing
+    """
+
+    md, inc, azi = checkarrays(md, inc, azi)
+
+    for input_array in [md, inc, azi]:
+        if np.isnan(input_array).any():
+            raise ValueError('md, inc and azi cannot contain NaN values.')
+    
+    try:
+        new_md = np.arange(md.min(), md.max() + md_step, md_step)
+        new_md[-1] = md.max()
+    except TypeError:
+        raise TypeError('md_step must be int or float')
+    
+    half_lens = (md[1:] - md[:-1]) / 2.0 # get the half the course length between survey stations
+    half_mds = np.cumsum(np.repeat(half_lens, 2)) # now repeat every other one to recover total wellbore length
+    tangents = toUnitDir(inc, azi) # the unit tangent directions of the wellbore at the survey station
+
+    idx = np.repeat(np.arange(len(tangents)), 2) # [0,1,2] => [0,0,1,1,2,2] - index of tangents including half course positions
+    bt_half_rela_pos = half_lens[idx[:-2]] * tangents[idx[1:-1]] # the relative positions including half positions
+    bt_half_pos_log = np.cumsum(bt_half_rela_pos, axis=0) # sum the relative postions to absolute
+
+    # interpolate each axis seperately
+    f_northing = interpolate.interp1d(half_mds, bt_half_pos_log[:,0])
+    new_northing = f_northing(new_md)
+    f_easting = interpolate.interp1d(half_mds, bt_half_pos_log[:,1])
+    new_easting = f_easting(new_md)
+    f_vertical = interpolate.interp1d(half_mds, bt_half_pos_log[:,2])
+    new_vertical = f_vertical(new_md)
+
+    t_idx = (np.searchsorted(half_mds, new_md) - 1) # find the indexes of the tangents for each half course
+    t_idx[0] = 0 # fixup the first one; it is always 0
+    new_inc, new_azi = toSpherical((tangents[idx])[t_idx]) # recover the inc and azi at each new_md
+
+    return new_md, new_inc, new_azi, new_vertical, new_northing, new_easting
