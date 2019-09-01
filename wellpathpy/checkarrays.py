@@ -47,10 +47,10 @@ def checkarrays(md, inc, azi):
             raise ValueError('{} cannot contain nan values'.format(prop))
 
     if not ((0 <= inc) & (inc < 180)).all():
-        raise ValueError('all inc values must be in range 0-90')
+        raise ValueError('all inc values must be in range 0 to LT 90')
 
     if not ((0 <= azi) & (azi < 360)).all():
-        raise ValueError('all azi values must be in range 0-360')
+        raise ValueError('all azi values must be in range 0 to LT 360')
 
     if not (md.shape == inc.shape == azi.shape):
         raise ValueError('md, inc, and azi must be the same shape')
