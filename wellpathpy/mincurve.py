@@ -55,14 +55,14 @@ def minimum_curvature_inner(md, inc, azi):
     md_diff = md_lower - md_upper
 
     upper = np.sin(inc_upper) * np.cos(azi_upper)
-    lower = np.sin(inc_lower) * np.cos(azi_lower) * rf
-    northing = np.cumsum(md_diff / 2 * (upper + lower))
+    lower = np.sin(inc_lower) * np.cos(azi_lower)
+    northing = np.cumsum((md_diff / 2) * (upper + lower) * rf)
 
     upper = np.sin(inc_upper) * np.sin(azi_upper)
-    lower = np.sin(inc_lower) * np.sin(azi_lower) * rf
-    easting = np.cumsum(md_diff / 2 * (upper + lower))
+    lower = np.sin(inc_lower) * np.sin(azi_lower)
+    easting = np.cumsum((md_diff / 2) * (upper + lower) * rf)
 
-    tvd = np.cumsum(md_diff / 2 * (np.cos(inc_upper) + np.cos(inc_lower)) * rf)
+    tvd = np.cumsum((md_diff / 2) * (np.cos(inc_upper) + np.cos(inc_lower)) * rf)
 
     return tvd, northing, easting, dogleg
 
