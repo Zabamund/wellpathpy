@@ -3,27 +3,31 @@ from scipy import interpolate
 
 from .checkarrays import checkarrays, checkarrays_tvd, checkarrays_monotonic_tvd
 
-def interpolate_deviation(md, inc, azi, md_step=1):
-    """
-    Interpolate a well deviation to a given step.
+def resample_deviation(md, inc, azi, md_step=1):
+    """Resample a well deviation to a given step.
 
     Parameters
     ----------
-    md: float, measured depth (units not defined)
-    inc: float, well inclination in degrees from vertical
-    azi: float, well azimuth in degrees from North
-    md_step: int or float, md increment to interpolate to
-
-    Returns
-    -------
-    Deviation intepolated to new md_step:
-        md, inc, azi
+    md : float
+        measured depth
+    inc : float
+        well inclination in degrees from vertical
+    azi : float
+        well azimuth in degrees from North
+    md_step : int or float
+        md increment to interpolate to
 
     Notes
     -----
     This function should not be used before md->tvd conversion.
-    Note that the input arrays must not contain NaN values.
+    
+    The input arrays must not contain NaN values.
 
+    Returns
+    -------
+    md : array_like of float
+    inc : array_like of float
+    azi : array_like of float
     """
 
     md, inc, azi = checkarrays(md, inc, azi)
@@ -45,34 +49,39 @@ def interpolate_deviation(md, inc, azi, md_step=1):
 
     return new_md, new_inc, new_azi
 
-def interpolate_position(tvd, easting, northing, tvd_step=1):
+def resample_position(tvd, easting, northing, tvd_step=1):
     """
-    Interpolate a well positional log to a given step.
+    Resample a well positional log to a given step.
 
     Parameters
     ----------
-    tvd: float, true verical depth (units not defined)
-    northing: float, north-offset from zero reference point
-        the units should be the same as the input deviation
-        or the results will be wrong
-    easting: float, east-offset from zero reference point
-        the units should be the same as the input deviation
-        or the results will be wrong
-    tvd_step: int or float, tvd increment to interpolate to
-
-    Returns
-    -------
-    Deviation intepolated to new step:
-        tvd, easting, northing
+    tvd : float
+        true verical depth
+    northing : float
+        north-offset from zero reference point
+    easting : float
+        east-offset from zero reference point
+    tvd_step : int or float
+        tvd increment to resample to
 
     Notes
     -----
     This function should not be used before tvd->md conversion.
-    Note that the input arrays must not contain NaN values.
+
+    The input arrays must not contain NaN values.
+
     The tvd values must be strictly increasing, i.e. this
     method will not work on horizontal wells, use
-    `interpolate_deviation` for those wells.
+    `resample_deviation` for those wells.
 
+    The units should be the same as the input deviation or the results will be wrong.
+
+    Returns
+    -------
+    tvd : array_like of float
+        true vertical depth
+    northing : array_like of float
+    easting : array_like of float
     """
     tvd, easting, northing = checkarrays_monotonic_tvd(tvd, easting, northing)
 
@@ -91,4 +100,4 @@ def interpolate_position(tvd, easting, northing, tvd_step=1):
     f_northing = interpolate.interp1d(tvd, northing)
     new_northing = f_northing(new_tvd)
 
-    return new_tvd, new_easting, new_northing
+    return new_tvd, new_northing, new_easting
