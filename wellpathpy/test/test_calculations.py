@@ -4,7 +4,7 @@ import numpy as np
 
 from ..tan import tan_method
 from ..mincurve import minimum_curvature
-from ..rad_curv import rad_curve_method
+from ..rad_curv import radius_curvature
 from ..location import loc_to_wellhead
 
 # import test well data
