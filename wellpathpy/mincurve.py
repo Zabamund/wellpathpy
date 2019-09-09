@@ -2,18 +2,15 @@ import numpy as np
 
 from .checkarrays import checkarrays
 
-def minimum_curvature(md, inc, azi):
-    """Minimum curvature
-
-    Calculate TVD, northing, easting, and dogleg, using the minimum curvature
+def minimum_curvature_inner(md, inc, azi):
+    """Calculate TVD, northing, easting, and dogleg, using the minimum curvature
     method.
 
-    This is the inner workhorse of the min_curve_method, and only implement the
-    pure mathematics. As a user, you should probably use the min_curve_method
+    This is the inner workhorse of the minimum_curvature, and only implement the
+    pure mathematics. As a user, you should probably use the minimum_curvature
     function.
 
-    This function considers md unitless, and assumes inc and azi are in
-    radians.
+    This function considers md unitless, and assumes inc and azi are in radians.
 
     Parameters
     ----------
@@ -27,17 +24,12 @@ def minimum_curvature(md, inc, azi):
     Returns
     -------
     tvd : array_like of float
-        true vertical depth
     northing : array_like of float
     easting : array_like of float
     dogleg : array_like of float
 
-    Notes
-    -----
-    This function does not insert surface location
     """
     md, inc, azi = checkarrays(md, inc, azi)
-
 
     # extract upper and lower survey stations
     md_upper, md_lower = md[:-1], md[1:]
@@ -57,107 +49,114 @@ def minimum_curvature(md, inc, azi):
     md_diff = md_lower - md_upper
 
     upper = np.sin(inc_upper) * np.cos(azi_upper)
-    lower = np.sin(inc_lower) * np.cos(azi_lower) * rf
-    northing = np.cumsum(md_diff / 2 * (upper + lower))
+    lower = np.sin(inc_lower) * np.cos(azi_lower)
+    northing = np.cumsum((md_diff / 2) * (upper + lower) * rf)
 
     upper = np.sin(inc_upper) * np.sin(azi_upper)
-    lower = np.sin(inc_lower) * np.sin(azi_lower) * rf
-    easting = np.cumsum(md_diff / 2 * (upper + lower))
+    lower = np.sin(inc_lower) * np.sin(azi_lower)
+    easting = np.cumsum((md_diff / 2) * (upper + lower) * rf)
 
-    tvd = np.cumsum(md_diff / 2 * (np.cos(inc_upper) + np.cos(inc_lower)) * rf)
+    tvd = np.cumsum((md_diff / 2) * (np.cos(inc_upper) + np.cos(inc_lower)) * rf)
 
     return tvd, northing, easting, dogleg
 
-def min_curve_method(md, inc, azi, md_units='m', norm_opt=0):
-    """
-    Calculate TVD using minimum curvature method.
+def minimum_curvature(md, inc, azi, course_length=30):
+    """Calculate TVD using minimum curvature method.
 
     This method uses angles from upper and lower end of survey interval to
     calculate a curve that passes through both survey points. This curve is
     smoothed by use of the ratio factor defined by the tortuosity or dogleg
     of the wellpath.
 
-    Formula
-    -------
-    dls = arccos(cos(inc_lower - inc_upper) - sin(inc_upper) * sin(inc_lower) * (1 - cos(azi_lower - azi_upper)))
-    rf = 2 / dls * (tan(dls/2))
-    northing = sum((md_lower - md_upper) * (sin(inc_upper) * cos(azi_upper) + sin(inc_lower) * cos(azi_lower) / 2) * cf)
-    easting = sum((md_lower - md_upper) *(sin(inc_upper) * sin(azi_upper) + sin(inc_lower) * sin(azi_lower) / 2) * cf)
-    tvd = sum((md_lower - md_upper) * (cos(inc_lower) + cos(inc_upper) / 2) * cf)
-
-    where:
-    dls: dog leg severity (degrees)
-    rf: ratio factor (radians)
-    md_upper: upper survey station depth MD
-    md_lower: lower survey station depth MD
-    inc_upper: upper survey station inclination in degrees
-    inc_lower: lower survey station inclination in degrees
-    azi_upper: upper survey station azimuth in degrees
-    azi_lower: lower survey station azimuth in degrees
-
     Parameters
     ----------
-    md: float, measured depth in m or ft
-    inc: float, well deviation in degrees
-    azi: float, well azimuth in degrees
-    md_units: str, measured depth units in m or ft
-        used for dogleg severity calculation
-    norm_opt: float, dogleg normalisation value,
-        if passed will override md_units
-
-    Returns
-    -------
-    Deviation converted to TVD, easting, northing
-        tvd in m,
-        northing in m,
-        easting in m
-    Dogleg severity
-        dls: dogleg severity angle in degrees per normalisation value
-            (normalisation value is deg/100ft, deg/30m or deg/<norm_opt>)
+    md : float
+        measured depth in m or ft
+    inc : float
+        well deviation in degrees
+    azi : float
+        well azimuth in degrees
+    course_length : float
+        dogleg normalisation value, if passed will override md_units
 
     Notes
     -----
-    Return units are in metres, regardless of input.
-    The user must convert to feet if required.
+    Formulae:
 
+    .. math::
+        dls = arccos[
+                  cos(inc_l - inc_u)
+                - sin(inc_u) \cdot sin(inc_l) \cdot (1 - cos(azi_l - azi_u))
+                ]
+
+    .. math::
+        rf = \\frac{2}{dls} \cdot tan(\\frac{dls}{2})
+
+    .. math::
+        northing = \\frac{md_l - md_u}{2}
+                   \cdot [sin(inc_u)cos(azi_u) + sin(inc_l)cos(azi_l)]
+                   \cdot rf
+
+    .. math::
+        easting = \\frac{md_l - md_u}{2}
+                  \cdot [sin(inc_u)sin(azi_u) + sin(inc_l)sin(azi_l)]
+                  \cdot rf
+
+    .. math::
+        tvd = \\frac{md_l - md_u}{2}
+              \cdot [cos(inc_l) + cos(inc_u)]
+              \cdot rf
+
+    where:
+
+    - :math:`dls` : dog leg severity (degrees)
+    - :math:`rf` : ratio factor (radians)
+    - :math:`md_u` : upper survey station depth MD
+    - :math:`md_l` : lower survey station depth MD
+    - :math:`inc_u` : upper survey station inclination in degrees
+    - :math:`inc_l` : lower survey station inclination in degrees
+    - :math:`azi_u` : upper survey station azimuth in degrees
+    - :math:`azi_l` : lower survey station azimuth in degrees
+
+    course_length is set to 30 by default, assuming that md units are in meters.
+    The user must change course_length if md units are feet.
+
+    Typical course_length values are:
+
+    - m : course_length = 30
+    - ft : course_length = 100
+
+    Other values can be passed, but they are non-standard and therefore not
+    explicitely supported.
+
+    Returns
+    -------
+    tvd : array_like of float
+        true vertical depth
+    northing : array_like of float
+    easting : array_like of float
+    dls : array_like of float
+        dog leg severity
     """
 
-    # get units and normalising for dls
     try:
-        norm_opt + 0
+        course_length + 0
     except TypeError:
-        raise TypeError('norm_opt must be a float')
-
-    if norm_opt != 0:
-        norm = norm_opt
-    else:
-        if md_units == 'm':
-            norm = 30
-        elif md_units == 'ft':
-            norm = 100
-            md *= 0.3048
-        else:
-            raise ValueError('md_units must be either m or ft')
+        raise TypeError('course_length must be a float')
 
     md, inc, azi = checkarrays(md, inc, azi)
     inc = np.deg2rad(inc)
     azi = np.deg2rad(azi)
 
     md_diff = md[1:] - md[:-1]
-    tvd, northing, easting, dogleg = minimum_curvature(md, inc, azi)
+    tvd, northing, easting, dogleg = minimum_curvature_inner(md, inc, azi)
 
     tvd = np.insert(tvd, 0, 0)
     northing = np.insert(northing, 0, 0)
     easting = np.insert(easting, 0, 0)
 
-    # calculate dogleg severity, change md units if dls in ft is passed in
     dl = np.rad2deg(dogleg)
-    if md_units == 'ft':
-        dls = dl * (norm / (md[1:]/0.3048 - md[:-1]/0.3048))
-        dls = np.insert(dls, 0, 0)
-    else:
-        dls = dl * (norm / md_diff)
-        dls = np.insert(dls, 0, 0)
-
+    dls = dl * (course_length / md_diff)
+    dls = np.insert(dls, 0, 0)
 
     return tvd, northing, easting, dls

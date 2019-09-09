@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy import interpolate
 
-from ..interpolate import interpolate_deviation, interpolate_position
+from ..interpolate import resample_deviation, resample_position
 
 class Chest:
     """A dumb object to just hold member varibles for the fixture
@@ -31,42 +31,42 @@ def well(request):
 # input arrays contain no NaN values
 def test_inter_dev_md_throws():
     with pytest.raises(ValueError):
-        _ = interpolate_deviation(md=np.array([1,2,np.nan]),
+        _ = resample_deviation(md=np.array([1,2,np.nan]),
                                 inc=np.array([1,2,3]),
                                 azi=np.array([1,2,3]),
                                 md_step=1)
 
 def test_inter_dev_inc_throws():
     with pytest.raises(ValueError):
-        _ = interpolate_deviation(md=np.array([1,2,3]),
+        _ = resample_deviation(md=np.array([1,2,3]),
                                 inc=np.array([1,2,np.nan]),
                                 azi=np.array([1,2,3]),
                                 md_step=1)
 
 def test_inter_dev_azi_throws():
     with pytest.raises(ValueError):
-        _ = interpolate_deviation(md=np.array([1,2,3]),
+        _ = resample_deviation(md=np.array([1,2,3]),
                                 inc=np.array([1,2,3]),
                                 azi=np.array([1,2,np.nan]),
                                 md_step=1)
 
 def test_inter_pos_md_throws():
     with pytest.raises(ValueError):
-        _ = interpolate_position(tvd=np.array([1,2,np.nan]),
+        _ = resample_position(tvd=np.array([1,2,np.nan]),
                                 easting=np.array([1,2,3]),
                                 northing=np.array([1,2,3]),
                                 tvd_step=1)
 
 def test_inter_pos_inc_throws():
     with pytest.raises(ValueError):
-        _ = interpolate_position(tvd=np.array([1,2,3]),
+        _ = resample_position(tvd=np.array([1,2,3]),
                                 easting=np.array([1,2,np.nan]),
                                 northing=np.array([1,2,3]),
                                 tvd_step=1)
 
 def test_inter_pos_azi_throws():
     with pytest.raises(ValueError):
-        _ = interpolate_position(tvd=np.array([1,2,3]),
+        _ = resample_position(tvd=np.array([1,2,3]),
                                 easting=np.array([1,2,3]),
                                 northing=np.array([1,2,np.nan]),
                                 tvd_step=1)
@@ -74,26 +74,26 @@ def test_inter_pos_azi_throws():
 # md_step and tvd_step are of type int
 def test_inter_dev_md_step_throws():
     with pytest.raises(TypeError):
-        _ = interpolate_deviation(md=np.array([1,2,3]),
+        _ = resample_deviation(md=np.array([1,2,3]),
                                 inc=np.array([1,2,3]),
                                 azi=np.array([1,2,3]),
                                 md_step='1')
 
 def test_inter_dev_tvd_step_throws():
     with pytest.raises(TypeError):
-        _ = interpolate_position(tvd=np.array([1,2,3]),
+        _ = resample_position(tvd=np.array([1,2,3]),
                                 easting=np.array([1,2,3]),
                                 northing=np.array([1,2,3]),
                                 tvd_step='1')
 
 def test_inter_pos_not_monotonic_throws():
     with pytest.raises(ValueError):
-        _ = interpolate_position(tvd=np.array([1,2,4,4,5]),
+        _ = resample_position(tvd=np.array([1,2,4,4,5]),
                                 easting=np.array([1,2,3,4,5]),
                                 northing=np.array([1,2,3,4,5]),
                                 tvd_step=1)
     with pytest.raises(ValueError):
-        _ = interpolate_position(tvd=np.array([1,2,6,4,5]),
+        _ = resample_position(tvd=np.array([1,2,6,4,5]),
                                 easting=np.array([1,2,3,4,5]),
                                 northing=np.array([1,2,3,4,5]),
                                 tvd_step=1)
@@ -111,26 +111,26 @@ def sample_interval(curve):
 def test_equivalent_deviation_curve_after_interpolation_md(well):
     steps = [1,2,3,4,5]
     for step in steps:
-        md, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=step)
+        md, _, _ = resample_deviation(well.md, well.inc, well.azi, md_step=step)
         assert md[0] == well.md[0]
         assert md[-1] == well.md[-1]
         np.testing.assert_almost_equal(md[1:-1] - md[:-2], step, decimal=1)
     dec_steps = [.1,.2,.3,.4,.5]
     for dec_step in dec_steps:
-        md, _, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=dec_step)
+        md, _, _ = resample_deviation(well.md, well.inc, well.azi, md_step=dec_step)
         assert md[0] == well.md[0]
         assert md[-1] == well.md[-1]
         np.testing.assert_almost_equal(md[1:-1] - md[:-2], dec_step, decimal=2)
 
 def test_equivalent_deviation_curve_after_interpolation_inc(well):
-    md, x, _ = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
+    md, x, _ = resample_deviation(well.md, well.inc, well.azi, md_step=1)
     refmd = sample_interval(md)
     reference = interpolate.interp1d(well.md, well.inc)(refmd)
     result = interpolate.interp1d(md, x)(refmd)
     np.testing.assert_allclose(reference, result, rtol = 1.5)
 
 def test_equivalent_deviation_curve_after_interpolation_azi(well):
-    md, _, x = interpolate_deviation(well.md, well.inc, well.azi, md_step=1)
+    md, _, x = resample_deviation(well.md, well.inc, well.azi, md_step=1)
     refmd = sample_interval(md)
     reference = interpolate.interp1d(well.md, well.azi)(refmd)
     result = interpolate.interp1d(md, x)(refmd)
@@ -142,13 +142,13 @@ def test_equivalent_position_curve_after_interpolation_tvd(well):
     well.northing = well.northing[:-40]
     steps = [1,2,3,4,5]
     for step in steps:
-        tvd, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=step)
+        tvd, _, _ = resample_position(well.tvd, well.easting, well.northing, tvd_step=step)
         assert tvd[0] == well.tvd[0]
         assert tvd[-1] == well.tvd[-1]
         np.testing.assert_almost_equal(tvd[1:-1] - tvd[:-2], step, decimal=1)
     dec_steps = [.1,.2,.3,.4,.5]
     for dec_step in dec_steps:
-        tvd, _, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=dec_step)
+        tvd, _, _ = resample_position(well.tvd, well.easting, well.northing, tvd_step=dec_step)
         assert tvd[0] == well.tvd[0]
         assert tvd[-1] == well.tvd[-1]
         np.testing.assert_almost_equal(tvd[1:-1] - tvd[:-2], dec_step, decimal=2)
@@ -157,7 +157,7 @@ def test_equivalent_position_curve_after_interpolation_easting(well):
     well.tvd = well.tvd[:-40]
     well.easting = well.easting[:-40]
     well.northing = well.northing[:-40]
-    tvd, x, _ = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
+    tvd, _, x = resample_position(well.tvd, well.easting, well.northing, tvd_step=1)
     reftvd = sample_interval(tvd)
     reference = interpolate.interp1d(well.tvd, well.easting)(reftvd)
     result = interpolate.interp1d(tvd, x)(reftvd)
@@ -167,7 +167,7 @@ def test_equivalent_position_curve_after_interpolation_northing(well):
     well.tvd = well.tvd[:-40]
     well.easting = well.easting[:-40]
     well.northing = well.northing[:-40]
-    tvd, _, x = interpolate_position(well.tvd, well.easting, well.northing, tvd_step=1)
+    tvd, x, _ = resample_position(well.tvd, well.easting, well.northing, tvd_step=1)
     reftvd = sample_interval(tvd)
     reference = interpolate.interp1d(well.tvd, well.northing)(reftvd)
     result = interpolate.interp1d(tvd, x)(reftvd)

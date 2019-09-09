@@ -3,16 +3,29 @@ import numpy as np
 from .checkarrays import checkarrays
 
 def tan_method(md, inc, azi, choice='avg'):
-    """
-    ToDo
-    ----
-    Implement surface location
-        replace `np.insert([tvd, northing, easting], 0, 0)` with
-        `np.insert([tvd, northing, easting], 0, <surface location>)`
+    """Calculate TVD using one of the tangential method.
+
+    Parameters
+    ----------
+    md : float
+        measured depth
+    inc : float
+        well deviation in degrees
+    azi : float
+        well azimuth in degrees
+    choice : str
+        choice of tangential method to run
+
+    Returns
+    -------
+    tvd : array_like of float
+        true vertical depth
+    northing : array_like of float
+    easting : array_like of float
     """
 
     if choice == 'bal':
-        return bal_tan_method(md, inc, azi)
+        return balanced_tan(md, inc, azi)
 
     md, inc, azi = checkarrays(md, inc, azi)
 
@@ -50,117 +63,150 @@ def tan_method(md, inc, azi, choice='avg'):
 
     return tvd, northing, easting
 
-def high_tan_method(md, inc, azi):
-    """
-    Calculate TVD using high tangential method.
+def high_tan(md, inc, azi):
+    """Calculate TVD using high tangential method.
+
     This method takes the sines and cosines of the inclination and azimuth
     at the bottom of the survey interval to estimate tvd.
 
     This method is not recommended as it can make gross tvd and offset
     errors in typical deviated wells.
 
-    Formula
-    -------
-    northing = sum((md_lower - md_upper) * sin(inc_lower) * cos(azi_lower))
-    easting = sum((md_lower - md_upper) * sin(inc_lower) * sin(azi_lower))
-    tvd = sum((md_lower - md_upper) * cos(azi_lower))
-
-    where:
-    md_upper: upper survey station depth MD
-    md_lower: lower survey station depth MD
-    inc_lower: lower survey station inclination in degrees
-    azi_lower: lower survey station azimuth in degrees
-
     Parameters
     ----------
-    md: float, measured depth in m or ft
-    inc: float, well deviation in degrees
-    azi: float, well azimuth in degrees
+    md : float
+        measured depth
+    inc : float
+        well deviation in degrees
+    azi : float
+        well azimuth in degrees
+
+    Notes
+    -----
+    Formulae:
+
+    .. math::
+        northing = (md_l - md_u) \cdot sin(inc_l) \cdot cos(azi_l)
+
+    .. math::
+        easting = (md_l - md_u) \cdot sin(inc_l) \cdot sin(azi_l)
+
+    .. math::
+        tvd = (md_l - md_u) \cdot cos(azi_l)
+
+    where:
+
+    - :math:`md_u`: upper survey station depth MD
+    - :math:`md_l`: lower survey station depth MD
+    - :math:`inc_l`: lower survey station inclination in degrees
+    - :math:`azi_l`: lower survey station azimuth in degrees
 
     Returns
     -------
-    Deviation converted to TVD, easting, northing
-        tvd in m or feet,
-        northing in m or feet,
-        easting in m or feet
+    tvd : array_like of float
+        true vertical depth
+    northing : array_like of float
+    easting : array_like of float
     """
     return tan_method(md, inc, azi, choice='high')
 
-def low_tan_method(md, inc, azi):
-    """
-    Calculate TVD using low tangential method.
+def low_tan(md, inc, azi):
+    """Calculate TVD using low tangential method.
+
     This method takes the sines and cosines of the inclination and azimuth
     at the top of the survey interval to estimate tvd.
 
     This method is not recommended as it can make gross tvd and offset
     errors in typical deviated wells.
 
-    Formula
-    -------
-    northing = sum((md_lower - md_upper) * sin(inc_upper) * cos(azi_upper))
-    easting = sum((md_lower - md_upper) * sin(inc_upper) * sin(azi_upper))
-    tvd = sum((md_lower - md_upper) * cos(azi_upper))
-
-    where:
-    md_upper: upper survey station depth MD
-    md_lower: lower survey station depth MD
-    inc_upper: upper survey station inclination in degrees
-    azi_upper: upper survey station azimuth in degrees
-
     Parameters
     ----------
-    md: float, measured depth in m or ft
-    inc: float, well deviation in degrees
-    azi: float, well azimuth in degrees
+    md : float
+        measured depth
+    inc : float
+        well deviation in degrees
+    azi : float
+        well azimuth in degrees
+
+    Notes
+    -----
+    Formulae:
+
+    .. math::
+        northing = (md_l - md_u) \cdot sin(inc_u) \cdot cos(azi_u)
+
+    .. math::
+        easting = (md_l - md_u) \cdot sin(inc_u) \cdot sin(azi_u)
+
+    .. math::
+        tvd = (md_l - md_u) \cdot cos(azi_u)
+
+    where:
+
+    - :math:`md_u`: upper survey station depth MD
+    - :math:`md_l`: lower survey station depth MD
+    - :math:`inc_u`: upper survey station inclination in degrees
+    - :math:`azi_u`: upper survey station azimuth in degrees
 
     Returns
     -------
-    Deviation converted to TVD, easting, northing
-        tvd in m or feet,
-        northing in m or feet,
-        easting in m or feet
+    tvd : array_like of float
+        true vertical depth
+    northing : array_like of float
+    easting : array_like of float
     """
     return tan_method(md, inc, azi, choice='low')
 
-def ave_tan_method(md, inc, azi):
-    """
-    Calculate TVD using average tangential method.
+def average_tan(md, inc, azi):
+    """Calculate TVD using average tangential method.
+
     This method averages the inclination and azimuth at the top and
     bottom of the survey interval before taking their sine and cosine,
     this average angle is used to estimate tvd.
 
-    Formula
-    -------
-    northing = sum((md_lower - md_upper) * sin((inc_lower + inc_upper) / 2) * cos((azi_lower + azi_upper) / 2))
-    easting = sum((md_lower - md_upper) * sin((inc_lower + inc_upper) / 2) * sin((azi_lower + azi_upper) / 2))
-    tvd = sum((md_lower - md_upper) * cos((inc_lower + inc_upper) / 2))
-
-    where:
-    md_upper: upper survey station depth MD
-    md_lower: lower survey station depth MD
-    inc_upper: upper survey station inclination in degrees
-    inc_lower: lower survey station inclination in degrees
-    azi_upper: upper survey station azimuth in degrees
-    azi_lower: lower survey station azimuth in degrees
-
     Parameters
     ----------
-    md: float, measured depth in m or ft
-    inc: float, well deviation in degrees
-    azi: float, well azimuth in degrees
+    md : float
+        measured depth
+    inc : float
+        well deviation in degrees
+    azi : float
+        well azimuth in degrees
+
+    Notes
+    -----
+    Formulae:
+
+    .. math::
+        northing = (md_l - md_u) \cdot sin(\\frac{inc_l + inc_u}{2}) \cdot cos(\\frac{azi_l + azi_u}{2})
+
+    .. math::
+        easting = (md_l - md_u) \cdot sin(\\frac{inc_l + inc_u}{2}) \cdot sin(\\frac{azi_l + azi_u}{2})
+
+    .. math::
+        tvd = (md_l - md_u) \cdot cos(\\frac{inc_l + inc_u}{2})
+
+    where:
+
+    - :math:`md_u`: upper survey station depth MD
+    - :math:`md_l`: lower survey station depth MD
+    - :math:`inc_u`: upper survey station inclination in degrees
+    - :math:`inc_l`: lower survey station inclination in degrees
+    - :math:`azi_u`: upper survey station azimuth in degrees
+    - :math:`azi_l`: lower survey station azimuth in degrees
 
     Returns
     -------
-    Deviation converted to TVD, easting, northing
-        tvd in m or feet,
-        northing in m or feet,
-        easting in m or feet
+    tvd : array_like of float
+        true vertical depth
+    northing : array_like of float
+    easting : array_like of float
     """
     return tan_method(md, inc, azi, choice='avg')
 
-def bal_tan_method(md, inc, azi):
-    """
-    Calculate TVD using balanced tangential method.
+def balanced_tan(md, inc, azi):
+    """Calculate TVD using balanced tangential method.
+
     This method takes the sines and cosines of the inclination and azimuth
     at the top and bottom of the survey interval before averaging them,
     this average angle is used to estimate tvd.
@@ -168,38 +214,43 @@ def bal_tan_method(md, inc, azi):
     This will provide a smoother curve than the ave_tan method but requires
     closely spaced survey stations to avoid errors.
 
-    Formula
-    -------
-    northing = sum((md_lower - md_upper) * ((sin(inc_upper) * cos(azi_upper) + sin(inc_lower) * cos(azi_lower)) / 2))
-    easting = sum((md_lower - md_upper) * ((sin(inc_upper) * sin(azi_upper) + sin(inc_lower) * sin(azi_lower)) / 2))
-    tvd = sum((md_lower - md_upper) * (cos(inc_lower) + cos(inc_upper)) / 2))
-
-    where:
-    md_upper: upper survey station depth MD
-    md_lower: lower survey station depth MD
-    inc_upper: upper survey station inclination in degrees
-    inc_lower: lower survey station inclination in degrees
-    azi_upper: upper survey station azimuth in degrees
-    azi_lower: lower survey station azimuth in degrees
-
     Parameters
     ----------
-    md: float, measured depth in m or ft
-    inc: float, well deviation in degrees
-    azi: float, well azimuth in degrees
+    md : float
+        measured depth
+    inc : float
+        well deviation in degrees
+    azi : float
+        well azimuth in degrees
+
+    Notes
+    -----
+    Formulae:
+
+    .. math::
+        northing = (md_l - md_u) \cdot \\frac{sin(inc_u) \cdot cos(azi_u) + sin(inc_l) \cdot cos(azi_l)}{2}
+
+    .. math::
+        easting = (md_l - md_u) \cdot \\frac{sin(inc_u) \cdot sin(azi_u) + sin(inc_l) \cdot sin(azi_l)}{2}
+
+    .. math::
+        tvd = (md_l - md_u) \cdot \\frac{cos(inc_l) + cos(inc_u)}{2}
+
+    where:
+
+    - :math:`md_u`: upper survey station depth MD
+    - :math:`md_l`: lower survey station depth MD
+    - :math:`inc_u`: upper survey station inclination in degrees
+    - :math:`inc_l`: lower survey station inclination in degrees
+    - :math:`azi_u`: upper survey station azimuth in degrees
+    - :math:`azi_l`: lower survey station azimuth in degrees
 
     Returns
     -------
-    Deviation converted to TVD, easting, northing
-        tvd in m or feet,
-        northing in m or feet,
-        easting in m or feet
-
-    ToDo
-    ----
-    Implement surface location
-        replace `np.insert([tvd, northing, easting], 0, 0)` with
-        `np.insert([tvd, northing, easting], 0, <surface location>)`
+    tvd : array_like of float
+        true vertical depth
+    northing : array_like of float
+    easting : array_like of float
     """
     md, inc, azi = checkarrays(md, inc, azi)
 
@@ -215,6 +266,7 @@ def bal_tan_method(md, inc, azi):
     northing = np.cumsum((md_lower - md_upper) * (np.sin(inc_upper) * np.cos(azi_upper)
                                                   + np.sin(inc_lower) * np.cos(azi_lower)) / 2)
     northing = np.insert(northing, 0, 0)
+
 
     easting = np.cumsum((md_lower - md_upper) * (np.sin(inc_upper) * np.sin(azi_upper)
                                                   + np.sin(inc_lower) * np.sin(azi_lower)) / 2)
