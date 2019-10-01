@@ -16,6 +16,6 @@ setup(name='wellpathpy',
       platforms='any',
       install_requires=['numpy >=1.10', 'pandas', 'pint'],
       setup_requires=['setuptools >=28', 'setuptools_scm', 'pytest-runner'],
-      tests_require=['pytest'],
+      tests_require=['pytest', 'hypothesis'],
       use_scm_version=True,
       )
