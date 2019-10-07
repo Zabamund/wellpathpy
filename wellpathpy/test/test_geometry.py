@@ -2,6 +2,7 @@ import pytest
 from hypothesis import given
 from hypothesis.strategies import floats
 from pytest import approx
+import numpy as np
 
 from ..geometry import tangent
 
@@ -110,3 +111,9 @@ def test_south_west_down():
     assert n == approx(-0.772324, rel=1e-5)
     assert e == approx(-0.386162, rel=1e-5)
     assert vd == approx(0.504375, rel=1e-5)
+
+def test_array():
+    vd, n, e = tangent([59.7101, 48.9322], [-153.435, -143.011])
+    np.testing.assert_allclose(n, np.array([-0.772324, -0.602206]), rtol=1e-5)
+    np.testing.assert_allclose(e, np.array([-0.386162, -0.45361]), rtol=1e-5)
+    np.testing.assert_allclose(vd, np.array([0.504375, 0.656952]), rtol=1e-5)
