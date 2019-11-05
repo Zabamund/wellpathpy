@@ -1,6 +1,6 @@
 import numpy as np
 
-def tangent(inc, azi):
+def direction_vector(inc, azi):
     """ Compute a direction vector from inclination and azimuth
 
     Convert spherical coordinates (inc, azi) to cubic coordinates (vertical
