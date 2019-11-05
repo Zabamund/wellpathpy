@@ -20,6 +20,20 @@ def direction_vector(inc, azi):
         vertial direction
     northing : array_like of float
     easting : array_like of float
+
+    Examples
+    --------
+    Inverse of spherical:
+    >>> inc, azi = spherical(N1, E1, V1)
+    >>> N2, E2, V2 = direction_vector(inc, azi)
+    >>> N1 == N2
+    True
+    >>> E1 == E2
+    True
+    >>> V1 == V2
+    True
+    >>> inc2, azi2 = spherical(N, E, V)
+
     """
     inc = np.deg2rad(inc)
     az = np.deg2rad(azi)
@@ -53,6 +67,21 @@ def spherical(northing, easting, depth):
         inclination in degrees
     azi : array_like of float or float
         azimuth in degrees, [0, 360)
+
+    Notes
+    -----
+    This functions assumes northing/easting/depth are normalized.
+
+    Examples
+    --------
+    Inverse of direction_vector:
+    >>> N, E, V = direction_vector(inc1, azi)
+    >>> inc2, azi2 = spherical(N, E, V)
+    >>> inc1 == inc2
+    True
+    >>> azi1 == azi2
+    True
+
     """
     n2 = northing * northing
     e2 = easting * easting
