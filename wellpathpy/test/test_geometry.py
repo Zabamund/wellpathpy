@@ -1,6 +1,10 @@
 import pytest
 from hypothesis import given
+from hypothesis import assume
+from hypothesis.strategies import integers
 from hypothesis.strategies import floats
+from hypothesis.strategies import lists
+from hypothesis.strategies import composite
 from pytest import approx
 import numpy as np
 
@@ -117,3 +121,80 @@ def test_array():
     np.testing.assert_allclose(n, np.array([-0.772324, -0.602206]), rtol=1e-5)
     np.testing.assert_allclose(e, np.array([-0.386162, -0.45361]), rtol=1e-5)
     np.testing.assert_allclose(vd, np.array([0.504375, 0.656952]), rtol=1e-5)
+
+from ..geometry import spherical
+
+@given(
+    floats(allow_nan = False),
+    floats(allow_nan = False),
+    floats(allow_nan = False),
+)
+def test_spherical_single(n, e, v):
+    inc, azi = spherical(n, e, v)
+    assert 0 <= azi < 360
+
+@composite
+def same_len_lists(draw):
+    """Draw random arrays of equal lengths
+
+    One precondition of the list version of spherical() is that its inputs must
+    be of equal length.
+    """
+    n = draw(integers(min_value = 0, max_value = 50))
+    fixlen = lists(
+        floats(allow_nan = False, allow_infinity = False),
+        min_size = n,
+        max_size = n,
+    )
+    fixnp = fixlen.map(np.array)
+    return (draw(fixnp), draw(fixnp), draw(fixnp))
+
+@given(same_len_lists())
+def test_spherical_list(nev):
+    """The same_len_lists can draw values that when squared overflow floats.
+    For regular floats, this doesn't flag, but numpy warns on it. It's
+    considered a caller problem if the value does overflow.
+
+    TODO
+    ----
+    Consider either properly warning or consistently failing when a partial
+    computation overflows. A solution could be to coerce even regular floats to
+    numpy, and look for the warning. For now, do the python thing and just
+    carry on.
+    """
+    n, e, v = nev
+    inc, azi = spherical(n, e, v)
+    assert np.all(0 <= azi)
+    assert np.all(azi < 360)
+
+def normalize(x, y, z):
+    magnitude = np.sqrt(x * x + y * y + z * z)
+    assume(np.isfinite(magnitude))
+    assume(magnitude != 0)
+    return x / magnitude, y / magnitude, z / magnitude
+
+@given(
+    floats(allow_nan = False, allow_infinity = False),
+    floats(allow_nan = False, allow_infinity = False),
+    floats(allow_nan = False, allow_infinity = False),
+)
+def test_spherical_position_roundtrip(n, e, v):
+    n, e, v = normalize(n, e, v)
+
+    inc, azi = spherical(n, e, v)
+    V, N, E = tangent(inc, azi)
+
+    if np.isnan(V):
+        assert np.isnan(v)
+    else:
+        assert V == approx(v, abs = 1e-10)
+
+    if np.isnan(N):
+        assert np.isnan(n)
+    else:
+        assert N == approx(n, abs = 1e-10)
+
+    if np.isnan(E):
+        assert np.isnan(e)
+    else:
+        assert E == approx(e, abs = 1e-10)
