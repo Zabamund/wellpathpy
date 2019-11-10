@@ -2,6 +2,8 @@ import pytest
 import pandas as pd
 import numpy as np
 
+import hypothesis
+
 from ..tan import tan_method
 from ..mincurve import minimum_curvature
 from ..rad_curv import radius_curvature
@@ -154,4 +156,5 @@ def test_rad_curve():
     np.testing.assert_allclose(mN9, well9_true_northing, atol=1)
     np.testing.assert_allclose(tvd10, well10_true_tvd_m, atol=5)
     np.testing.assert_allclose(mE10, well10_true_easting, atol=85)
+    np.testing.assert_allclose(mN10, well10_true_northing, atol=10)
     np.testing.assert_allclose(mN10, well10_true_northing, atol=10)

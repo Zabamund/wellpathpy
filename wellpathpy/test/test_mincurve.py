@@ -30,3 +30,10 @@ def test_increasing_md_throws():
 def test_bad_normalising_throws():
     with pytest.raises(TypeError):
         _ = minimum_curvature(md=[1,2,3], inc=[1,2,3], azi=[1,2,3], course_length='0')
+
+# def test_new_interface():
+#     md, inc, azi = wp.read_csv()
+#     md = wp.unit_convert(md, src = 'ft', dst = 'm')
+#     pos = wp.position_log.minimum_curvature(md, inc, azi)
+#     pos = pos.resample(onto = [1..])
+#     dev = pos.deviation()
