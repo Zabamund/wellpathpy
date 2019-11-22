@@ -10,6 +10,13 @@ good_data = '''md,inc,azi
     3,15,258
     '''
 
+renamed_cols = '''measured-depth,inci,am
+    0,0,244
+    1,11,220
+    2,13,254
+    3,15,258
+    '''
+
 mixed_data = '''azi,md,inc,
     244,0,0
     220,1,11
@@ -93,3 +100,10 @@ def test_nans_throws():
         data = io.StringIO(nans_present)
         with pytest.raises(ValueError):
             _ = read_csv(data)
+
+def test_renamed_columns():
+    data = io.StringIO(renamed_cols)
+    md = 'measured-depth'
+    inc = 'inci'
+    azi = 'am'
+    _ = read_csv(data, md = md, inc = inc, azi = azi)
