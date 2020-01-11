@@ -10,9 +10,9 @@ def direction_vector(inc, azi):
     Parameters
     ----------
     inc : array_like of float
-        inclination
+        inclination in degrees
     azi : array_like of float
-        azimuth
+        azimuth in degrees
 
     Returns
     -------
