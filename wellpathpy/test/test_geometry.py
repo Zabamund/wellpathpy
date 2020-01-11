@@ -1,12 +1,11 @@
 import pytest
+import numpy as np
 from hypothesis import given
 from hypothesis import assume
-from hypothesis.strategies import integers
 from hypothesis.strategies import floats
-from hypothesis.strategies import lists
-from hypothesis.strategies import composite
 from pytest import approx
-import numpy as np
+
+from . import same_len_lists
 
 from ..geometry import direction_vector
 
@@ -132,22 +131,6 @@ from ..geometry import spherical
 def test_spherical_single(n, e, v):
     inc, azi = spherical(n, e, v)
     assert 0 <= azi < 360
-
-@composite
-def same_len_lists(draw):
-    """Draw random arrays of equal lengths
-
-    One precondition of the list version of spherical() is that its inputs must
-    be of equal length.
-    """
-    n = draw(integers(min_value = 0, max_value = 50))
-    fixlen = lists(
-        floats(allow_nan = False, allow_infinity = False),
-        min_size = n,
-        max_size = n,
-    )
-    fixnp = fixlen.map(np.array)
-    return (draw(fixnp), draw(fixnp), draw(fixnp))
 
 @given(same_len_lists())
 def test_spherical_list(nev):
