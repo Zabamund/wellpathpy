@@ -57,7 +57,7 @@ def spherical(northing, easting, depth):
     ----------
     northing : array_like of float or float
     easting : array_like of float or float
-    depth : array_ike of float or float
+    depth : array_like of float or float
 
     Returns
     -------
