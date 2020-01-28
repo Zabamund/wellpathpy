@@ -8,6 +8,7 @@ from ..tan import tan_method
 from ..mincurve import minimum_curvature
 from ..rad_curv import radius_curvature
 from ..location import loc_to_wellhead
+from ..position_log import deviation, position_log as mc
 
 # import test well data
 well9 = pd.read_csv('./wellpathpy/test/fixtures/well9.csv', sep=",")
@@ -158,3 +159,21 @@ def test_rad_curve():
     np.testing.assert_allclose(mE10, well10_true_easting, atol=85)
     np.testing.assert_allclose(mN10, well10_true_northing, atol=10)
     np.testing.assert_allclose(mN10, well10_true_northing, atol=10)
+
+def test_position_log_interface_mincurve():
+    """
+    This pretty much only tests the mincurve, but packed in the
+    deviation+position_log interface
+    """
+    md = well9_true_md_m
+    inc = well9_true_inc
+    azi = well9_true_azi
+
+    dev = deviation(md, inc, azi)
+    pos = dev.minimum_curvature()
+    pos = pos.resample(depths = md)
+    pos.to_wellhead(surface_northing = 39998.454, surface_easting = 655701.278)
+
+    np.testing.assert_allclose(pos.tvd,      well9_true_tvd_m,    atol=1)
+    np.testing.assert_allclose(pos.northing, well9_true_northing, atol=1)
+    np.testing.assert_allclose(pos.easting,  well9_true_easting,  atol=1)

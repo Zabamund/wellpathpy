@@ -43,8 +43,9 @@ def minimum_curvature_inner(md, inc, azi):
     dogleg = np.arccos(cos_inc - (sin_inc * cos_azi))
 
     # ratio factor, correct for dogleg == 0 values
-    rf = 2 / dogleg * np.tan(dogleg / 2)
-    rf = np.where(dogleg == 0., 1, rf)
+    with np.errstate(divide = 'ignore', invalid = 'ignore'):
+        rf = 2 / dogleg * np.tan(dogleg / 2)
+        rf = np.where(dogleg == 0., 1, rf)
 
     md_diff = md_lower - md_upper
 

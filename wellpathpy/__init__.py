@@ -20,6 +20,7 @@ __all__ = [
     'deviation_to_csv',
     'position_to_csv',
     'deviation',
+    'position_log',
 ]
 
 from .convert import unit_convert
@@ -31,4 +32,4 @@ from .rad_curv import radius_curvature
 from .read import read_csv
 from .tan import high_tan, low_tan, balanced_tan, average_tan
 from .write import deviation_to_csv, position_to_csv
-from .position_log import deviation
+from .position_log import deviation, position_log

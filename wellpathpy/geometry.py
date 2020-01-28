@@ -10,9 +10,9 @@ def direction_vector(inc, azi):
     Parameters
     ----------
     inc : array_like of float
-        inclination
+        inclination in degrees
     azi : array_like of float
-        azimuth
+        azimuth in degrees
 
     Returns
     -------
@@ -56,10 +56,8 @@ def spherical(northing, easting, depth):
     Parameters
     ----------
     northing : array_like of float or float
-        northing in radians
     easting : array_like of float or float
-        eastin gin radians
-    depth : array_ike of float or float
+    depth : array_like of float or float
 
     Returns
     -------
