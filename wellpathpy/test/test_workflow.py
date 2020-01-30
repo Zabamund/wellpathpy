@@ -29,7 +29,7 @@ def test_workflow_compute_mincurve():
     expected_easting = 655870.4178517371
     expected_northing = 38631.13241000773
     expected_dls = 0.871150714388663
-    assert pos.tvd[-1] == pytest.approx(expected_tvd)
+    assert pos.depth[-1] == pytest.approx(expected_tvd)
     assert pos.northing[-1] == pytest.approx(expected_northing, abs = 0.5)
     assert pos.easting[-1] == pytest.approx(expected_easting)
     assert pos.dls[-1] == pytest.approx(expected_dls, abs = 1)

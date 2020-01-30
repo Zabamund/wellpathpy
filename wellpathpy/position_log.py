@@ -49,7 +49,7 @@ class position_log:
     Glossary:
     tvd : true vertical depth
     """
-    def __init__(self, src, tvd, northing, easting):
+    def __init__(self, src, depth, northing, easting):
         """
 
         Parameters
@@ -162,9 +162,12 @@ def spherical_interpolate(p0, p1, t):
     return V0 + V1
 
 class minimum_curvature(position_log):
-    def __init__(self, src, tvd, n, e, dls):
-        super().__init__(src, tvd, n, e)
+    def __init__(self, src, depth, n, e, dls):
+        super().__init__(src, depth, n, e)
         self.dls = dls
+
+    def copy(self):
+        return minimum_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting), np.copy(self.dls))
 
     def resample(self, depths):
         """
@@ -193,7 +196,7 @@ class minimum_curvature(position_log):
         # individually, and stack the results.
 
         depths = np.asarray(depths)
-        nve = np.column_stack([self.northing, self.easting, self.tvd])
+        nve = np.column_stack([self.northing, self.easting, self.depth])
         upper = nve[:-1]
         lower = nve[1:]
 
@@ -222,7 +225,7 @@ class minimum_curvature(position_log):
 
         pos = minimum_curvature(
             src = self.source,
-            tvd = xs[:, 2],
+            depth = xs[:, 2],
             n   = xs[:, 0],
             e   = xs[:, 1],
             dls = self.dls,

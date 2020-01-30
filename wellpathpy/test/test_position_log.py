@@ -23,6 +23,6 @@ def test_resample_onto_unchanged_md(survey):
     pos = dev.minimum_curvature()
     resampled = pos.resample(depths = md)
 
-    np.testing.assert_allclose(pos.tvd, resampled.tvd)
+    np.testing.assert_allclose(pos.depth, resampled.depth)
     np.testing.assert_allclose(pos.northing, resampled.northing)
     np.testing.assert_allclose(pos.easting, resampled.easting)
