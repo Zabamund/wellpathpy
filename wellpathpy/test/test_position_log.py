@@ -5,6 +5,7 @@ import numpy as np
 
 from . import same_len_lists
 from .. import deviation
+from .. import position_log
 
 @composite
 def deviation_survey(draw):
@@ -26,3 +27,9 @@ def test_resample_onto_unchanged_md(survey):
     np.testing.assert_allclose(pos.depth, resampled.depth)
     np.testing.assert_allclose(pos.northing, resampled.northing)
     np.testing.assert_allclose(pos.easting, resampled.easting)
+
+def test_copy():
+    original = position_log(np.array([]), np.array([1,2,3,4]), [4,3,2,1], [1,1,1,1])
+    copy = original.copy()
+    original.depth += 10
+    np.testing.assert_equal([1,2,3,4], copy.depth)

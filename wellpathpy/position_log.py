@@ -6,7 +6,7 @@ from .mincurve import minimum_curvature as mincurve
 from . import location
 
 class deviation:
-    """
+    """Deviation
 
     The deviation is a glorified triple (md, inc, azi), with some interesting
     operations.
@@ -60,28 +60,32 @@ class position_log:
         easting : array_like
         """
         self.source = src.copy()
-        self.tvd = tvd
+        self.depth = depth
         self.northing = northing
         self.easting = easting
         self.resampled_md = None
 
+    def copy(self):
+        return position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
+
     def to_wellhead(self, surface_northing, surface_easting):
-        """Shift position to wellhead location in-place
+        """Create a new position log instance moved to the wellhead location
 
         Parameters
         ----------
         surface_northing : array_like
         surface_easting : array_like
         """
-        tvd, n, e = location.loc_to_wellhead(
-            self.tvd,
+
+        depth, n, e = location.loc_to_wellhead(
+            self.depth,
             self.northing,
             self.easting,
             surface_northing,
             surface_easting,
         )
 
-        self.tvd = tvd
+        self.depth = depth
         self.northing = n
         self.easting = e
 
