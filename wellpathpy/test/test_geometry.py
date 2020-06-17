@@ -170,14 +170,14 @@ def test_spherical_position_roundtrip(n, e, v):
     if np.isnan(V):
         assert np.isnan(v)
     else:
-        assert V == approx(v, abs = 1e-10)
+        assert V == approx(v, abs = 1e-9)
 
     if np.isnan(N):
         assert np.isnan(n)
     else:
-        assert N == approx(n, abs = 1e-10)
+        assert N == approx(n, abs = 1e-9)
 
     if np.isnan(E):
         assert np.isnan(e)
     else:
-        assert E == approx(e, abs = 1e-10)
+        assert E == approx(e, abs = 1e-9)
