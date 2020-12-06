@@ -66,7 +66,10 @@ class position_log:
         self.resampled_md = None
 
     def copy(self):
-        return position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
+        l = position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
+        if self.resampled_md is not None:
+            l.resampled_md = np.copy(self.resampled_md)
+        return l
 
     def to_wellhead(self, surface_northing, surface_easting):
         """Create a new position log instance moved to the wellhead location
@@ -171,7 +174,10 @@ class minimum_curvature(position_log):
         self.dls = dls
 
     def copy(self):
-        return minimum_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting), np.copy(self.dls))
+        l = minimum_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting), np.copy(self.dls))
+        if self.resampled_md is not None:
+            l.resampled_md = np.copy(self.resampled_md)
+        return l
 
     def resample(self, depths):
         """
