@@ -16,10 +16,10 @@ def direction_vector(inc, azi):
 
     Returns
     -------
-    vd : array_like of float
-        vertial direction
     northing : array_like of float
     easting : array_like of float
+    vd : array_like of float
+        vertial direction
 
     Examples
     --------
@@ -42,7 +42,7 @@ def direction_vector(inc, azi):
     northing = np.sin(inc) * np.cos(az)
     easting  = np.sin(inc) * np.sin(az)
 
-    return vd, northing, easting
+    return northing, easting, vd
 
 def spherical(northing, easting, depth):
     """[N E V] -> (inc, azi)
