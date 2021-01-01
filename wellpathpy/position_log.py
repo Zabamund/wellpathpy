@@ -197,7 +197,7 @@ class minimum_curvature(position_log):
         --------
         Resample onto a regular, 1m measured depth interval:
 
-        >>> depths = list(range(int(dev.md[-1])) + 1)
+        >>> depths = list(range(int(dev.md[-1]) + 1))
         >>> resampled = pos.resample(depths = depths)
         """
         # break the well path into its survey stations, upper and lower, and
