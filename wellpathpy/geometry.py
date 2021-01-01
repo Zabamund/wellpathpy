@@ -102,3 +102,104 @@ def spherical(northing, easting, depth):
     azi = np.rad2deg(azi)
     return inc, azi
 
+def normalize(v):
+    """Normalize vector or compute unit vector
+
+    Compute the normalized (unit vector) [1]_ of v, a vector with the same
+    direction, but a length of 1.
+
+    Parameters
+    ----------
+    v : array_like
+
+    Returns
+    -------
+    V : array_like
+        normalized v
+
+    Notes
+    -----
+    Normalize is in addition to zeros also sensitive to *very* small floats.
+
+        Falsifying example: deviation_survey=(
+            md = array([0.0000000e+000, 1.0000000e+000, 4.1242594e-162]),
+            inc = array([0., 0., 0.]),
+            azi = array([0., 0., 0.]))
+
+    yields a dot product of 1.0712553822854385, which is outside [-1, 1]. This
+    should *really* only show up in testing scenarios and not real data.
+
+    Whenever norm values are less than eps, consider them zero. All zero norms
+    are assigned 1, to avoid divide-by-zero. The value for zero is chosen
+    arbitrarily as a something that shouldn't happen in real data, or when it
+    does is reasonable to consier as zero.
+
+    References
+    ----------
+    .. [1] https://mathworld.wolfram.com/NormalizedVector.html
+    """
+    norm = np.atleast_1d(np.linalg.norm(v))
+    zero = 1e-15
+    norm[np.abs(norm) < zero] = 1.0
+    return v / norm
+
+def unit_vector(v):
+    """Alias to normalize
+
+    See also
+    --------
+    normalize
+    """
+    return normalize(v)
+
+def angle_between(v1, v2):
+    """Angle between vectors
+
+    Parameters
+    ----------
+    v1 : array_like
+    v2 : array_like
+
+    Returns
+    -------
+    alpha : float
+        Angle between vectors in radians
+
+    Examples
+    --------
+    >>> angle_between((1, 0, 0), (0, 1, 0))
+    1.5707963267948966
+    >>> angle_between((1, 0, 0), (1, 0, 0))
+    0.0
+    >>> angle_between((1, 0, 0), (-1, 0, 0))
+    3.141592653589793
+    """
+    v1unit = normalize(v1)
+    v2unit = normalize(v2)
+    dot = np.dot(v1unit, v2unit)
+    # arccos is only defined [-1,1], dot can _sometimes_ go outside this domain
+    # because of floating points
+    return np.arccos(np.clip(dot, -1.0, 1.0))
+
+def normal_vector(v1, v2):
+    """Normal vector to plane given by vectors v1 and v2
+
+    From mathworld [1]_: The normal vector, often simply called the "normal,"
+    to a surface is a vector which is perpendicular to the surface at a given
+    point.
+
+    Parameters
+    ----------
+    v1 : array_like
+    v2 : array_like
+
+    Returns
+    -------
+    normal : array_like
+        A normal vector to the plane
+
+    References
+    ----------
+    .. [1] https://mathworld.wolfram.com/NormalVector.html
+    """
+    return np.cross(v1, v2)

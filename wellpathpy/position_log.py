@@ -1,9 +1,9 @@
 import numpy as np
 
 from .checkarrays import checkarrays
-from .geometry import spherical
 from .mincurve import minimum_curvature as mincurve
 from . import location
+from . import geometry
 
 class deviation:
     """Deviation
@@ -98,28 +98,6 @@ class position_log:
     def deviation(self, *args, **kwargs):
         raise NotImplementedError
 
-def normalize(x):
-    """
-    Normalize is in addition to zeros also sensitive to *very* small floats.
-
-        Falsifying example: deviation_survey=(
-            md = array([0.0000000e+000, 1.0000000e+000, 4.1242594e-162]),
-            inc = array([0., 0., 0.]),
-            azi = array([0., 0., 0.]))
-
-    yields a dot product of 1.0712553822854385, which is outside [-1, 1]. This
-    should *really* only show up in testing scenarios and not real data.
-
-    Whenever norm values are less than eps, consider them zero. All zero norms
-    are assigned 1, to avoid divide-by-zero. The value for zero is chosen
-    arbitrarily as a something that shouldn't happen in real data, or when it
-    does is reasonable to consier as zero.
-    """
-    norm = np.atleast_1d(np.linalg.norm(x))
-    zero = 1e-15
-    norm[np.abs(norm) < zero] = 1.0
-    return x / norm
-
 def spherical_interpolate(p0, p1, t):
     """
     https://en.wikipedia.org/wiki/Slerp
@@ -143,20 +121,7 @@ def spherical_interpolate(p0, p1, t):
     positions : array_like
         Resampled positions in (northing, easting, tvd)
     """
-    p0unit = normalize(p0)
-    p1unit = normalize(p1)
-    dot = np.dot(p0unit, p1unit)
-    # arccos is only defined [-1,1], dot can _sometimes_ go outside this domain
-    # because of floating points
-    if not -1 <= dot <= 1:
-        clipped = np.clip(dot, -1, 1)
-        if np.isclose(dot, clipped, atol = 1e-7, rtol = 1e-7):
-            dot = clipped
-        else:
-            msg = 'dot product (= {}) outside of arccos domain [-1, 1]'
-            raise RuntimeError(msg.format(dot))
-
-    omega = np.arccos(dot)
+    omega = geometry.angle_between(p0, p1)
     if omega != 0:
         v0 = np.sin((1 - t) * omega) / np.sin(omega)
         v1 = np.sin(     t  * omega) / np.sin(omega)
