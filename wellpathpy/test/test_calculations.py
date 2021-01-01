@@ -174,6 +174,6 @@ def test_position_log_interface_mincurve():
     pos = pos.resample(depths = md)
     pos.to_wellhead(surface_northing = 39998.454, surface_easting = 655701.278)
 
-    np.testing.assert_allclose(pos.depth,      well9_true_tvd_m,    atol=1)
+    np.testing.assert_allclose(pos.depth,    well9_true_tvd_m,    atol=1)
     np.testing.assert_allclose(pos.northing, well9_true_northing, atol=1)
     np.testing.assert_allclose(pos.easting,  well9_true_easting,  atol=1)
