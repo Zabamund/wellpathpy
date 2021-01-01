@@ -1,9 +1,9 @@
 import numpy as np
 
 from .checkarrays import checkarrays
-from .geometry import spherical
 from .mincurve import minimum_curvature as mincurve
 from . import location
+from . import geometry
 
 class deviation:
     """Deviation
@@ -66,7 +66,10 @@ class position_log:
         self.resampled_md = None
 
     def copy(self):
-        return position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
+        l = position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
+        if self.resampled_md is not None:
+            l.resampled_md = np.copy(self.resampled_md)
+        return l
 
     def to_wellhead(self, surface_northing, surface_easting):
         """Create a new position log instance moved to the wellhead location
@@ -95,28 +98,6 @@ class position_log:
     def deviation(self, *args, **kwargs):
         raise NotImplementedError
 
-def normalize(x):
-    """
-    Normalize is in addition to zeros also sensitive to *very* small floats.
-
-        Falsifying example: deviation_survey=(
-            md = array([0.0000000e+000, 1.0000000e+000, 4.1242594e-162]),
-            inc = array([0., 0., 0.]),
-            azi = array([0., 0., 0.]))
-
-    yields a dot product of 1.0712553822854385, which is outside [-1, 1]. This
-    should *really* only show up in testing scenarios and not real data.
-
-    Whenever norm values are less than eps, consider them zero. All zero norms
-    are assigned 1, to avoid divide-by-zero. The value for zero is chosen
-    arbitrarily as a something that shouldn't happen in real data, or when it
-    does is reasonable to consier as zero.
-    """
-    norm = np.atleast_1d(np.linalg.norm(x))
-    zero = 1e-15
-    norm[np.abs(norm) < zero] = 1.0
-    return x / norm
-
 def spherical_interpolate(p0, p1, t):
     """
     https://en.wikipedia.org/wiki/Slerp
@@ -140,20 +121,7 @@ def spherical_interpolate(p0, p1, t):
     positions : array_like
         Resampled positions in (northing, easting, tvd)
     """
-    p0unit = normalize(p0)
-    p1unit = normalize(p1)
-    dot = np.dot(p0unit, p1unit)
-    # arccos is only defined [-1,1], dot can _sometimes_ go outside this domain
-    # because of floating points
-    if not -1 <= dot <= 1:
-        clipped = np.clip(dot, -1, 1)
-        if np.isclose(dot, clipped, atol = 1e-7, rtol = 1e-7):
-            dot = clipped
-        else:
-            msg = 'dot product (= {}) outside of arccos domain [-1, 1]'
-            raise RuntimeError(msg.format(dot))
-
-    omega = np.arccos(dot)
+    omega = geometry.angle_between(p0, p1)
     if omega != 0:
         v0 = np.sin((1 - t) * omega) / np.sin(omega)
         v1 = np.sin(     t  * omega) / np.sin(omega)
@@ -171,7 +139,10 @@ class minimum_curvature(position_log):
         self.dls = dls
 
     def copy(self):
-        return minimum_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting), np.copy(self.dls))
+        l = minimum_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting), np.copy(self.dls))
+        if self.resampled_md is not None:
+            l.resampled_md = np.copy(self.resampled_md)
+        return l
 
     def resample(self, depths):
         """
@@ -191,7 +162,7 @@ class minimum_curvature(position_log):
         --------
         Resample onto a regular, 1m measured depth interval:
 
-        >>> depths = list(range(int(dev.md[-1])) + 1)
+        >>> depths = list(range(int(dev.md[-1]) + 1))
         >>> resampled = pos.resample(depths = depths)
         """
         # break the well path into its survey stations, upper and lower, and
@@ -236,3 +207,93 @@ class minimum_curvature(position_log):
         )
         pos.resampled_md = np.array(depths, copy = True)
         return pos
+
+    def deviation(self):
+        """Deviation survey
+
+        Compute an approximate deviation survey from the position log, i.e. the
+        measured that would be convertable to this well path. It is assumed
+        that inclination, azimuth, and measured-depth starts at 0.
+
+        Returns
+        -------
+        dev : deviation
+        """
+
+        upper = zip(self.northing[:-1], self.easting[:-1], self.depth[:-1])
+        lower = zip(self.northing[1:],  self.easting[1:],  self.depth[1:])
+
+        """
+        The implementation is based on this [1] stackexchange answer by tma,
+        which is included verbatim for future reference.
+
+            In order to get a better picture you should look at the problem in
+            2d. Your arc from (x1,y1,z1) to (x2,y2,z2) lives in a 2d plane,
+            also in the same pane the tangents (a1,i1) and (a2, i2). The 2d
+            plane is given by the vector (x1,y1,y3) to (x2,y2,z2) and vector
+            converted from polar to Cartesian of (a1, i1). In case their
+            co-linear is just a straight line and your done. Given the angle
+            between the (x1,y1,z2) and (a1, i1) be alpha, then the angle
+            between (x2,y2,z2) and (a2, i2) is –alpha. Use the normal vector of
+            the 2d plane and rotate normalized vector (x1,y1,z1) to (x2,y2,z2)
+            by alpha (maybe –alpha) and converter back to polar coordinates,
+            which gives you (a2,i2). If d is the distance from (x1,y1,z1) to
+            (x2,y2,z2) then MD = d* alpha /sin(alpha).
+
+        In essence, the well path (in cartesian coordinates) is evaluated in
+        segments from top to bottom, and for every segment the inclination and
+        azimuth "downwards" are reconstructed. The reconstructed inc and azi is
+        used as "entry angle" of the well bore into the next segment. This uses
+        some assumptions deriving from knowing that the position log was
+        calculated with the min-curve method, since a straight
+        cartesian-to-spherical conversion could be very sensitive [2].
+
+        [1] https://math.stackexchange.com/a/1191620
+        [2] I observed low error on average, but some segments could be off by
+            80 degrees azimuth
+        """
+
+        # Assume the initial depth and angles are all zero, but this can likely
+        # be parametrised.
+        incs, azis, mds = [0], [0], [0]
+        i1, a1 = 0, 0
+
+        for up, lo in zip(upper, lower):
+            up = np.array(up)
+            lo = np.array(lo)
+
+            # Make two vectors
+            # v1 is the vector from the upper survey station to the lower
+            # v2 is the vector formed by the initial inc/azi (given by the
+            # previous iteration).
+            #
+            # The v1 and v2 vectors form a plane the well path arc lives in.
+            v1 = lo - up
+            v2 = np.array(geometry.direction_vector(i1, a1))
+
+            alpha  = geometry.angle_between(v1, v2)
+            normal = geometry.normal_vector(v1, v2)
+
+            # v3 is the "exit vector", i.e. the direction of the well bore
+            # at the lower survey station, which would in turn be "entry
+            # direction" in the next segment.
+            v3 = geometry.rotate(v1, normal, -alpha)
+            i2, a2 = geometry.spherical(*v3)
+
+            # d is the length of the vector (straight line) from the upper
+            # station to the lower station.
+            d = np.linalg.norm(v1)
+            incs.append(i2)
+            azis.append(a2)
+            mds.append(d * alpha / np.sin(alpha))
+            # The current lower station is the upper station in the next
+            # segment.
+            i1 = i2
+            a1 = a2
+
+        mds = np.cumsum(mds)
+        return deviation(
+            md  = np.array(mds),
+            inc = np.array(incs),
+            azi = np.array(azis),
+        )

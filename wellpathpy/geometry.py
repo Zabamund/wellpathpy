@@ -16,10 +16,10 @@ def direction_vector(inc, azi):
 
     Returns
     -------
-    vd : array_like of float
-        vertial direction
     northing : array_like of float
     easting : array_like of float
+    vd : array_like of float
+        vertial direction
 
     Examples
     --------
@@ -42,7 +42,7 @@ def direction_vector(inc, azi):
     northing = np.sin(inc) * np.cos(az)
     easting  = np.sin(inc) * np.sin(az)
 
-    return vd, northing, easting
+    return northing, easting, vd
 
 def spherical(northing, easting, depth):
     """[N E V] -> (inc, azi)
@@ -102,3 +102,179 @@ def spherical(northing, easting, depth):
     azi = np.rad2deg(azi)
     return inc, azi
 
+def normalize(v):
+    """Normalize vector or compute unit vector
+
+    Compute the normalized (unit vector) [1]_ of v, a vector with the same
+    direction, but a length of 1.
+
+    Parameters
+    ----------
+    v : array_like
+
+    Returns
+    -------
+    V : array_like
+        normalized v
+
+    Notes
+    -----
+    Normalize is in addition to zeros also sensitive to *very* small floats.
+
+        Falsifying example: deviation_survey=(
+            md = array([0.0000000e+000, 1.0000000e+000, 4.1242594e-162]),
+            inc = array([0., 0., 0.]),
+            azi = array([0., 0., 0.]))
+
+    yields a dot product of 1.0712553822854385, which is outside [-1, 1]. This
+    should *really* only show up in testing scenarios and not real data.
+
+    Whenever norm values are less than eps, consider them zero. All zero norms
+    are assigned 1, to avoid divide-by-zero. The value for zero is chosen
+    arbitrarily as a something that shouldn't happen in real data, or when it
+    does is reasonable to consier as zero.
+
+    References
+    ----------
+    .. [1] https://mathworld.wolfram.com/NormalizedVector.html
+    """
+    norm = np.atleast_1d(np.linalg.norm(v))
+    zero = 1e-15
+    norm[np.abs(norm) < zero] = 1.0
+    return v / norm
+
+def unit_vector(v):
+    """Alias to normalize
+
+    See also
+    --------
+    normalize
+    """
+    return normalize(v)
+
+def angle_between(v1, v2):
+    """Angle between vectors
+
+    Parameters
+    ----------
+    v1 : array_like
+    v2 : array_like
+
+    Returns
+    -------
+    alpha : float
+        Angle between vectors in radians
+
+    Examples
+    --------
+    >>> angle_between((1, 0, 0), (0, 1, 0))
+    1.5707963267948966
+    >>> angle_between((1, 0, 0), (1, 0, 0))
+    0.0
+    >>> angle_between((1, 0, 0), (-1, 0, 0))
+    3.141592653589793
+    """
+    v1unit = normalize(v1)
+    v2unit = normalize(v2)
+    dot = np.dot(v1unit, v2unit)
+    # arccos is only defined [-1,1], dot can _sometimes_ go outside this domain
+    # because of floating points
+    return np.arccos(np.clip(dot, -1.0, 1.0))
+
+def normal_vector(v1, v2):
+    """Normal vector to plane given by vectors v1 and v2
+
+    From mathworld [1]_: The normal vector, often simply called the "normal,"
+    to a surface is a vector which is perpendicular to the surface at a given
+    point.
+
+    Parameters
+    ----------
+    v1 : array_like
+    v2 : array_like
+
+    Returns
+    -------
+    normal : array_like
+        A normal vector to the plane
+
+    References
+    ----------
+    .. [1] https://mathworld.wolfram.com/NormalVector.html
+    """
+    return np.cross(v1, v2)
+
+def mul_quat(q1, q2):
+    """Quaternion multiplication
+
+    This is for internal use and may be removed without notice.
+    """
+    q3 = np.copy(q1)
+    q3[0] = q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3]
+    q3[1] = q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2]
+    q3[2] = q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1]
+    q3[3] = q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0]
+    return q3
+
+def rotate(vector, axis, angle):
+    """Rotate vector around an axis
+
+    Rotate the vector around the axis.
+
+    Parameters
+    ----------
+    vector : array_like
+        Vector to rotate
+    axis : array_like
+        Axis to rotate around
+    angle : float
+        Angle to rotate, in radians
+
+    Returns
+    -------
+    v : array_like
+        The rotated vector
+    """
+    # Vector rotate is implemented in terms of quaternions - while this means
+    # some extra maths, it avoids a heavy scipy dependency for this one
+    # operation.
+    #
+    # In early development, the rotate() function looked like this:
+    #     def rotate(vector, axis, angle):
+    #         import scipy
+    #         from scipy.spatial.transform import Rotation
+    #         rot = Rotation.from_rotvec(angle * normalize(axis))
+    #         return normalize(rot.apply(normalize(vector)))
+    #
+    # this is obviously much nicer, but has the drawback of pulling the massive
+    # scipy dependency. If wellpathpy should at some point depend on scipy
+    # anyway, the implementation of rotate() should be changed to using
+    # scipy.spatial.transform.
+    #
+    # The implementation is short enough to do by hand, and to not pull in a
+    # large quaternion library (at which point we might as well pull scipy
+    # which is more likely to already be installed).
+    #
+    # Both implementations are based on answers in this thread, with some
+    # slight modifications
+    # https://stackoverflow.com/questions/6802577/rotation-of-3d-vector/25709323
+
+    # https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Using_quaternion_as_rotations
+    # compute the rotation quaternion
+    axis = normalize(axis)
+    rotq = np.append([np.cos(angle/2)], np.sin(angle/2) * axis)
+
+    # compute the quaternion form of the vector
+    vect = np.append([0], vector)
+    vecq = normalize(vect)
+    norm = np.linalg.norm(vect)
+    # conjugate the rotation quaternion
+    conj = np.append(rotq[0], -rotq[1:])
+    # multiply with the norm in order to preserve length. As of now the only
+    # property used post-rotation is the direction (to compute angles), but
+    # preserving vector magnitude means that the numerical values of vectors
+    # should be reasonably close, which in turn should make floating-point
+    # arithmetic more predictable.
+    # r = p' = qpq^-1
+    r = mul_quat(rotq, mul_quat(vecq, conj)) * norm
+    return r[1:]

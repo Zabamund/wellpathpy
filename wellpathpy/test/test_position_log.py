@@ -30,6 +30,8 @@ def test_resample_onto_unchanged_md(survey):
 
 def test_copy():
     original = position_log(np.array([]), np.array([1,2,3,4]), [4,3,2,1], [1,1,1,1])
+    original.resampled_md = (original.depth + 1)
     copy = original.copy()
     original.depth += 10
     np.testing.assert_equal([1,2,3,4], copy.depth)
+    np.testing.assert_equal([2,3,4,5], copy.resampled_md)

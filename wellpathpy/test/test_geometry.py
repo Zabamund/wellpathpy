@@ -11,18 +11,18 @@ from ..geometry import direction_vector
 
 @given(floats(allow_nan=False, allow_infinity=False), floats(allow_nan=False, allow_infinity=False))
 def test_unit_vector_domain(inc, azi):
-    vd, northing, easting = direction_vector(inc, azi)
+    northing, easting, vd = direction_vector(inc, azi)
     assert -1 <= vd <= 1
     assert -1 <= northing <= 1
     assert -1 <= easting <= 1
 
 @given(floats(allow_nan=False, allow_infinity=False))
 def test_zero_inc_yields_vertical_nev(azi):
-    assert direction_vector(0.0, azi) == (1, 0, 0)
+    assert direction_vector(0.0, azi) == (0, 0, 1)
 
 @given(floats(allow_nan=False, allow_infinity=False))
 def test_zero_azi_fixes_easting(inc):
-    vd, northing, easting = direction_vector(inc, 0.0)
+    northing, easting, vd = direction_vector(inc, 0.0)
     assert -1 <= vd <= 1
     assert -1 <= northing <= 1
     assert easting == 0
@@ -30,19 +30,19 @@ def test_zero_azi_fixes_easting(inc):
 #test up/down and cardinal points
 @given(floats(allow_nan=False, allow_infinity=False))
 def test_180_inc_yields_vertical_nev(azi):
-    assert direction_vector(180., azi) == (-1, approx(0), approx(0))
+    assert direction_vector(180., azi) == (approx(0), approx(0), -1)
 
 def test_n_hor_yields_north_nev():
-    assert direction_vector(90., 0) == (approx(0), 1, approx(0))
+    assert direction_vector(90., 0) == (1, approx(0), approx(0))
 
 def test_s_hor_yields_south_nev():
-    assert direction_vector(90., 180.) == (approx(0), -1, approx(0))
+    assert direction_vector(90., 180.) == (-1, approx(0), approx(0))
 
 def test_e_hor_yields_east_nev():
-    assert direction_vector(90., 90.) == (approx(0), approx(0), 1)
+    assert direction_vector(90., 90.) == (approx(0), 1, approx(0))
 
 def test_w_hor_yields_west_nev():
-    assert direction_vector(90., 270.) == (approx(0), approx(0), -1)
+    assert direction_vector(90., 270.) == (approx(0), -1, approx(0))
 
 # Systematic random orientations covering all eight octants
 # we use https://www.wolframalpha.com/ in order to generate
@@ -54,72 +54,72 @@ def test_w_hor_yields_west_nev():
 def test_north_east_up():
     #[x  y  z]
     #[0.43, 0.17, 0.93]
-    vd, n, e = direction_vector(26.436, 21.5713)
+    n, e, v = direction_vector(26.436, 21.5713)
     assert n == approx(0.414017, rel=1e-5)
     assert e == approx(0.163681, rel=1e-5)
-    assert vd == approx(0.895432, rel=1e-5)
+    assert v == approx(0.895432, rel=1e-5)
 
 def test_north_east_down():
     #[x  y -z]
     #[0.75, 0.87, -0.34]
-    vd, n, e = direction_vector(73.5113, 49.2364)
+    n, e, v = direction_vector(73.5113, 49.2364)
     assert n == approx(0.626088, rel=1e-5)
     assert e == approx(0.726262, rel=1e-5)
-    assert vd == approx(0.283827, rel=1e-5)
+    assert v == approx(0.283827, rel=1e-5)
 
 def test_south_east_up():
     #[x -y  z]
     #[0.86, -0.34, 0.65]
-    vd, n, e = direction_vector(54.8975, -21.5713)
+    n, e, v = direction_vector(54.8975, -21.5713)
     assert n == approx(0.760824, rel=1e-5)
     assert e == approx(-0.300791, rel=1e-5)
-    assert vd == approx(0.575041, rel=1e-5)
+    assert v == approx(0.575041, rel=1e-5)
 
 def test_south_east_down():
     #[x -y -z]
     #[0.88, -0.98, -0.97]
-    vd, n, e = direction_vector(53.63, -48.0775)
+    n, e, v = direction_vector(53.63, -48.0775)
     assert n == approx(0.537977, rel=1e-5)
     assert e == approx(-0.599111, rel=1e-5)
-    assert vd == approx(0.592998, rel=1e-5)
+    assert v == approx(0.592998, rel=1e-5)
 
 def test_north_west_up():
     #[-x  y  z]
     #[-0.43, 0.54, 0.62]
-    vd, n, e = direction_vector(48.0707, 128.53)
+    n, e, v = direction_vector(48.0707, 128.53)
     assert n == approx(-0.463438, rel=1e-5)
     assert e == approx(0.581993, rel=1e-5)
-    assert vd == approx(0.668214, rel=1e-5)
+    assert v == approx(0.668214, rel=1e-5)
 
 def test_north_west_down():
     #[-x  y -z]
     #[-0.87, 0.63, -0.94]
-    vd, n, e = direction_vector(48.8105, 144.09)
+    n, e, v = direction_vector(48.8105, 144.09)
     assert n == approx(-0.60951, rel=1e-5)
     assert e == approx(0.44137, rel=1e-5)
-    assert vd == approx(0.658551, rel=1e-5)
+    assert v == approx(0.658551, rel=1e-5)
 
 def test_south_west_up():
     #[-x -y  z]
     #[-0.77, -0.58, 0.84]
-    vd, n, e = direction_vector(48.9322, -143.011)
+    n, e, v = direction_vector(48.9322, -143.011)
     assert n == approx(-0.602206, rel=1e-5)
     assert e == approx(-0.45361, rel=1e-5)
-    assert vd == approx(0.656952, rel=1e-5)
+    assert v == approx(0.656952, rel=1e-5)
 
 def test_south_west_down():
     #[-x -y -z]
     #[-0.98, -0.49, -0.64]
-    vd, n, e = direction_vector(59.7101, -153.435)
+    n, e, v = direction_vector(59.7101, -153.435)
     assert n == approx(-0.772324, rel=1e-5)
     assert e == approx(-0.386162, rel=1e-5)
-    assert vd == approx(0.504375, rel=1e-5)
+    assert v == approx(0.504375, rel=1e-5)
 
 def test_array():
-    vd, n, e = direction_vector([59.7101, 48.9322], [-153.435, -143.011])
+    n, e, v = direction_vector([59.7101, 48.9322], [-153.435, -143.011])
     np.testing.assert_allclose(n, np.array([-0.772324, -0.602206]), rtol=1e-5)
     np.testing.assert_allclose(e, np.array([-0.386162, -0.45361]), rtol=1e-5)
-    np.testing.assert_allclose(vd, np.array([0.504375, 0.656952]), rtol=1e-5)
+    np.testing.assert_allclose(v, np.array([0.504375, 0.656952]), rtol=1e-5)
 
 from ..geometry import spherical
 
@@ -165,7 +165,7 @@ def test_spherical_position_roundtrip(n, e, v):
     n, e, v = normalize(n, e, v)
 
     inc, azi = spherical(n, e, v)
-    V, N, E = direction_vector(inc, azi)
+    N, E, V = direction_vector(inc, azi)
 
     if np.isnan(V):
         assert np.isnan(v)
