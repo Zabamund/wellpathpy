@@ -203,3 +203,78 @@ def normal_vector(v1, v2):
     .. [1] https://mathworld.wolfram.com/NormalVector.html
     """
     return np.cross(v1, v2)
+
+def mul_quat(q1, q2):
+    """Quaternion multiplication
+
+    This is for internal use and may be removed without notice.
+    """
+    q3 = np.copy(q1)
+    q3[0] = q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3]
+    q3[1] = q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2]
+    q3[2] = q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1]
+    q3[3] = q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0]
+    return q3
+
+def rotate(vector, axis, angle):
+    """Rotate vector around an axis
+
+    Rotate the vector around the axis.
+
+    Parameters
+    ----------
+    vector : array_like
+        Vector to rotate
+    axis : array_like
+        Axis to rotate around
+    angle : float
+        Angle to rotate, in radians
+
+    Returns
+    -------
+    v : array_like
+        The rotated vector
+    """
+    # Vector rotate is implemented in terms of quaternions - while this means
+    # some extra maths, it avoids a heavy scipy dependency for this one
+    # operation.
+    #
+    # In early development, the rotate() function looked like this:
+    #     def rotate(vector, axis, angle):
+    #         import scipy
+    #         from scipy.spatial.transform import Rotation
+    #         rot = Rotation.from_rotvec(angle * normalize(axis))
+    #         return normalize(rot.apply(normalize(vector)))
+    #
+    # this is obviously much nicer, but has the drawback of pulling the massive
+    # scipy dependency. If wellpathpy should at some point depend on scipy
+    # anyway, the implementation of rotate() should be changed to using
+    # scipy.spatial.transform.
+    #
+    # The implementation is short enough to do by hand, and to not pull in a
+    # large quaternion library (at which point we might as well pull scipy
+    # which is more likely to already be installed).
+    #
+    # Both implementations are based on answers in this thread, with some
+    # slight modifications
+    # https://stackoverflow.com/questions/6802577/rotation-of-3d-vector/25709323
+
+    # https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Using_quaternion_as_rotations
+    # compute the rotation quaternion
+    axis = normalize(axis)
+    rotq = np.append([np.cos(angle/2)], np.sin(angle/2) * axis)
+
+    # compute the quaternion form of the vector
+    vect = np.append([0], vector)
+    vecq = normalize(vect)
+    norm = np.linalg.norm(vect)
+    # conjugate the rotation quaternion
+    conj = np.append(rotq[0], -rotq[1:])
+    # multiply with the norm in order to preserve length. As of now the only
+    # property used post-rotation is the direction (to compute angles), but
+    # preserving vector magnitude means that the numerical values of vectors
+    # should be reasonably close, which in turn should make floating-point
+    # arithmetic more predictable.
+    # r = p' = qpq^-1
+    r = mul_quat(rotq, mul_quat(vecq, conj)) * norm
+    return r[1:]

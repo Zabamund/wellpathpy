@@ -207,3 +207,93 @@ class minimum_curvature(position_log):
         )
         pos.resampled_md = np.array(depths, copy = True)
         return pos
+
+    def deviation(self):
+        """Deviation survey
+
+        Compute an approximate deviation survey from the position log, i.e. the
+        measured that would be convertable to this well path. It is assumed
+        that inclination, azimuth, and measured-depth starts at 0.
+
+        Returns
+        -------
+        dev : deviation
+        """
+
+        upper = zip(self.northing[:-1], self.easting[:-1], self.depth[:-1])
+        lower = zip(self.northing[1:],  self.easting[1:],  self.depth[1:])
+
+        """
+        The implementation is based on this [1] stackexchange answer by tma,
+        which is included verbatim for future reference.
+
+            In order to get a better picture you should look at the problem in
+            2d. Your arc from (x1,y1,z1) to (x2,y2,z2) lives in a 2d plane,
+            also in the same pane the tangents (a1,i1) and (a2, i2). The 2d
+            plane is given by the vector (x1,y1,y3) to (x2,y2,z2) and vector
+            converted from polar to Cartesian of (a1, i1). In case their
+            co-linear is just a straight line and your done. Given the angle
+            between the (x1,y1,z2) and (a1, i1) be alpha, then the angle
+            between (x2,y2,z2) and (a2, i2) is –alpha. Use the normal vector of
+            the 2d plane and rotate normalized vector (x1,y1,z1) to (x2,y2,z2)
+            by alpha (maybe –alpha) and converter back to polar coordinates,
+            which gives you (a2,i2). If d is the distance from (x1,y1,z1) to
+            (x2,y2,z2) then MD = d* alpha /sin(alpha).
+
+        In essence, the well path (in cartesian coordinates) is evaluated in
+        segments from top to bottom, and for every segment the inclination and
+        azimuth "downwards" are reconstructed. The reconstructed inc and azi is
+        used as "entry angle" of the well bore into the next segment. This uses
+        some assumptions deriving from knowing that the position log was
+        calculated with the min-curve method, since a straight
+        cartesian-to-spherical conversion could be very sensitive [2].
+
+        [1] https://math.stackexchange.com/a/1191620
+        [2] I observed low error on average, but some segments could be off by
+            80 degrees azimuth
+        """
+
+        # Assume the initial depth and angles are all zero, but this can likely
+        # be parametrised.
+        incs, azis, mds = [0], [0], [0]
+        i1, a1 = 0, 0
+
+        for up, lo in zip(upper, lower):
+            up = np.array(up)
+            lo = np.array(lo)
+
+            # Make two vectors
+            # v1 is the vector from the upper survey station to the lower
+            # v2 is the vector formed by the initial inc/azi (given by the
+            # previous iteration).
+            #
+            # The v1 and v2 vectors form a plane the well path arc lives in.
+            v1 = lo - up
+            v2 = np.array(geometry.direction_vector(i1, a1))
+
+            alpha  = geometry.angle_between(v1, v2)
+            normal = geometry.normal_vector(v1, v2)
+
+            # v3 is the "exit vector", i.e. the direction of the well bore
+            # at the lower survey station, which would in turn be "entry
+            # direction" in the next segment.
+            v3 = geometry.rotate(v1, normal, -alpha)
+            i2, a2 = geometry.spherical(*v3)
+
+            # d is the length of the vector (straight line) from the upper
+            # station to the lower station.
+            d = np.linalg.norm(v1)
+            incs.append(i2)
+            azis.append(a2)
+            mds.append(d * alpha / np.sin(alpha))
+            # The current lower station is the upper station in the next
+            # segment.
+            i1 = i2
+            a1 = a2
+
+        mds = np.cumsum(mds)
+        return deviation(
+            md  = np.array(mds),
+            inc = np.array(incs),
+            azi = np.array(azis),
+        )
