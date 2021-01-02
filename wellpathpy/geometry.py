@@ -1,10 +1,12 @@
 import numpy as np
 
 def direction_vector(inc, azi):
-    """ Compute a direction vector from inclination and azimuth
+    """(inc, azi) -> [N E V]
 
-    Convert spherical coordinates (inc, azi) to cubic coordinates (vertical
-    depth, northing, easting), a unit length direction vector in a right handed
+    Compute a direction vector from inclination and azimuth.
+
+    Convert spherical coordinates (inc, azi) to cubic coordinates (northing,
+    easting, vertical depth), a unit length direction vector in a right handed
     coordinate system.
 
     Parameters
