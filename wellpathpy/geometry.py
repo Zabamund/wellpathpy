@@ -112,7 +112,7 @@ def normalize(v):
 
     Parameters
     ----------
-    v : array_like
+    v : array_like or array_like of vectors
 
     Returns
     -------
@@ -139,11 +139,27 @@ def normalize(v):
     References
     ----------
     .. [1] https://mathworld.wolfram.com/NormalizedVector.html
+
+    Examples
+    --------
+    >>> a = [2, 4, 3]
+    >>> b = [5, 6, 7]
+    >>> normalize(a)
+    [0.371391, 0.742781, 0.557086]
+    >>> normalize([a, b])
+    [[0.37139068 0.74278135 0.55708601]
+     [0.47673129 0.57207755 0.66742381]]
     """
-    norm = np.atleast_1d(np.linalg.norm(v))
+    v = np.asarray(v)
+    norm = np.atleast_1d(np.linalg.norm(v, axis = v.ndim - 1))
+
     zero = 1e-15
-    norm[np.abs(norm) < zero] = 1.0
-    return v / norm
+    norm.ravel()[np.abs(norm.ravel()) < zero] = 1.0
+
+    if v.ndim == 1:
+        return v / norm[:]
+    else:
+        return v / norm[:, np.newaxis]
 
 def unit_vector(v):
     """Alias to normalize

@@ -10,6 +10,7 @@ from . import same_len_lists
 
 from ..geometry import direction_vector
 from ..geometry import angle_between
+from .. import geometry
 
 @given(floats(allow_nan=False, allow_infinity=False), floats(allow_nan=False, allow_infinity=False))
 def test_unit_vector_domain(inc, azi):
@@ -192,3 +193,14 @@ def test_angle_between():
     a = [[1, 0, 0]]
     b = [[0, 1, 0]]
     npt.assert_array_almost_equal(angle_between(a, b), [1.5707963267948966])
+
+def test_normalize():
+    a = [2, 4, 3]
+    b = [5, 6, 7]
+
+    norma = [0.371391, 0.742781, 0.557086]
+    normb = [0.476731, 0.572078, 0.667424]
+    npt.assert_array_almost_equal(geometry.normalize(a), norma)
+    npt.assert_array_almost_equal(geometry.normalize(b), normb)
+    ab = [a, b]
+    npt.assert_array_almost_equal(geometry.normalize(ab), [norma, normb])
