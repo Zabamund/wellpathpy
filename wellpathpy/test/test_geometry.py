@@ -157,9 +157,9 @@ def normalize(x, y, z):
     return x / magnitude, y / magnitude, z / magnitude
 
 @given(
-    floats(allow_nan = False, allow_infinity = False),
-    floats(allow_nan = False, allow_infinity = False),
-    floats(allow_nan = False, allow_infinity = False),
+    floats(allow_nan = False, allow_infinity = False, min_value = 1e-12, max_value=1e12),
+    floats(allow_nan = False, allow_infinity = False, min_value = 1e-12, max_value=1e12),
+    floats(allow_nan = False, allow_infinity = False, min_value = 1e-12, max_value=1e12),
 )
 def test_spherical_position_roundtrip(n, e, v):
     n, e, v = normalize(n, e, v)
