@@ -1,10 +1,12 @@
 import numpy as np
 
 def direction_vector(inc, azi):
-    """ Compute a direction vector from inclination and azimuth
+    """(inc, azi) -> [N E V]
 
-    Convert spherical coordinates (inc, azi) to cubic coordinates (vertical
-    depth, northing, easting), a unit length direction vector in a right handed
+    Compute a direction vector from inclination and azimuth.
+
+    Convert spherical coordinates (inc, azi) to cubic coordinates (northing,
+    easting, vertical depth), a unit length direction vector in a right handed
     coordinate system.
 
     Parameters
@@ -110,7 +112,7 @@ def normalize(v):
 
     Parameters
     ----------
-    v : array_like
+    v : array_like or array_like of vectors
 
     Returns
     -------
@@ -137,11 +139,27 @@ def normalize(v):
     References
     ----------
     .. [1] https://mathworld.wolfram.com/NormalizedVector.html
+
+    Examples
+    --------
+    >>> a = [2, 4, 3]
+    >>> b = [5, 6, 7]
+    >>> normalize(a)
+    [0.371391, 0.742781, 0.557086]
+    >>> normalize([a, b])
+    [[0.37139068 0.74278135 0.55708601]
+     [0.47673129 0.57207755 0.66742381]]
     """
-    norm = np.atleast_1d(np.linalg.norm(v))
+    v = np.asarray(v)
+    norm = np.atleast_1d(np.linalg.norm(v, axis = v.ndim - 1))
+
     zero = 1e-15
-    norm[np.abs(norm) < zero] = 1.0
-    return v / norm
+    norm.ravel()[np.abs(norm.ravel()) < zero] = 1.0
+
+    if v.ndim == 1:
+        return v / norm[:]
+    else:
+        return v / norm[:, np.newaxis]
 
 def unit_vector(v):
     """Alias to normalize
@@ -153,7 +171,7 @@ def unit_vector(v):
     return normalize(v)
 
 def angle_between(v1, v2):
-    """Angle between vectors
+    """Return the angle between (arrays of) vectors
 
     Parameters
     ----------
@@ -173,10 +191,22 @@ def angle_between(v1, v2):
     0.0
     >>> angle_between((1, 0, 0), (-1, 0, 0))
     3.141592653589793
+    >>> a = [[1, 0, 0]]
+    >>> b = [[0, 1, 0]]
+    >>> angle_between(a, b)
+    [1.5707963267948966]
     """
-    v1unit = normalize(v1)
-    v2unit = normalize(v2)
-    dot = np.dot(v1unit, v2unit)
+    # The angle between vectors is computed from the dot-product, but we want
+    # to also do this for arrays-of-vectors, and np.dot() interprets that as
+    # matrix multiplication.
+    v1 = normalize(v1)
+    v2 = normalize(v2)
+    if v1.ndim == 1:
+        dot = np.dot(v1, v2)
+    else:
+        # This is just a way of writing dot(v1,v2) for an array-of-vectors
+        dot = np.einsum('ij,ij->i', v1, v2)
+
     # arccos is only defined [-1,1], dot can _sometimes_ go outside this domain
     # because of floating points
     return np.arccos(np.clip(dot, -1.0, 1.0))

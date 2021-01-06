@@ -63,12 +63,9 @@ class position_log:
         self.depth = depth
         self.northing = northing
         self.easting = easting
-        self.resampled_md = None
 
     def copy(self):
         l = position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
-        if self.resampled_md is not None:
-            l.resampled_md = np.copy(self.resampled_md)
         return l
 
     def to_wellhead(self, surface_northing, surface_easting):
@@ -98,7 +95,7 @@ class position_log:
     def deviation(self, *args, **kwargs):
         raise NotImplementedError
 
-def spherical_interpolate(p0, p1, t):
+def spherical_interpolate(p0, p1, t, omega):
     """
     https://en.wikipedia.org/wiki/Slerp
 
@@ -115,13 +112,14 @@ def spherical_interpolate(p0, p1, t):
         Last points  on the arc, in (northing, easting, tvd)
     t : array_like
         The points between p0 and p1 to return, 0 <= t <= 1
+    omega : float
+        The angle subtended by the arc
 
     Returns
     -------
     positions : array_like
         Resampled positions in (northing, easting, tvd)
     """
-    omega = geometry.angle_between(p0, p1)
     if omega != 0:
         v0 = np.sin((1 - t) * omega) / np.sin(omega)
         v1 = np.sin(     t  * omega) / np.sin(omega)
@@ -140,8 +138,6 @@ class minimum_curvature(position_log):
 
     def copy(self):
         l = minimum_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting), np.copy(self.dls))
-        if self.resampled_md is not None:
-            l.resampled_md = np.copy(self.resampled_md)
         return l
 
     def resample(self, depths):
@@ -165,10 +161,35 @@ class minimum_curvature(position_log):
         >>> depths = list(range(int(dev.md[-1]) + 1))
         >>> resampled = pos.resample(depths = depths)
         """
-        # break the well path into its survey stations, upper and lower, and
-        # consider the well path between two stations a curve, the edge of a
-        # circle, between them. Interpolate each of these segments
-        # individually, and stack the results.
+        # This function uses a lot of geometry, and is easier to follow
+        # when able to see the shapes, vectors, and lines. There is a geogebra
+        # [1] project checked [2] in, which draws the arc, chord, sphere and
+        # tangents at an arbitrary segment.
+        #
+        # The geogebra file can be viewed through with a geogebra client, or in
+        # their web client [3].
+        #
+        # In maths terms, resampling is done by breaking the well back into
+        # segments between the (measured) survey stations in (inc, azi).
+        # The line from the upper station (A) to the lower (B) is a chord on a
+        # sphere, to which the vectors derived from the inclination and azimuth
+        # at A and B are tangential. The arc between A and B is interpolated.
+        #
+        # The spherical_interpolate function takes the two points A and B, but
+        # assumes that A and B have their origin in the centre of the sphere,
+        # but A and B as given have their centre in the cartesian (0, 0, 0). To
+        # address this, the centre of the circle is determined through a dance
+        # of cross products, see the geogebra file [2]. It boils down to
+        # finding the normal unit vector to either tangent with direction
+        # towards the centre (C) of the sphere.
+        #
+        # To make it easier to follow the geometry, and map it back to
+        # illustration, variable names are generally capital letters and in
+        # terms of geometry.
+        #
+        # [1] https://www.geogebra.org/
+        # [2] wellpathpy/docs/arc-interpolation.ggb
+        # [3] https://www.geogebra.org/3d
 
         depths = np.asarray(depths)
         nve = np.column_stack([self.northing, self.easting, self.depth])
@@ -178,6 +199,47 @@ class minimum_curvature(position_log):
         mds = self.source.md
         md_upper = mds[:-1]
         md_lower = mds[1:]
+
+        A  = upper
+        B  = lower
+        AB = B - A
+
+        # The inc/azis, gives tangents of the arc, for every segment
+        incs = self.source.inc
+        azis = self.source.azi
+        Ts  = np.column_stack(geometry.direction_vector(incs, azis))
+        Tup = Ts[:-1]
+        Tlo = Ts[1:]
+        Tco = geometry.normalize(np.cross(Tup, Tlo))
+        N   = geometry.normalize(np.cross(Tlo, Tco))
+
+        # The angle alpha = <(AB,Tup) is identicial to the angle <(AB,Tlo).
+        # Since AC and AB are both perpendicular to the tangents Tup and Tlo,
+        # the angle <CAB and <ABC is given by (pi/2 - alpha). This gives the
+        # angle omega = 2*alpha, the angle subtended by the arc, which is the
+        # parameter to the interpolation.
+        #
+        # For an illustration with these names in 2D, see
+        # wellpathpy/docs/arc.png
+        alpha = geometry.angle_between(AB, Tup)
+        omega = 2 * alpha
+        # If the angle is zero, the hole is straight and arc is undefined.
+        # Handling this well probably needs a better check, and a good test
+        # suite backing it
+        sinalpha = 2 * np.sin(alpha)
+        sinalpha.ravel()[sinalpha.ravel() == 0] = 1
+        radius = np.linalg.norm(AB, axis = 1) / sinalpha
+        # Get the centre of the sphere by following the selected normal vector
+        # by the length of the radius. The N is normal, but in opposite
+        # direction (it has the direction from centre to surface, but we want
+        # from surface to centre)
+        C = B - N * radius[:, np.newaxis]
+
+        # P0 and P1 are the points at the start/end of the arc and chord, but
+        # "moved" to be relative to the origin (0, 0, 0) rather than C, the
+        # centre of the sphere
+        P0 = A - C
+        P1 = B - C
 
         assert len(md_upper) == len(md_lower)
         assert len(upper) == len(md_upper)
@@ -193,19 +255,21 @@ class minimum_curvature(position_log):
             else:
                 md_i = depths[(depths >= md1) & (depths <= md2)]
 
+            # t are the points (0 <= t <= 1) on the arc to interpolate
             t = (md_i - md1) / (md2 - md1)
-            interpolated = spherical_interpolate(upper[i], lower[i], t)
-            xs.append(interpolated.T)
-        xs = np.concatenate(xs, axis = 0)
+            log = spherical_interpolate(P0[i], P1[i], t, omega[i])
+            log = log + C[i, :, np.newaxis]
+            xs.append(log)
+
+        xs = np.concatenate(xs, axis = 1)
 
         pos = minimum_curvature(
-            src = self.source,
-            depth = xs[:, 2],
-            n   = xs[:, 0],
-            e   = xs[:, 1],
+            src   = self.source,
+            depth = xs[2],
+            n     = xs[0],
+            e     = xs[1],
             dls = self.dls,
         )
-        pos.resampled_md = np.array(depths, copy = True)
         return pos
 
     def deviation(self):

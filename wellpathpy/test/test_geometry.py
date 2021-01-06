@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import numpy.testing as npt
 from hypothesis import given
 from hypothesis import assume
 from hypothesis.strategies import floats
@@ -8,6 +9,8 @@ from pytest import approx
 from . import same_len_lists
 
 from ..geometry import direction_vector
+from ..geometry import angle_between
+from .. import geometry
 
 @given(floats(allow_nan=False, allow_infinity=False), floats(allow_nan=False, allow_infinity=False))
 def test_unit_vector_domain(inc, azi):
@@ -157,9 +160,9 @@ def normalize(x, y, z):
     return x / magnitude, y / magnitude, z / magnitude
 
 @given(
-    floats(allow_nan = False, allow_infinity = False),
-    floats(allow_nan = False, allow_infinity = False),
-    floats(allow_nan = False, allow_infinity = False),
+    floats(allow_nan = False, allow_infinity = False, min_value = 1e-12, max_value=1e12),
+    floats(allow_nan = False, allow_infinity = False, min_value = 1e-12, max_value=1e12),
+    floats(allow_nan = False, allow_infinity = False, min_value = 1e-12, max_value=1e12),
 )
 def test_spherical_position_roundtrip(n, e, v):
     n, e, v = normalize(n, e, v)
@@ -181,3 +184,23 @@ def test_spherical_position_roundtrip(n, e, v):
         assert np.isnan(e)
     else:
         assert E == approx(e, abs = 1e-9)
+
+def test_angle_between():
+    assert angle_between((1, 0, 0), (0, 1, 0))  == approx(1.5707963267948966)
+    assert angle_between((1, 0, 0), (1, 0, 0))  == 0.0
+    assert angle_between((1, 0, 0), (-1, 0, 0)) == approx(3.141592653589793)
+
+    a = [[1, 0, 0]]
+    b = [[0, 1, 0]]
+    npt.assert_array_almost_equal(angle_between(a, b), [1.5707963267948966])
+
+def test_normalize():
+    a = [2, 4, 3]
+    b = [5, 6, 7]
+
+    norma = [0.371391, 0.742781, 0.557086]
+    normb = [0.476731, 0.572078, 0.667424]
+    npt.assert_array_almost_equal(geometry.normalize(a), norma)
+    npt.assert_array_almost_equal(geometry.normalize(b), normb)
+    ab = [a, b]
+    npt.assert_array_almost_equal(geometry.normalize(ab), [norma, normb])
