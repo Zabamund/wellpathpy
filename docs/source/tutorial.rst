@@ -61,7 +61,7 @@ A valid input file must be a CSV file containing the columns: md, inc, azi in th
 
 - column headers are **required**
 - md must increase monotonically
-- as inc and azi cannot be distinguished numerically it is the user's responsibility to ensure the data are passed in in this order
+- as inc and azi cannot be distinguished numerically it is the user's responsibility to ensure the data are passed in this order
 - inc must be in range 0-180 (to allow for horizontal wells to climb)
 - azi must be in range 0-360
 
@@ -75,7 +75,7 @@ You can then load them into wellpathpy using:
 
 Some simple sanity checks are performed to reject bad CSVs. ``wp.read_csv`` supports all options ``pd.read_csv`` supports. Only those columns named md, inc, azi will be read.
 
-If the deviation survey is not in CSV, is generated a different place in your
+If the deviation survey is not in CSV, is generated in a different place in your
 program, or is from some other source, wellpathpy is still useful. If you
 provide three ``np.ndarray`` md, inc, and azi, the rest of wellpathpy works fine.
 
@@ -85,6 +85,35 @@ Observe that the same basic requirements still apply:
 - md increases monotonically
 - inc is in range 0-180
 - azi is in range 0-360
+
+Once `md`, `inc` and `azi` have been returned from `wp.read_csv()`, an instance of the `wp.deviation()` class is created with:
+
+.. code-block:: python
+
+   dev = wp.deviation(
+       md = md,
+       inc = inc,
+       azi = azi
+   )
+
+With this, it is then possible to resample the depths using the minimum_curvature method and go back to a deviation survey in `md`, `inc` and `azi`:
+
+.. code-block:: python
+
+   step = 30
+   depths = list(range(0, int(dev.md[-1]) + 1, step))
+   pos = dev.mininum_curvature().resample(depths = depths)
+   dev2 = pos.deviation()
+
+With increasing step size, float uncertainty can introduce some noise:
+
+.. image:: ./figures/Deviation_resampling_example_step5.png
+    :width: 600
+    :alt: Deviation_resampling_example_step5
+   
+.. image:: ./figures/Deviation_resampling_example_step30.png
+    :width: 600
+    :alt: Deviation_resampling_example_step30
 
 Loading the well header
 #######################
