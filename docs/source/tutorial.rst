@@ -107,7 +107,11 @@ With this, it is then possible to resample the depths using the `minimum_curvatu
 
 **Notes**:
 
-With increasing step size, float uncertainty can introduce some noise as shown in the figures below:
+With increasing step size, float uncertainty can introduce some noise as shown in the figures below. First we see an overview of the well in 3D, followed by plots of inclination and azimuth versus depth.
+
+.. image:: ./figures/Example_well_3D.png
+    :width: 600
+    :alt: Example well positional log\n(no header information)
 
 .. image:: ./figures/Deviation_resampling_example_step5.png
     :width: 600
