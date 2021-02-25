@@ -96,7 +96,7 @@ Once `md`, `inc` and `azi` have been returned from `wp.read_csv()`, an instance 
        azi = azi
    )
 
-With this, it is then possible to resample the depths using the minimum_curvature method and go back to a deviation survey in `md`, `inc` and `azi`:
+With this, it is then possible to resample the depths using the `minimum_curvature()` method and go back to a deviation survey in `md`, `inc` and `azi`:
 
 .. code-block:: python
 
@@ -105,7 +105,9 @@ With this, it is then possible to resample the depths using the minimum_curvatur
    pos = dev.mininum_curvature().resample(depths = depths)
    dev2 = pos.deviation()
 
-With increasing step size, float uncertainty can introduce some noise:
+**Notes**:
+
+With increasing step size, float uncertainty can introduce some noise as shown in the figures below:
 
 .. image:: ./figures/Deviation_resampling_example_step5.png
     :width: 600
@@ -139,7 +141,7 @@ header from json file. The header requires the following keys:
 **Notes**:
 
 This function is provided for convenience - wellpathpy does not care about the
-source of this data.
+source of this data. It will simply use `json.load()` to read the JSON file and save it as a python `dict`.
 
 Converting units
 ################
