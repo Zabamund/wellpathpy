@@ -173,7 +173,7 @@ That means wellpathpy assumes the provided date are in SI units and degrees:
 Conversion API
 **************
 
-To convert between unit systems, you can use the unit_convert function:
+To convert between unit systems, you can use the `unit_convert` function:
 
 .. code-block:: python
 
@@ -189,6 +189,25 @@ To convert between unit systems, you can use the unit_convert function:
 
 Observe that the elevation and coordinate units are never explicitly read in
 the program, they're only passed to unit_convert.
+
+Using the same well as an example, which currently has MD units in 'ft':
+
+.. code-block:: python
+
+   # MD units in feet:
+   print('MD min: {:>7.2f} ft\nMD max: {:>7.2f} ft'.format(md.min(), md.max()))
+   MD min:    0.00 ft
+   MD max: 9450.67 ft
+
+Conversion to metres can be done with `wp.unit_convert()`:
+
+.. code-block:: python
+
+   md = wp.unit_convert(md, src='ft', dst='m')
+   # MD units in metres:
+   print('MD min: {:>7.2f} m\nMD max: {:>7.2f} m'.format(md.min(), md.max()))
+   MD min:    0.00 m
+   MD max: 2880.56 m
 
 The `pint <https://github.com/hgrecco/pint>`_ library drives the unit
 conversion. If you require units not already known to pint, you can pass your
