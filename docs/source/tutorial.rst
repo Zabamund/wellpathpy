@@ -225,57 +225,61 @@ Consider the need of converting a bizarre devation survey in
 Converting deviation surveys to positional logs
 ###############################################
 
-wellpathpy provides the following methods to convert **deviation surveys** md, inc, azi into **positional logs** tvd, northing, easting:
+All these methods can be accessed from the *deviation* object created with:
 
-Recommended methods
-*******************
+.. code-block:: python
 
-These methods are most commonly used in drilling operations and are recommended for most cases:
+   dev = wp.deviation(
+       md = md,
+       inc = inc,
+       azi = azi,
+       )
 
-- **minimum curvature method** : ``wp.mininum_curvature``
+Standard method
+***************
+
+The standard method for converting a **deviation surveys** [md, inc, azi] into a **positional logs** [tvd, northing, easting] is the *minimum curvature* method.
+This method is provided by wellpathpy and is recommended for most use cases.
+
+- **minimum curvature method** : ``dev.minimum_curvature()``
     This method uses angles from upper and lower end of survey interval to
     calculate a curve that passes through both survey points.
     This curve is
     smoothed by use of the ratio factor defined by the tortuosity or dogleg
     of the wellpath.
     This method returns a dogleg severity calculated for a given course_length.
-- **radius of curvature method** : ``wp.radius_curvature``
+
+Comparison methods
+******************
+
+Other methods are provided should the need arise to compare *mininum curvature* to older surveys that may have been calculated with one of these older methods.
+In general these other methods are **not recommended**.
+
+- **radius of curvature method** : ``dev.radius_curvature()``
     Calculate TVD using radius or curvature method.
     **Caution**: this will yield unreliable results when data are closely spaced
     or when the borehole is straight but deviated.
     This method uses angles from upper and lower end of survey interval to
     calculate a curve that passes through both survey points.
-
-Comparison methods
-******************
-
-These methods might be used for comparison to the recommended methods:
-
-- **average tan method** : ``wp.average_tan``
+- **average tan method** : ``dev.tan_method()``
     Calculate TVD using average tangential method.
     This method averages the inclination and azimuth at the top and
     bottom of the survey interval before taking their sine and cosine,
     this average angle is used to estimate tvd.
-- **balanced tan method** : ``wp.balanced_tan``
+- **balanced tan method** : ``dev.tan_method(choice='bal')``
     Calculate TVD using balanced tangential method.
     This method takes the sines and cosines of the inclination and azimuth
     at the top and bottom of the survey interval before averaging them,
     this average angle is used to estimate tvd.
-    This will provide a smoother curve than the ave_tan method but requires
+    This will provide a smoother curve than the average tan method but requires
     closely spaced survey stations to avoid errors.
-
-Not recommended methods
-***********************
-
-These methods are provided for completeness and in case a comparison must be made to an existing survey using these methods, but they are *not recommended*:
-
-- **high tan method** : ``wp.high_tan``
+- **high tan method** : ``dev.tan_method(choice='high')``
     Calculate TVD using high tangential method.
     This method takes the sines and cosines of the inclination and azimuth
     at the bottom of the survey interval to estimate tvd.
     This method is **not recommended** as it can make gross tvd and offset
     errors in typical deviated wells.
-- **low tan method** : ``wp.low_tan``
+- **low tan method** : ``dev.tan_method(choice='low')``
     Calculate TVD using low tangential method.
     This method takes the sines and cosines of the inclination and azimuth
     at the top of the survey interval to estimate tvd.
