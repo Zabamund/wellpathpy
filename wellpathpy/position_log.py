@@ -378,9 +378,4 @@ class radius_curvature(position_log):
     def copy(self):
         l = radius_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
         return l
-
-    def resample(self, depths):
-        raise NotImplementedError
-    
-    def deviation(self):
-        raise NotImplementedError
+        
