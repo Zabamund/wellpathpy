@@ -289,15 +289,21 @@ In general these other methods are **not recommended**.
 Usage
 *****
 
-In order to use any of these functions, you can run the following code once you've imported your deviation and header and done any unit conversion required as described above:
-
-Recommended usage:
+In order to use these functions, you first need a deviation object as described in `Loading a deviation`_.
+You can then run the following methods once you've imported your deviation and header and done any unit conversion required as described above.
 
 .. code-block:: python
 
-    tvd, northing, easting, dls = wp.mininum_curvature(md, inc, azi, course_length=30)
-    tvd, northing, easting      = wp.radius_curvature(md, inc, azi)
+    # The recommended method for most use-cases
+    tvd, northing, easting, dls = dev.mininum_curvature(course_length=30)
 
+    # Comparison methods to contrast with older deviation surveys
+    tvd, northing, easting      = dev.radius_curvature()
+    tvd, northing, easting      = dev.tan_method() # for the default 'avg' method
+    tvd, northing, easting      = dev.tan_method(choice='bal')
+    tvd, northing, easting      = dev.tan_method(choice='high')
+    tvd, northing, easting      = dev.tan_method(choice='low')
+    
 Well location and tvdss
 #######################
 
