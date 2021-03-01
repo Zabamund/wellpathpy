@@ -15,6 +15,7 @@ def tan_method(md, inc, azi, choice='avg'):
         well azimuth in degrees
     choice : str
         choice of tangential method to run
+        one of `['high', 'low', 'avg', 'bal']`
 
     Returns
     -------
