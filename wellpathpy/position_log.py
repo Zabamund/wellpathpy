@@ -3,6 +3,7 @@ import numpy as np
 from .checkarrays import checkarrays
 from .mincurve import minimum_curvature as mincurve
 from .rad_curv import radius_curvature as radcurve
+from .tan import tan_method as tanmethod
 from . import location
 from . import geometry
 
@@ -44,6 +45,15 @@ class deviation:
             azi = self.azi
         )
         return radius_curvature(self, tvd, n, e)
+
+    def tan_method(self, choice = 'avg'):
+        tvd, n, e = tanmethod(
+            md = self.md,
+            inc = self.inc, 
+            azi = self.azi,
+            choice = choice,
+        )
+        return tan_method(self, tvd, n, e)
 
 class position_log:
     """Position log
@@ -378,4 +388,11 @@ class radius_curvature(position_log):
     def copy(self):
         l = radius_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
         return l
-        
+
+class tan_method(position_log):
+    def __init__(self, src, depth, n, e):
+        super().__init__(src, depth, n, e)
+
+    def copy(self):
+        l = tan_method(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
+        return l
