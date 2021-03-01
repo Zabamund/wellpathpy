@@ -304,6 +304,13 @@ You can then run the following methods once you've imported your deviation and h
     tvd, northing, easting      = dev.tan_method(choice='high')
     tvd, northing, easting      = dev.tan_method(choice='low')
     
+We can compare the outputs of all these methods in the figure below:
+
+.. image:: ./figures/Dev_methods_comparison.png
+    :width: 600
+    :alt: Dev_methods_comparison
+
+
 Well location and tvdss
 #######################
 
