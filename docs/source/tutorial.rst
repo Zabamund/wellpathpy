@@ -252,7 +252,7 @@ This method is provided by wellpathpy and is recommended for most use cases.
 Comparison methods
 ******************
 
-Other methods are provided should the need arise to compare *mininum curvature* to older surveys that may have been calculated with one of these older methods.
+Other methods are provided should the need arise to compare *mininum curvature* to older surveys that may have been calculated with one of these methods.
 In general these other methods are **not recommended**.
 
 - **radius of curvature method** : ``dev.radius_curvature()``
