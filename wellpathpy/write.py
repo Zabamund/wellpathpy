@@ -33,7 +33,7 @@ def deviation_to_csv(fname, md, inc, azi):
         'azi': azi
     }
     df = pd.DataFrame(data=data)
-    df.to_csv(fname)
+    df.to_csv(fname, index=False)
 
     return None
 
@@ -69,6 +69,6 @@ def position_to_csv(fname, depth, northing, easting):
         'easting': easting
     }
     df = pd.DataFrame(data=data)
-    df.to_csv(fname)
+    df.to_csv(fname, index=False)
 
     return None
