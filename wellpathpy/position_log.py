@@ -87,13 +87,14 @@ class position_log:
         l = position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
         return l
 
-    def to_wellhead(self, surface_northing, surface_easting, inplace=False):
+    def to_wellhead(self, surface_northing, surface_easting, inplace = False):
         """Create a new position log instance moved to the wellhead location
 
         Parameters
         ----------
         surface_northing : array_like
         surface_easting : array_like
+        inplace : bool
         """
         if inplace:
             copy = self
@@ -101,6 +102,34 @@ class position_log:
             copy = self.copy()
 
         depth, n, e = location.loc_to_wellhead(
+            copy.depth,
+            copy.northing,
+            copy.easting,
+            surface_northing,
+            surface_easting,
+        )
+
+        copy.depth = depth
+        copy.northing = n
+        copy.easting = e
+
+        return position_log(copy, copy.depth, copy.northing, copy.easting)
+
+    def loc_to_zero(self, surface_northing, surface_easting, inplace = False):
+        """Create a new position log instance moved to 0m North and 0m East
+
+        Parameters
+        ----------
+        surface_northing : array_like
+        surface_easting : array_like
+        inplace : bool
+        """
+        if inplace:
+            copy = self
+        else:
+            copy = self.copy()
+
+        depth, n, e = location.loc_to_zero(
             copy.depth,
             copy.northing,
             copy.easting,
