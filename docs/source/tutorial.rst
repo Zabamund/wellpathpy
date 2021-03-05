@@ -369,19 +369,21 @@ Ensure you have consistent units, and use `Converting units`_ if required to ens
 Exporting results
 #################
 
-Once you have converted your deviation survey to a positional logs, you can write the results to a CSV file with:
+The two main ``wellpathpy`` objects; ``deviation`` and ``position`` logs can be written to CSV via
+object methods as shown below. These simply use ``pd.DataFrame.to_csv`` under the hood with the
+``pandas`` ``kwarg`` ``index`` set to ``False`` so that the index is not written out.
 
 - for a deviation survey:
 
 .. code-block:: python
 
-    wp.deviation_to_csv(fname, md, inc, azi)
+    dev.to_csv('./deviation.csv')
 
 - for a positional log:
 
 .. code-block:: python
 
-    wp.position_to_csv(fname, depth, northing, easting)
+    pos.to_csv('./position.csv')
 
 This is a pretty straight-forward function convenient CSV writing. If you need
 more control, or more sophisticated output, you must implement your own writer.
