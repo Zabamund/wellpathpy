@@ -143,6 +143,25 @@ class position_log:
 
         return position_log(copy, copy.depth, copy.northing, copy.easting)
 
+    def loc_to_tvdss(self, datum_elevation, inplace = False):
+        if inplace:
+            copy = self
+        else:
+            copy = self.copy()
+
+        depth, n, e = location.loc_to_tvdss(
+            copy.depth,
+            copy.northing,
+            copy.easting,
+            datum_elevation,
+        )
+
+        copy.depth = depth
+        copy.northing = n
+        copy.easting = e
+
+        return position_log(copy, copy.depth, copy.northing, copy.easting)
+
     def resample(self, *args, **kwargs):
         raise NotImplementedError
 
