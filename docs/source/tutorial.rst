@@ -329,17 +329,30 @@ you can use the following functions which return a copy of the positional log by
     pos_wellhead = pos.to_wellhead(surface_northing=surface_northing,
                                    surface_easting=surface_easting)
 
+.. image:: ./figures/pos_to_wellhead.png
+    :width: 600
+    :alt: pos_to_wellhead
+
 - to shift a positional log to a 0,0 coordinate location
 
 .. code-block:: python
 
-    tvd, new_northing, new_easting = wp.loc_to_zero(tvd, northing, easting, surface_northing, surface_easting)
+    pos_zero = pos_wellhead.loc_to_zero(surface_northing=surface_northing,
+                                        surface_easting=surface_easting)
+
+.. image:: ./figures/loc_to_zero.png
+    :width: 600
+    :alt: loc_to_zero
 
 - to shift a positional log to tvdss
 
 .. code-block:: python
 
-    new_tvdss, northing, easting   = wp.loc_to_tvdss(tvd, northing, easting, datum_elevation)
+    pos_tvdss = pos.loc_to_tvdss(datum_elevation=header['elevation'])
+
+.. image:: ./figures/loc_to_tvdss.png
+    :width: 600
+    :alt: loc_to_tvdss
 
 If you have a header loaded as shown in the `Loading the well header`_ section, you can use that object to access the required properties with:
 
