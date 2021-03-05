@@ -73,7 +73,8 @@ You can then load them into wellpathpy using:
 
 **Notes**:
 
-Some simple sanity checks are performed to reject bad CSVs. ``wp.read_csv`` supports all options ``pd.read_csv`` supports. Only those columns named md, inc, azi will be read.
+Some simple sanity checks are performed to reject bad CSVs. ``wp.read_csv`` supports all options ``pd.read_csv``
+supports. Only those columns named md, inc, azi will be read.
 
 If the deviation survey is not in CSV, is generated in a different place in your
 program, or is from some other source, wellpathpy is still useful. If you
@@ -86,7 +87,8 @@ Observe that the same basic requirements still apply:
 - inc is in range 0-180
 - azi is in range 0-360
 
-Once `md`, `inc` and `azi` have been returned from `wp.read_csv()`, an instance of the `wp.deviation()` class is created with:
+Once ``md``, ``inc`` and ``azi`` have been returned from ``wp.read_csv()``, an instance of
+the ``wp.deviation()`` class is created with:
 
 .. code-block:: python
 
@@ -96,7 +98,8 @@ Once `md`, `inc` and `azi` have been returned from `wp.read_csv()`, an instance 
        azi = azi
    )
 
-With this, it is then possible to resample the depths using the `minimum_curvature()` method and go back to a deviation survey in `md`, `inc` and `azi`:
+With this, it is then possible to resample the depths using the ``minimum_curvature()`` method
+ and go back to a deviation survey in ``md``, ``inc`` and ``azi``:
 
 .. code-block:: python
 
@@ -107,7 +110,8 @@ With this, it is then possible to resample the depths using the `minimum_curvatu
 
 **Notes**:
 
-With increasing step size, float uncertainty can introduce some noise as shown in the figures below. First we see an overview of the well in 3D, followed by plots of inclination and azimuth versus depth.
+With increasing step size, float uncertainty can introduce some noise as shown in the figures below.
+First we see an overview of the well in 3D, followed by plots of inclination and azimuth versus depth.
 
 .. image:: ./figures/Example_well_3D.png
     :width: 600
@@ -116,7 +120,7 @@ With increasing step size, float uncertainty can introduce some noise as shown i
 .. image:: ./figures/Deviation_resampling_example_step5.png
     :width: 600
     :alt: Deviation_resampling_example_step5
-   
+
 .. image:: ./figures/Deviation_resampling_example_step30.png
     :width: 600
     :alt: Deviation_resampling_example_step30
@@ -145,7 +149,7 @@ header from json file. The header requires the following keys:
 **Notes**:
 
 This function is provided for convenience - wellpathpy does not care about the
-source of this data. It will simply use `json.load()` to read the JSON file and save it as a python `dict`.
+source of this data. It will simply use ``json.load()`` to read the JSON file and save it as a python ``dict``.
 
 Converting units
 ################
@@ -199,7 +203,7 @@ Using the same well as an example, which currently has MD units in 'ft':
    MD min:    0.00 ft
    MD max: 9450.67 ft
 
-Conversion to metres can be done with `wp.unit_convert()`:
+Conversion to metres can be done with ``wp.unit_convert()``:
 
 .. code-block:: python
 
@@ -303,7 +307,7 @@ You can then run the following methods once you've imported your :ref:`deviation
     tvd, northing, easting      = dev.tan_method(choice='bal')
     tvd, northing, easting      = dev.tan_method(choice='high')
     tvd, northing, easting      = dev.tan_method(choice='low')
-    
+
 We can compare the outputs of all these methods in the figure below:
 
 .. image:: ./figures/Dev_methods_comparison.png
@@ -314,13 +318,16 @@ We can compare the outputs of all these methods in the figure below:
 Well location and tvdss
 #######################
 
-The methods above are not aware of surface location or datum elevation. If you want to move the positional log tvd, northing, easting to a given surface location, to 0,0 coordinates, or shift the tvd to tvdss, you can use the following functions:
+The methods above are not aware of surface location or datum elevation.
+If you want to move the positional log to a given surface location, to 0,0 coordinates, or shift the tvd to tvdss,
+you can use the following functions which return a copy of the positional log by default (``inplace=False``).
 
 - to shift a positional log to a wellhead location
 
 .. code-block:: python
 
-    tvd, new_northing, new_easting = wp.loc_to_wellhead(tvd, northing, easting, surface_northing, surface_easting)
+    pos_wellhead = pos.to_wellhead(surface_northing=surface_northing,
+                                   surface_easting=surface_easting)
 
 - to shift a positional log to a 0,0 coordinate location
 
