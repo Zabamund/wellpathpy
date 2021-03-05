@@ -4,6 +4,7 @@ from .checkarrays import checkarrays
 from .mincurve import minimum_curvature as mincurve
 from .rad_curv import radius_curvature as radcurve
 from .tan import tan_method as tanmethod
+from .write import deviation_to_csv, position_to_csv
 from . import location
 from . import geometry
 
@@ -54,6 +55,9 @@ class deviation:
             choice = choice,
         )
         return tan_method(self, tvd, n, e)
+
+    def to_csv(self, fname):
+        return deviation_to_csv(fname, self.md, self.inc, self.azi)
 
 class position_log:
     """Position log
@@ -167,6 +171,9 @@ class position_log:
 
     def deviation(self, *args, **kwargs):
         raise NotImplementedError
+
+    def to_csv(self, fname):
+        return position_to_csv(fname, self.depth, self.northing, self.easting)
 
 def spherical_interpolate(p0, p1, t, omega):
     """
