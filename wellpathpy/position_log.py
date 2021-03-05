@@ -49,7 +49,7 @@ class deviation:
     def tan_method(self, choice = 'avg'):
         tvd, n, e = tanmethod(
             md = self.md,
-            inc = self.inc, 
+            inc = self.inc,
             azi = self.azi,
             choice = choice,
         )
@@ -87,7 +87,7 @@ class position_log:
         l = position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
         return l
 
-    def to_wellhead(self, surface_northing, surface_easting):
+    def to_wellhead(self, surface_northing, surface_easting, inplace=False):
         """Create a new position log instance moved to the wellhead location
 
         Parameters
@@ -95,18 +95,24 @@ class position_log:
         surface_northing : array_like
         surface_easting : array_like
         """
+        if inplace:
+            copy = self
+        else:
+            copy = self.copy()
 
         depth, n, e = location.loc_to_wellhead(
-            self.depth,
-            self.northing,
-            self.easting,
+            copy.depth,
+            copy.northing,
+            copy.easting,
             surface_northing,
             surface_easting,
         )
 
-        self.depth = depth
-        self.northing = n
-        self.easting = e
+        copy.depth = depth
+        copy.northing = n
+        copy.easting = e
+
+        return position_log(copy, copy.depth, copy.northing, copy.easting)
 
     def resample(self, *args, **kwargs):
         raise NotImplementedError
