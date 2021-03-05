@@ -113,7 +113,7 @@ class position_log:
         copy.northing = n
         copy.easting = e
 
-        return position_log(copy, copy.depth, copy.northing, copy.easting)
+        return copy
 
     def loc_to_zero(self, surface_northing, surface_easting, inplace = False):
         """Create a new position log instance moved to 0m North and 0m East
@@ -141,7 +141,7 @@ class position_log:
         copy.northing = n
         copy.easting = e
 
-        return position_log(copy, copy.depth, copy.northing, copy.easting)
+        return copy
 
     def loc_to_tvdss(self, datum_elevation, inplace = False):
         if inplace:
@@ -160,7 +160,7 @@ class position_log:
         copy.northing = n
         copy.easting = e
 
-        return position_log(copy, copy.depth, copy.northing, copy.easting)
+        return copy
 
     def resample(self, *args, **kwargs):
         raise NotImplementedError
