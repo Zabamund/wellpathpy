@@ -11,6 +11,9 @@
 /notebooks/Wellpathpy_proto.ipynb
 /notebooks/Tan Method - Testing.ipynb
 /notebooks/Plot wells trajectories.ipynb
+/notebooks/Tutorial_update_scrapbook.ipynb
+/notebooks/Github_issues.ipynb
+/notebooks/*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,7 +1,6 @@
 pytest
 pandas
 numpy
-scipy
 pint
 setuptools-scm
 hypothesis

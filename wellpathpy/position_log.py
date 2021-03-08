@@ -2,6 +2,9 @@ import numpy as np
 
 from .checkarrays import checkarrays
 from .mincurve import minimum_curvature as mincurve
+from .rad_curv import radius_curvature as radcurve
+from .tan import tan_method as tanmethod
+from .write import deviation_to_csv, position_to_csv
 from . import location
 from . import geometry
 
@@ -36,6 +39,26 @@ class deviation:
         )
         return minimum_curvature(self, tvd, n, e, dls)
 
+    def radius_curvature(self):
+        tvd, n, e = radcurve(
+            md = self.md,
+            inc = self.inc,
+            azi = self.azi
+        )
+        return radius_curvature(self, tvd, n, e)
+
+    def tan_method(self, choice = 'avg'):
+        tvd, n, e = tanmethod(
+            md = self.md,
+            inc = self.inc,
+            azi = self.azi,
+            choice = choice,
+        )
+        return tan_method(self, tvd, n, e)
+
+    def to_csv(self, fname):
+        return deviation_to_csv(fname, self.md, self.inc, self.azi)
+
 class position_log:
     """Position log
 
@@ -68,32 +91,89 @@ class position_log:
         l = position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
         return l
 
-    def to_wellhead(self, surface_northing, surface_easting):
+    def to_wellhead(self, surface_northing, surface_easting, inplace = False):
         """Create a new position log instance moved to the wellhead location
 
         Parameters
         ----------
         surface_northing : array_like
         surface_easting : array_like
+        inplace : bool
         """
+        if inplace:
+            copy = self
+        else:
+            copy = self.copy()
 
         depth, n, e = location.loc_to_wellhead(
-            self.depth,
-            self.northing,
-            self.easting,
+            copy.depth,
+            copy.northing,
+            copy.easting,
             surface_northing,
             surface_easting,
         )
 
-        self.depth = depth
-        self.northing = n
-        self.easting = e
+        copy.depth = depth
+        copy.northing = n
+        copy.easting = e
+
+        return copy
+
+    def loc_to_zero(self, surface_northing, surface_easting, inplace = False):
+        """Create a new position log instance moved to 0m North and 0m East
+
+        Parameters
+        ----------
+        surface_northing : array_like
+        surface_easting : array_like
+        inplace : bool
+        """
+        if inplace:
+            copy = self
+        else:
+            copy = self.copy()
+
+        depth, n, e = location.loc_to_zero(
+            copy.depth,
+            copy.northing,
+            copy.easting,
+            surface_northing,
+            surface_easting,
+        )
+
+        copy.depth = depth
+        copy.northing = n
+        copy.easting = e
+
+        return copy
+
+    def loc_to_tvdss(self, datum_elevation, inplace = False):
+        if inplace:
+            copy = self
+        else:
+            copy = self.copy()
+
+        depth, n, e = location.loc_to_tvdss(
+            copy.depth,
+            copy.northing,
+            copy.easting,
+            datum_elevation,
+        )
+
+        copy.depth = depth
+        copy.northing = n
+        copy.easting = e
+
+        return copy
 
     def resample(self, *args, **kwargs):
         raise NotImplementedError
 
     def deviation(self, *args, **kwargs):
         raise NotImplementedError
+
+    def to_csv(self, fname):
+        return position_to_csv(fname, self.depth, self.northing, self.easting)
 
 def spherical_interpolate(p0, p1, t, omega):
     """
@@ -361,3 +441,19 @@ class minimum_curvature(position_log):
             inc = np.array(incs),
             azi = np.array(azis),
         )
+
+class radius_curvature(position_log):
+    def __init__(self, src, depth, n, e):
+        super().__init__(src, depth, n, e)
+
+    def copy(self):
+        l = radius_curvature(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
+        return l
+
+class tan_method(position_log):
+    def __init__(self, src, depth, n, e):
+        super().__init__(src, depth, n, e)
+
+    def copy(self):
+        l = tan_method(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
+        return l

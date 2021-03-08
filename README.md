@@ -41,7 +41,6 @@ From [pypi](https://pypi.org/project/wellpathpy/) with:
 
 - [pandas](https://pandas.pydata.org/) version 0.24.2 or greater
 - [numpy](https://numpy.org/) version 1.16.2 or greater
-- [scipy](https://www.scipy.org/) version 1.2.1 or greater
 - [pytest](https://pytest.org/) version 4.3.1 or greater
 - [pint](https://github.com/hgrecco/pint) version 0.9 or greater
 

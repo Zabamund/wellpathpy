@@ -61,7 +61,7 @@ A valid input file must be a CSV file containing the columns: md, inc, azi in th
 
 - column headers are **required**
 - md must increase monotonically
-- as inc and azi cannot be distinguished numerically it is the user's responsibility to ensure the data are passed in in this order
+- as inc and azi cannot be distinguished numerically it is the user's responsibility to ensure the data are passed in this order
 - inc must be in range 0-180 (to allow for horizontal wells to climb)
 - azi must be in range 0-360
 
@@ -73,9 +73,10 @@ You can then load them into wellpathpy using:
 
 **Notes**:
 
-Some simple sanity checks are performed to reject bad CSVs. ``wp.read_csv`` supports all options ``pd.read_csv`` supports. Only those columns named md, inc, azi will be read.
+Some simple sanity checks are performed to reject bad CSVs. ``wp.read_csv`` supports all options ``pd.read_csv``
+supports. Only those columns named md, inc, azi will be read.
 
-If the deviation survey is not in CSV, is generated a different place in your
+If the deviation survey is not in CSV, is generated in a different place in your
 program, or is from some other source, wellpathpy is still useful. If you
 provide three ``np.ndarray`` md, inc, and azi, the rest of wellpathpy works fine.
 
@@ -85,6 +86,44 @@ Observe that the same basic requirements still apply:
 - md increases monotonically
 - inc is in range 0-180
 - azi is in range 0-360
+
+Once ``md``, ``inc`` and ``azi`` have been returned from ``wp.read_csv()``, an instance of
+the ``wp.deviation()`` class is created with:
+
+.. code-block:: python
+
+   dev = wp.deviation(
+       md = md,
+       inc = inc,
+       azi = azi
+   )
+
+With this, it is then possible to resample the depths using the ``minimum_curvature()`` method
+ and go back to a deviation survey in ``md``, ``inc`` and ``azi``:
+
+.. code-block:: python
+
+   step = 30
+   depths = list(range(0, int(dev.md[-1]) + 1, step))
+   pos = dev.mininum_curvature().resample(depths = depths)
+   dev2 = pos.deviation()
+
+**Notes**:
+
+With increasing step size, float uncertainty can introduce some noise as shown in the figures below.
+First we see an overview of the well in 3D, followed by plots of inclination and azimuth versus depth.
+
+.. image:: ./figures/Example_well_3D.png
+    :width: 600
+    :alt: Example well positional log\n(no header information)
+
+.. image:: ./figures/Deviation_resampling_example_step5.png
+    :width: 600
+    :alt: Deviation_resampling_example_step5
+
+.. image:: ./figures/Deviation_resampling_example_step30.png
+    :width: 600
+    :alt: Deviation_resampling_example_step30
 
 Loading the well header
 #######################
@@ -110,7 +149,7 @@ header from json file. The header requires the following keys:
 **Notes**:
 
 This function is provided for convenience - wellpathpy does not care about the
-source of this data.
+source of this data. It will simply use ``json.load()`` to read the JSON file and save it as a python ``dict``.
 
 Converting units
 ################
@@ -138,7 +177,7 @@ That means wellpathpy assumes the provided date are in SI units and degrees:
 Conversion API
 **************
 
-To convert between unit systems, you can use the unit_convert function:
+To convert between unit systems, you can use the `unit_convert` function:
 
 .. code-block:: python
 
@@ -154,6 +193,25 @@ To convert between unit systems, you can use the unit_convert function:
 
 Observe that the elevation and coordinate units are never explicitly read in
 the program, they're only passed to unit_convert.
+
+Using the same well as an example, which currently has MD units in 'ft':
+
+.. code-block:: python
+
+   # MD units in feet:
+   print('MD min: {:>7.2f} ft\nMD max: {:>7.2f} ft'.format(md.min(), md.max()))
+   MD min:    0.00 ft
+   MD max: 9450.67 ft
+
+Conversion to metres can be done with ``wp.unit_convert()``:
+
+.. code-block:: python
+
+   md = wp.unit_convert(md, src='ft', dst='m')
+   # MD units in metres:
+   print('MD min: {:>7.2f} m\nMD max: {:>7.2f} m'.format(md.min(), md.max()))
+   MD min:    0.00 m
+   MD max: 2880.56 m
 
 The `pint <https://github.com/hgrecco/pint>`_ library drives the unit
 conversion. If you require units not already known to pint, you can pass your
@@ -171,57 +229,61 @@ Consider the need of converting a bizarre devation survey in
 Converting deviation surveys to positional logs
 ###############################################
 
-wellpathpy provides the following methods to convert **deviation surveys** md, inc, azi into **positional logs** tvd, northing, easting:
+All these methods can be accessed from the *deviation* object created with:
 
-Recommended methods
-*******************
+.. code-block:: python
 
-These methods are most commonly used in drilling operations and are recommended for most cases:
+   dev = wp.deviation(
+       md = md,
+       inc = inc,
+       azi = azi,
+       )
 
-- **minimum curvature method** : ``wp.mininum_curvature``
+Standard method
+***************
+
+The standard method for converting a **deviation surveys** [md, inc, azi] into a **positional logs** [tvd, northing, easting] is the *minimum curvature* method.
+This method is provided by wellpathpy and is recommended for most use cases.
+
+- **minimum curvature method** : ``dev.minimum_curvature()``
     This method uses angles from upper and lower end of survey interval to
     calculate a curve that passes through both survey points.
     This curve is
     smoothed by use of the ratio factor defined by the tortuosity or dogleg
     of the wellpath.
     This method returns a dogleg severity calculated for a given course_length.
-- **radius of curvature method** : ``wp.radius_curvature``
+
+Comparison methods
+******************
+
+Other methods are provided should the need arise to compare *mininum curvature* to older surveys that may have been calculated with one of these methods.
+In general these other methods are **not recommended**.
+
+- **radius of curvature method** : ``dev.radius_curvature()``
     Calculate TVD using radius or curvature method.
     **Caution**: this will yield unreliable results when data are closely spaced
     or when the borehole is straight but deviated.
     This method uses angles from upper and lower end of survey interval to
     calculate a curve that passes through both survey points.
-
-Comparison methods
-******************
-
-These methods might be used for comparison to the recommended methods:
-
-- **average tan method** : ``wp.average_tan``
+- **average tan method** : ``dev.tan_method()``
     Calculate TVD using average tangential method.
     This method averages the inclination and azimuth at the top and
     bottom of the survey interval before taking their sine and cosine,
     this average angle is used to estimate tvd.
-- **balanced tan method** : ``wp.balanced_tan``
+- **balanced tan method** : ``dev.tan_method(choice='bal')``
     Calculate TVD using balanced tangential method.
     This method takes the sines and cosines of the inclination and azimuth
     at the top and bottom of the survey interval before averaging them,
     this average angle is used to estimate tvd.
-    This will provide a smoother curve than the ave_tan method but requires
+    This will provide a smoother curve than the average tan method but requires
     closely spaced survey stations to avoid errors.
-
-Not recommended methods
-***********************
-
-These methods are provided for completeness and in case a comparison must be made to an existing survey using these methods, but they are *not recommended*:
-
-- **high tan method** : ``wp.high_tan``
+- **high tan method** : ``dev.tan_method(choice='high')``
     Calculate TVD using high tangential method.
     This method takes the sines and cosines of the inclination and azimuth
     at the bottom of the survey interval to estimate tvd.
     This method is **not recommended** as it can make gross tvd and offset
     errors in typical deviated wells.
-- **low tan method** : ``wp.low_tan``
+- **low tan method** : ``dev.tan_method(choice='low')``
     Calculate TVD using low tangential method.
     This method takes the sines and cosines of the inclination and azimuth
     at the top of the survey interval to estimate tvd.
@@ -231,37 +293,66 @@ These methods are provided for completeness and in case a comparison must be mad
 Usage
 *****
 
-In order to use any of these functions, you can run the following code once you've imported your deviation and header and done any unit conversion required as described above:
-
-Recommended usage:
+In order to use these functions, you first need a deviation object as described in `Loading a deviation`_.
+You can then run the following methods once you've imported your :ref:`deviation<Loading a deviation>` and :ref:`header<Loading the well header>` and done any :ref:`unit conversion<Converting units>` required as described above.
 
 .. code-block:: python
 
-    tvd, northing, easting, dls = wp.mininum_curvature(md, inc, azi, course_length=30)
-    tvd, northing, easting      = wp.radius_curvature(md, inc, azi)
+    # The recommended method for most use-cases
+    tvd, northing, easting, dls = dev.mininum_curvature(course_length=30)
+
+    # Comparison methods to contrast with older deviation surveys
+    tvd, northing, easting      = dev.radius_curvature()
+    tvd, northing, easting      = dev.tan_method() # for the default 'avg' method
+    tvd, northing, easting      = dev.tan_method(choice='bal')
+    tvd, northing, easting      = dev.tan_method(choice='high')
+    tvd, northing, easting      = dev.tan_method(choice='low')
+
+We can compare the outputs of all these methods in the figure below:
+
+.. image:: ./figures/Dev_methods_comparison.png
+    :width: 600
+    :alt: Dev_methods_comparison
+
 
 Well location and tvdss
 #######################
 
-The methods above are not aware of surface location or datum elevation. If you want to move the positional log tvd, northing, easting to a given surface location, to 0,0 coordinates, or shift the tvd to tvdss, you can use the following functions:
+The methods above are not aware of surface location or datum elevation.
+If you want to move the positional log to a given surface location, to 0,0 coordinates, or shift the tvd to tvdss,
+you can use the following functions which return a copy of the positional log by default (``inplace=False``).
 
 - to shift a positional log to a wellhead location
 
 .. code-block:: python
 
-    tvd, new_northing, new_easting = wp.loc_to_wellhead(tvd, northing, easting, surface_northing, surface_easting)
+    pos_wellhead = pos.to_wellhead(surface_northing=surface_northing,
+                                   surface_easting=surface_easting)
+
+.. image:: ./figures/pos_to_wellhead.png
+    :width: 600
+    :alt: pos_to_wellhead
 
 - to shift a positional log to a 0,0 coordinate location
 
 .. code-block:: python
 
-    tvd, new_northing, new_easting = wp.loc_to_zero(tvd, northing, easting, surface_northing, surface_easting)
+    pos_zero = pos_wellhead.loc_to_zero(surface_northing=surface_northing,
+                                        surface_easting=surface_easting)
+
+.. image:: ./figures/loc_to_zero.png
+    :width: 600
+    :alt: loc_to_zero
 
 - to shift a positional log to tvdss
 
 .. code-block:: python
 
-    new_tvdss, northing, easting   = wp.loc_to_tvdss(tvd, northing, easting, datum_elevation)
+    pos_tvdss = pos.loc_to_tvdss(datum_elevation=header['elevation'])
+
+.. image:: ./figures/loc_to_tvdss.png
+    :width: 600
+    :alt: loc_to_tvdss
 
 If you have a header loaded as shown in the `Loading the well header`_ section, you can use that object to access the required properties with:
 
@@ -278,19 +369,21 @@ Ensure you have consistent units, and use `Converting units`_ if required to ens
 Exporting results
 #################
 
-Once you have converted your deviation survey to a positional logs, you can write the results to a CSV file with:
+The two main ``wellpathpy`` objects; ``deviation`` and ``position`` logs can be written to CSV via
+object methods as shown below. These simply use ``pd.DataFrame.to_csv`` under the hood with the
+``pandas`` ``kwarg`` ``index`` set to ``False`` so that the index is not written out.
 
 - for a deviation survey:
 
 .. code-block:: python
 
-    wp.deviation_to_csv(fname, md, inc, azi)
+    dev.to_csv('./deviation.csv')
 
 - for a positional log:
 
 .. code-block:: python
 
-    wp.position_to_csv(fname, depth, northing, easting)
+    pos.to_csv('./position.csv')
 
 This is a pretty straight-forward function convenient CSV writing. If you need
 more control, or more sophisticated output, you must implement your own writer.

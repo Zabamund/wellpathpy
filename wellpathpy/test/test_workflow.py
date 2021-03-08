@@ -21,7 +21,7 @@ def test_workflow_compute_mincurve():
     md = unit_convert(md, src = 'ft', dst ='m')
     dev = deviation(md, inc, azi)
     pos = dev.minimum_curvature(course_length = 30)
-    pos.to_wellhead(39998.454, 655701.278)
+    pos.to_wellhead(39998.454, 655701.278, inplace = True)
 
     # expected reference values, from the last row of the CSV
     # simple sanity checks so it's not all bonkers
