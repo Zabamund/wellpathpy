@@ -14,3 +14,7 @@ formats:
    - pdf
    - htmlzip
    - epub
+
+python:
+  install:
+    - requirements: requirements.txt
