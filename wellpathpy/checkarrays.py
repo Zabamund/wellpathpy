@@ -49,8 +49,8 @@ def checkarrays(md, inc, azi):
     if not ((0 <= inc) & (inc < 180)).all():
         raise ValueError('all inc values must be in range 0 <= inc < 180')
 
-    if not ((0 <= azi) & (azi <= 360)).all():
-        raise ValueError('all azi values must be in range 0-360')
+    if not ((0 <= azi) & (azi < 360)).all():
+        raise ValueError('all azi values must be in range 0 <= azi < 360')
 
     if not (md.shape == inc.shape == azi.shape):
         raise ValueError('md, inc, and azi must be the same shape')
