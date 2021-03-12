@@ -176,6 +176,13 @@ class position_log:
         return copy
 
     def loc_to_tvdss(self, datum_elevation, inplace = False):
+        """This function calls location.location_to_tvdss with self
+
+        Notes
+        -----
+            You can access help with `wp.location.loc_to_tvdss?`
+            in `ipython`
+        """
         if inplace:
             copy = self
         else:
@@ -201,6 +208,13 @@ class position_log:
         raise NotImplementedError
 
     def to_csv(self, fname):
+         """This function calls write.position_to_csv with self
+
+        Notes
+        -----
+            You can access help with `wp.write.position_to_csv?`
+            in `ipython`
+        """
         return position_to_csv(fname, self.depth, self.northing, self.easting)
 
 def spherical_interpolate(p0, p1, t, omega):
