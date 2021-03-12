@@ -31,6 +31,13 @@ class deviation:
         return deviation(self.md, self.inc, self.azi)
 
     def minimum_curvature(self, course_length = 30):
+        """This function calls mincurve.minimum_curvature with self
+
+        Notes
+        -----
+            You can access help with `wp.mincurve.minimum_curvature?`
+            in `ipython`
+        """
         tvd, n, e, dls = mincurve(
             md = self.md,
             inc = self.inc,
@@ -40,6 +47,13 @@ class deviation:
         return minimum_curvature(self, tvd, n, e, dls)
 
     def radius_curvature(self):
+        """This function calls rad_curv.radius_curvature with self
+
+        Notes
+        -----
+            You can access help with `wp.rad_curv.radius_curvature?`
+            in `ipython`
+        """
         tvd, n, e = radcurve(
             md = self.md,
             inc = self.inc,
@@ -48,6 +62,13 @@ class deviation:
         return radius_curvature(self, tvd, n, e)
 
     def tan_method(self, choice = 'avg'):
+        """This function calls tan.tan_method with self
+
+        Notes
+        -----
+            You can access help with `wp.tan.tan_method?`
+            in `ipython`
+        """
         tvd, n, e = tanmethod(
             md = self.md,
             inc = self.inc,
@@ -57,6 +78,13 @@ class deviation:
         return tan_method(self, tvd, n, e)
 
     def to_csv(self, fname):
+        """This function calls write.deviation_to_csv with self
+
+        Notes
+        -----
+            You can access help with `wp.write.deviation_to_csv?`
+            in `ipython`
+        """
         return deviation_to_csv(fname, self.md, self.inc, self.azi)
 
 class position_log:
@@ -148,6 +176,13 @@ class position_log:
         return copy
 
     def loc_to_tvdss(self, datum_elevation, inplace = False):
+        """This function calls location.location_to_tvdss with self
+
+        Notes
+        -----
+            You can access help with `wp.location.loc_to_tvdss?`
+            in `ipython`
+        """
         if inplace:
             copy = self
         else:
@@ -173,6 +208,13 @@ class position_log:
         raise NotImplementedError
 
     def to_csv(self, fname):
+        """This function calls write.position_to_csv with self
+
+        Notes
+        -----
+            You can access help with `wp.write.position_to_csv?`
+            in `ipython`
+        """
         return position_to_csv(fname, self.depth, self.northing, self.easting)
 
 def spherical_interpolate(p0, p1, t, omega):
