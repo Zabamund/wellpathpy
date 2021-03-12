@@ -62,7 +62,7 @@ class deviation:
         return radius_curvature(self, tvd, n, e)
 
     def tan_method(self, choice = 'avg'):
-         """This function calls tan.tan_method with self
+        """This function calls tan.tan_method with self
 
         Notes
         -----
@@ -208,7 +208,7 @@ class position_log:
         raise NotImplementedError
 
     def to_csv(self, fname):
-         """This function calls write.position_to_csv with self
+        """This function calls write.position_to_csv with self
 
         Notes
         -----
