@@ -46,8 +46,8 @@ def checkarrays(md, inc, azi):
         if np.isnan(arr).any():
             raise ValueError('{} cannot contain nan values'.format(prop))
 
-    if not ((0 <= inc) & (inc <= 180)).all():
-        raise ValueError('all inc values must be in range 0-90')
+    if not ((0 <= inc) & (inc < 180)).all():
+        raise ValueError('all inc values must be in range 0 <= inc < 180')
 
     if not ((0 <= azi) & (azi <= 360)).all():
         raise ValueError('all azi values must be in range 0-360')
