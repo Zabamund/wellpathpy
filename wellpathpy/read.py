@@ -1,23 +1,35 @@
-import pandas as pd
+#import pandas as pd
+import numpy as np
 
 from .checkarrays import checkarrays
 
-def read_csv(fname, md = 'md', inc = 'inc', azi = 'azi', **kwargs):
+def read_csv(fname, delimiter=',', skiprows=1, **kwargs):
     """Read a deviation file in CSV format
 
-    Read a deviation survey from a CSV file. Columns can be specified with the
-    md, inc, and azi parameters.
+    A header row containing the column names `md`, `inc`, `azi` in
+    that order is generally expected to be included as the first row
+    in the file. By default, this header is skipped with the `skiprows`
+    argument set to `1` but this can be changed to `0` if no header is
+    inclduded.
+    The data must be ordered as `md`, `inc`, `azi` as the data cannot
+    be distinguished numerically.
 
     Parameters
     ----------
     fname : str
         path to a CSV file with this format:
-    md : str
-        measured depth column name
-    inc : str
-        inclination column name
-    azi : str
-        azimuth column name
+        ```
+        md,inc,azi
+        0,0,244
+        10,11,220
+        50,43,254
+        150,78.5,254
+        252.5,90,359.9
+        ```
+    delimiter: str
+        the character used as a delimiter in the CSV
+    skiprows : int
+        number of rows to skip, normally the header row
 
     Returns
     -------
@@ -31,11 +43,10 @@ def read_csv(fname, md = 'md', inc = 'inc', azi = 'azi', **kwargs):
     inc : float
         well inclination in degrees from vertical
     azi : float
-        well azimuth in degrees from North
+        well azimuth in degrees from Grid North
     """
-    df = pd.read_csv(fname, header=0, **kwargs)
-
-    md, inc, azi = df[md].values, df[inc].values, df[azi].values
+    dev = np.loadtxt(fname, delimiter=delimiter, skiprows=skiprows)
+    md, inc, azi = np.split(dev[:,0:3], 3, 1)
     md, inc, azi = checkarrays(md, inc, azi)
 
     return md, inc, azi
