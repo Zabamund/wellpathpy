@@ -18,14 +18,12 @@ def read_csv(fname, delimiter=',', skiprows=1, **kwargs):
     ----------
     fname : str
         path to a CSV file with this format:
-        ```
-        md,inc,azi
+        ```md,inc,azi
         0,0,244
         10,11,220
         50,43,254
         150,78.5,254
-        252.5,90,359.9
-        ```
+        252.5,90,359.9```
     delimiter: str
         the character used as a delimiter in the CSV
     skiprows : int
