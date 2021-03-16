@@ -119,7 +119,7 @@ With this, it is then possible to resample the depths using the ``minimum_curvat
 
    step = 30
    depths = list(range(0, int(dev.md[-1]) + 1, step))
-   pos = dev.mininum_curvature().resample(depths = depths)
+   pos = dev.minimum_curvature().resample(depths = depths)
    dev2 = pos.deviation()
 
 **Notes**:
