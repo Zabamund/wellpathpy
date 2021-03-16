@@ -13,10 +13,7 @@ def test_workflow_compute_mincurve():
     """
     fname = 'wellpathpy/test/fixtures/well9.csv'
     with open(fname) as f:
-        md_col = 'Measured Depth ( ft )'
-        inc_col = 'Inclination ( deg )'
-        azi_col = 'Azimuth Grid ( deg )'
-        md, inc, azi = read_csv(f, md = md_col, inc = inc_col, azi = azi_col)
+        md, inc, azi = read_csv(f)
 
     md = unit_convert(md, src = 'ft', dst ='m')
     dev = deviation(md, inc, azi)

@@ -59,11 +59,12 @@ A valid input file must be a CSV file containing the columns: md, inc, azi in th
     150,78.5,254
     252.5,90,359.9
 
-- column headers are **required**
+- column headers are generally expected but will be skipped when the file is read
+- if no headers are provided, the ``skiprows`` argument can be set to ``0``
 - md must increase monotonically
 - as inc and azi cannot be distinguished numerically it is the user's responsibility to ensure the data are passed in this order
-- inc must be in range 0-180 (to allow for horizontal wells to climb)
-- azi must be in range 0-360
+- inc must be in range 0 <= inc < 180 (to allow for horizontal wells to climb)
+- azi must be in range 0 <= azi < 360
 
 You can then load them into wellpathpy using:
 
@@ -71,9 +72,22 @@ You can then load them into wellpathpy using:
 
    md, inc, azi = wp.read_csv(fname)
 
+``wp.read_csv`` simply calls ``np.loadtxt`` with ``delimiter=','`` and ``skiprows=1``.
+These can be changed if required; for example the ``delimiter`` and ``skiprows`` can be changed with:
+
+.. code-block:: python
+
+   md, inc, azi = wp.read_csv(fname, delimiter='\t', skiprows=0)
+
+Additional ``kwargs`` accepted by ``np.loadtxt`` can also be passed in, for example:
+
+.. code-block:: python
+
+   md, inc, azi = wp.read_csv(fname, comments='$')
+
 **Notes**:
 
-Some simple sanity checks are performed to reject bad CSVs. ``wp.read_csv`` supports all options ``pd.read_csv``
+Some simple sanity checks are performed to reject bad CSVs. ``wp.read_csv`` supports all options ``np.loadtxt``
 supports. Only those columns named md, inc, azi will be read.
 
 If the deviation survey is not in CSV, is generated in a different place in your
@@ -105,7 +119,7 @@ With this, it is then possible to resample the depths using the ``minimum_curvat
 
    step = 30
    depths = list(range(0, int(dev.md[-1]) + 1, step))
-   pos = dev.mininum_curvature().resample(depths = depths)
+   pos = dev.minimum_curvature().resample(depths = depths)
    dev2 = pos.deviation()
 
 **Notes**:
@@ -370,8 +384,9 @@ Exporting results
 #################
 
 The two main ``wellpathpy`` objects; ``deviation`` and ``position`` logs can be written to CSV via
-object methods as shown below. These simply use ``pd.DataFrame.to_csv`` under the hood with the
-``pandas`` ``kwarg`` ``index`` set to ``False`` so that the index is not written out.
+object methods as shown below. These both call ``np.savetxt`` with ``fmt='%.3f'`` and ``delimiter=','``.
+The ``deviation`` also has ``header='md,inc,azi'`` and the ``postition`` has ``header='easting,northing,depth'``.
+Other ``kwargs`` accepted by ``np.savetxt`` are also accepted.
 
 - for a deviation survey:
 
@@ -384,6 +399,13 @@ object methods as shown below. These simply use ``pd.DataFrame.to_csv`` under th
 .. code-block:: python
 
     pos.to_csv('./position.csv')
+
+Additional ``kwargs`` can be passed like:
+
+.. code-block:: python
+
+    dev.to_csv('./deviation.csv', fmt='%.2e')
+    pos.to_csv('./position.csv', header='X,Y,Z', comments='$')
 
 This is a pretty straight-forward function convenient CSV writing. If you need
 more control, or more sophisticated output, you must implement your own writer.

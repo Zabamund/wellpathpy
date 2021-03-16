@@ -77,7 +77,7 @@ class deviation:
         )
         return tan_method(self, tvd, n, e)
 
-    def to_csv(self, fname):
+    def to_csv(self, fname, **kwargs):
         """This function calls write.deviation_to_csv with self
 
         Notes
@@ -85,7 +85,7 @@ class deviation:
             You can access help with `wp.write.deviation_to_csv?`
             in `ipython`
         """
-        return deviation_to_csv(fname, self.md, self.inc, self.azi)
+        return deviation_to_csv(fname, self.md, self.inc, self.azi, **kwargs)
 
 class position_log:
     """Position log
@@ -207,7 +207,7 @@ class position_log:
     def deviation(self, *args, **kwargs):
         raise NotImplementedError
 
-    def to_csv(self, fname):
+    def to_csv(self, fname, **kwargs):
         """This function calls write.position_to_csv with self
 
         Notes
@@ -215,7 +215,7 @@ class position_log:
             You can access help with `wp.write.position_to_csv?`
             in `ipython`
         """
-        return position_to_csv(fname, self.depth, self.northing, self.easting)
+        return position_to_csv(fname, self.depth, self.northing, self.easting, **kwargs)
 
 def spherical_interpolate(p0, p1, t, omega):
     """

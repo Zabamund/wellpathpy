@@ -7,47 +7,35 @@ good_data = '''md,inc,azi
     0,0,244
     1,11,220
     2,13,254
-    3,15,258
-    '''
+    3,15,258'''
 
 renamed_cols = '''measured-depth,inci,am
     0,0,244
     1,11,220
     2,13,254
-    3,15,258
-    '''
-
-mixed_data = '''azi,md,inc,
-    244,0,0
-    220,1,11
-    254,2,13
-    258,3,15
-    '''
+    3,15,258'''
 
 xtra_cols = '''md,inc,azi,tvd
     0,0,244,0
     1,11,220,21
     2,13,254,23
-    3,15,258,25
-    '''
+    3,15,258,25'''
+
+too_few_columns = '''md,inc
+    0,0
+    1,11
+    2,13
+    3,15'''
 
 not_monotonic_md = '''md,inc,azi
     0,0,244
     1,11,220
     3,13,254
-    2,15,258
-    '''
-
-col_names = ['md', 'inc', 'azi']
+    2,15,258'''
 
 def test_all_cols_present():
     # should pass if md, inc and azi are present
     data = io.StringIO(good_data)
-    _ = read_csv(data)
-
-def test_mixed_order_passes():
-    # should pass if md, inc and azi present in wrong order
-    data = io.StringIO(mixed_data)
     _ = read_csv(data)
 
 def test_too_many_columns():
@@ -55,13 +43,11 @@ def test_too_many_columns():
     data = io.StringIO(xtra_cols)
     _ = read_csv(data)
 
-def test_missing_cols_raise():
-    # shoud fail if md, inc and azi are not all there
-    for key in col_names:
-        missing_cols = good_data.replace(key, 'x')
-        data = io.StringIO(missing_cols)
-        with pytest.raises(KeyError):
-            _ = read_csv(data)
+def test_too_few_columns():
+    # should fail if few than three columns passed
+    data = io.StringIO(too_few_columns)
+    with pytest.raises(ValueError):
+        _ = read_csv(data)
 
 def test_inc_in_range_raise():
     # should fail if inc values not within 0-180
@@ -103,7 +89,4 @@ def test_nans_throws():
 
 def test_renamed_columns():
     data = io.StringIO(renamed_cols)
-    md = 'measured-depth'
-    inc = 'inci'
-    azi = 'am'
-    _ = read_csv(data, md = md, inc = inc, azi = azi)
+    _ = read_csv(data)

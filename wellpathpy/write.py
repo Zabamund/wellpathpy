@@ -1,8 +1,8 @@
-import pandas as pd
+import numpy as np
 
 from .checkarrays import checkarrays, checkarrays_tvd
 
-def deviation_to_csv(fname, md, inc, azi):
+def deviation_to_csv(fname, md, inc, azi, fmt='%.3f', delimiter=',', header='md,inc,azi', **kwargs):
     """Write a log to a comma-separated values (csv) file.
 
     Parameters
@@ -15,6 +15,19 @@ def deviation_to_csv(fname, md, inc, azi):
         inclination from vertical
     azi : array-like,
         azimuth from north
+    fmt : str
+        this is the fmt argument to numpy.savetxt, see:
+        https://numpy.org/doc/stable/reference/generated/numpy.savetxt.html
+    delimiter : str
+        String or character separating columns.
+    header : str
+        String that will be written at the beginning of the file.
+        Beware if changing the header that it does not change the order in
+        which the data are written, which remains: `md`,`inc`,`azi`.
+
+    Other Parameters
+    ----------------
+    **kwargs : All other keyword arguments are passed to `np.savetxt`
 
     Notes
     -----
@@ -27,17 +40,12 @@ def deviation_to_csv(fname, md, inc, azi):
 
     md, inc, azi = checkarrays(md, inc, azi)
 
-    data = {
-        'md': md,
-        'inc': inc,
-        'azi': azi
-    }
-    df = pd.DataFrame(data=data)
-    df.to_csv(fname, index=False)
+    a = np.asarray([md, inc, azi])
+    np.savetxt(fname, a, fmt=fmt, delimiter=delimiter, header=header, **kwargs)
 
     return None
 
-def position_to_csv(fname, depth, northing, easting):
+def position_to_csv(fname, depth, northing, easting, fmt='%.3f', delimiter=',', header='easting,northing,depth', **kwargs):
     """Write a log to a comma-separated values (csv) file.
 
     Parameters
@@ -51,6 +59,19 @@ def position_to_csv(fname, depth, northing, easting):
         distance north of reference point
     easting : array-like,
         distance east of reference point,
+    fmt : str
+        this is the fmt argument to numpy.savetxt, see:
+        https://numpy.org/doc/stable/reference/generated/numpy.savetxt.html
+    delimiter : str
+        String or character separating columns.
+    header : str
+        String that will be written at the beginning of the file.
+        Beware if changing the header that it does not change the order in
+        which the data are written, which remains: `easting`,`northing`,`depth`.
+
+    Other Parameters
+    ----------------
+    **kwargs : All other keyword arguments are passed to `np.savetxt`
 
     Notes
     -----
@@ -63,12 +84,7 @@ def position_to_csv(fname, depth, northing, easting):
 
     depth, northing, easting = checkarrays_tvd(depth, northing, easting)
 
-    data = {
-        'depth': depth,
-        'northing': northing,
-        'easting': easting
-    }
-    df = pd.DataFrame(data=data)
-    df.to_csv(fname, index=False)
+    a = np.asarray([easting, northing, depth])
+    np.savetxt(fname, a, fmt=fmt, delimiter=delimiter, header=header, **kwargs)
 
     return None

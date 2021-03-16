@@ -1,31 +1,32 @@
 import pytest
 import numpy as np
-import pandas as pd
 
 from ..mincurve import minimum_curvature
 from ..location import loc_to_wellhead, loc_to_zero, loc_to_tvdss
 
 # import test well data
-well9 = pd.read_csv('./wellpathpy/test/fixtures/well9.csv', sep=",")
-well10 = pd.read_csv('./wellpathpy/test/fixtures/well10.csv', sep=",")
+well9 = np.loadtxt('./wellpathpy/test/fixtures/well9.csv', delimiter=",", skiprows=1)
+well10 = np.loadtxt('./wellpathpy/test/fixtures/well10.csv', delimiter=",", skiprows=1)
 
 # get data series
-well9_true_md_m = well9['Measured Depth ( ft )'].values * 0.3048 # converting feet to meters
-well9_true_inc = well9['Inclination ( deg )'].values
-well9_true_azi = well9['Azimuth Grid ( deg )'].values
-well9_true_tvd_m = well9['TVD ( ft )'].values * 0.3048 # converting feet to meters
-well9_true_northing = well9['Northing ( m )'].values
-well9_true_easting = well9['Easting ( m )'].values
+well9_true_md_m = well9[:,0] * 0.3048 # converting feet to meters
+well9_true_inc = well9[:,1]
+well9_true_azi = well9[:,2]
+well9_true_tvd_m = well9[:,3] * 0.3048 # converting feet to meters
+well9_true_northing = well9[:,5]
+well9_true_easting = well9[:,6]
+well9_true_dls = well9[:,4]
 well9_true_surface_northing = 39998.454
 well9_true_surface_easting = 655701.278
 well9_true_datum_elevation = 100 * 0.3048 # converting feet to meters
 
-well10_true_md_m = well10['Measured Depth ( ft )'].values * 0.3048 # converting feet to meters
-well10_true_inc = well10['Inclination ( deg )'].values
-well10_true_azi = well10['Azimuth Grid ( deg )'].values
-well10_true_tvd_m = well10['TVD ( ft )'].values * 0.3048 # converting feet to meters
-well10_true_northing = well10['Northing ( m )'].values
-well10_true_easting = well10['Easting ( m )'].values
+well10_true_md_m = well10[:,0] * 0.3048 # converting feet to meters
+well10_true_inc = well10[:,1]
+well10_true_azi = well10[:,2]
+well10_true_tvd_m = well10[:,3] * 0.3048 # converting feet to meters
+well10_true_northing = well10[:,5]
+well10_true_easting = well10[:,6]
+well10_true_dls = well10[:,4]
 well10_true_surface_northing = 40004.564
 well10_true_surface_easting = 655701.377
 well10_true_datum_elevation = 100 * 0.3048 # converting feet to meters
