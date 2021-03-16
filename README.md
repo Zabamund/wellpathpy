@@ -1,7 +1,7 @@
 # README
 
-[wellpathpy/master](https://github.com/Zabamund/wellpathpy/tree/master):[![Build Status](https://travis-ci.com/Zabamund/wellpathpy.svg?branch=master)](https://travis-ci.com/Zabamund/wellpathpy)
-[wellpathpy/api_models](https://github.com/Zabamund/wellpathpy/tree/api_models):[![Build Status](https://travis-ci.com/Zabamund/wellpathpy.svg?branch=api_models)](https://travis-ci.com/Zabamund/wellpathpy)
+[wellpathpy/master](https://github.com/Zabamund/wellpathpy/tree/master):
+[![Build Status](https://travis-ci.com/Zabamund/wellpathpy.svg?branch=master)](https://travis-ci.com/Zabamund/wellpathpy)
 
 ## Contributors:
 
@@ -18,16 +18,16 @@
 - load well deviation in (md, inc, azi) format:
     * meta data (header, rkb, dfe, rt)
     * md, incl, azi
-- interpolate survey using one of these methods:
+- calculate position log survey using one of these methods:
     * minimum curvature method
     * radius of curvature method
-    * tangential method
-- calculate dog-leg severity
+    * tangential methods
+- calculate dog-leg severity from minimum curvature
 - calculate depth references using header data if available: MD, TVD, TVDSS
 - return interpolated deviation in (tvd, northing, easting) format
 - move surface location to (0, 0, 0) or to (kb, mE, mN)
 - convert to tvdss based on kb elevation
-- resample deviation on regular steps
+- resample deviation on regular steps with minimum curvature only
 
 ## Installation
 
@@ -39,14 +39,12 @@ From [pypi](https://pypi.org/project/wellpathpy/) with:
 
 ## Requirements
 
-- [pandas](https://pandas.pydata.org/) version 0.24.2 or greater
 - [numpy](https://numpy.org/) version 1.16.2 or greater
-- [pytest](https://pytest.org/) version 4.3.1 or greater
 - [pint](https://github.com/hgrecco/pint) version 0.9 or greater
 
 ## Tutorials
 
-Currently work-in-progress in [branch:api_models](https://github.com/Zabamund/wellpathpy/tree/api_models).
+A tutorial is available on [wellpathpy.readthedocs.io](https://wellpathpy.readthedocs.io/en/latest/tutorial.html)
 
 ## Contributing
 
