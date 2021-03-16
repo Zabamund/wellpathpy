@@ -89,7 +89,4 @@ def test_nans_throws():
 
 def test_renamed_columns():
     data = io.StringIO(renamed_cols)
-    md = 'measured-depth'
-    inc = 'inci'
-    azi = 'am'
-    _ = read_csv(data, md = md, inc = inc, azi = azi)
+    _ = read_csv(data)
