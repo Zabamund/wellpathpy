@@ -1,5 +1,4 @@
 pytest
 numpy
-pint
 setuptools-scm
 hypothesis

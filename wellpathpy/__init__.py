@@ -7,7 +7,6 @@ except pkg_resources.DistributionNotFound:
 __all__ = [
     'read_header_json',
     'read_csv',
-    'unit_convert',
     'deviation_to_csv',
     'position_to_csv',
     'deviation',
@@ -15,7 +14,6 @@ __all__ = [
     'minimum_curvature'
 ]
 
-from .convert import unit_convert
 from .header import read_header_json
 from .read import read_csv
 from .write import deviation_to_csv, position_to_csv
