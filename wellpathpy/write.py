@@ -32,7 +32,7 @@ def deviation_to_csv(fname, md, inc, azi, fmt='%.3f', delimiter=',', header='md,
     Notes
     -----
     This function is totally unit unaware, the user is responsible
-    to handle units, for example with the unit_convert function.
+    to handle units.
 
     Caution: deviation_to_csv uses Python write mode set to the default: ‘w’
     therefore existing files will be overwritten.
@@ -76,7 +76,7 @@ def position_to_csv(fname, depth, northing, easting, fmt='%.3f', delimiter=',', 
     Notes
     -----
     This function is totally unit unaware, the user is responsible
-    to handle units, for example with the unit_convert function.
+    to handle units.
 
     Caution: position_to_csv uses Python write mode set to the default: ‘w’
     therefore existing files will be overwritten.

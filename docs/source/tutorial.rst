@@ -302,7 +302,7 @@ If you have a header loaded as shown in the `Loading the well header`_ section, 
 
 **Notes:**
 
-Ensure you have consistent units, and use `Converting units`_ if required to ensure consistency.
+Wellpathpy is oblivious to units, and assumes the input units are consistent.
 
 Exporting results
 #################
