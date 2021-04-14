@@ -2,7 +2,6 @@ import pytest
 
 from .. import deviation
 from .. import read_csv
-from .. import unit_convert
 
 def test_workflow_compute_mincurve():
     """
@@ -15,7 +14,9 @@ def test_workflow_compute_mincurve():
     with open(fname) as f:
         md, inc, azi = read_csv(f)
 
-    md = unit_convert(md, src = 'ft', dst ='m')
+    # convert md from ft to m
+    md *= 0.3048
+    
     dev = deviation(md, inc, azi)
     pos = dev.minimum_curvature(course_length = 30)
     pos.to_wellhead(39998.454, 655701.278, inplace = True)

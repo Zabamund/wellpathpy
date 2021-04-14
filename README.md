@@ -40,7 +40,6 @@ From [pypi](https://pypi.org/project/wellpathpy/) with:
 ## Requirements
 
 - [numpy](https://numpy.org/) version 1.16.2 or greater
-- [pint](https://github.com/hgrecco/pint) version 0.9 or greater
 
 ## Tutorials
 
