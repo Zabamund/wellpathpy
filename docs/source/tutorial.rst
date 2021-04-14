@@ -232,7 +232,7 @@ Usage
 *****
 
 In order to use these functions, you first need a deviation object as described in `Loading a deviation`_.
-You can then run the following methods once you've imported your :ref:`deviation<Loading a deviation>` and :ref:`header<Loading the well header>` and done any :ref:`unit conversion<Converting units>` required as described above.
+You can then run the following methods once you've imported your :ref:`deviation<Loading a deviation>` and :ref:`header<Loading the well header>` and done any unit conversion required as described above.
 
 .. code-block:: python
 
