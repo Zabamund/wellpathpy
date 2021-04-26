@@ -2,7 +2,7 @@ import numpy as np
 
 from .checkarrays import checkarrays_tvd
 
-def loc_to_wellhead(tvd, northing, easting, surface_northing, surface_easting):
+def to_wellhead(tvd, northing, easting, surface_northing, surface_easting):
     """Move deviation to wellhead location.
 
     Adds the surface location coordinates to the northing and easting arrays.
@@ -38,7 +38,7 @@ def loc_to_wellhead(tvd, northing, easting, surface_northing, surface_easting):
     return tvd, northing, easting
 
 
-def loc_to_zero(tvd, northing, easting, surface_northing, surface_easting):
+def to_zero(tvd, northing, easting, surface_northing, surface_easting):
     """Move deviation to zero coordinates.
 
     Substracts the surface location coordinates from the northing and easting arrays.
@@ -73,7 +73,7 @@ def loc_to_zero(tvd, northing, easting, surface_northing, surface_easting):
 
     return tvd, northing, easting
 
-def loc_to_tvdss(tvd, northing, easting, datum_elevation):
+def to_tvdss(tvd, northing, easting, datum_elevation):
     """
     Shift tvd to tvdss given datum elevation.
 

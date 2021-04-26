@@ -275,8 +275,8 @@ you can use the following functions which return a copy of the positional log by
 
 .. code-block:: python
 
-    pos_zero = pos_wellhead.loc_to_zero(surface_northing=surface_northing,
-                                        surface_easting=surface_easting)
+    pos_zero = pos_wellhead.to_zero(surface_northing=surface_northing,
+                                    surface_easting=surface_easting)
 
 .. image:: ./figures/loc_to_zero.png
     :width: 600
@@ -286,7 +286,7 @@ you can use the following functions which return a copy of the positional log by
 
 .. code-block:: python
 
-    pos_tvdss = pos.loc_to_tvdss(datum_elevation=header['elevation'])
+    pos_tvdss = pos.to_tvdss(datum_elevation=header['elevation'])
 
 .. image:: ./figures/loc_to_tvdss.png
     :width: 600
