@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 from ..mincurve import minimum_curvature
-from ..location import loc_to_wellhead, loc_to_zero, loc_to_tvdss
+from ..location import to_wellhead, to_zero, to_tvdss
 
 # import test well data
 well9 = np.loadtxt('./wellpathpy/test/fixtures/well9.csv', delimiter=",", skiprows=1)
@@ -34,7 +34,7 @@ well10_true_datum_elevation = 100 * 0.3048 # converting feet to meters
 def test_wellhead():
     # test well9
     well9_tvd, well9_northing, well9_easting, _ = minimum_curvature(well9_true_md_m, well9_true_inc, well9_true_azi)
-    tvd, mN, mE = loc_to_wellhead(
+    tvd, mN, mE = to_wellhead(
         well9_tvd,
         well9_northing,
         well9_easting,
@@ -46,7 +46,7 @@ def test_wellhead():
     np.testing.assert_allclose(mE, well9_true_easting, atol=1)
     # test well10
     well10_tvd, well10_northing, well10_easting, _ = minimum_curvature(well10_true_md_m, well10_true_inc, well10_true_azi)
-    tvd, mN, mE = loc_to_wellhead(
+    tvd, mN, mE = to_wellhead(
         well10_tvd,
         well10_northing,
         well10_easting,
@@ -60,7 +60,7 @@ def test_wellhead():
 def test_zero():
     # test well9
     _, well9_northing, well9_easting, _ = minimum_curvature(well9_true_md_m, well9_true_inc, well9_true_azi)
-    tvd, mN, mE = loc_to_zero(
+    tvd, mN, mE = to_zero(
         well9_true_tvd_m,
         well9_true_northing,
         well9_true_easting,
@@ -72,7 +72,7 @@ def test_zero():
     np.testing.assert_allclose(mE, well9_easting, atol=1)
     # test well10
     _, well10_northing, well10_easting, _ = minimum_curvature(well10_true_md_m, well10_true_inc, well10_true_azi)
-    tvd, mN, mE = loc_to_zero(
+    tvd, mN, mE = to_zero(
         well10_true_tvd_m,
         well10_true_northing,
         well10_true_easting,
@@ -86,7 +86,7 @@ def test_zero():
 def test_tvdss():
     # test well9
     well9_tvd, well9_northing, well9_easting, _ = minimum_curvature(well9_true_md_m, well9_true_inc, well9_true_azi)
-    tvdss, mN, mE = loc_to_tvdss(
+    tvdss, mN, mE = to_tvdss(
         well9_tvd,
         well9_northing,
         well9_easting,
@@ -97,7 +97,7 @@ def test_tvdss():
     np.testing.assert_equal(mE, well9_easting)
     # test well10
     well10_tvd, well10_northing, well10_easting, _ = minimum_curvature(well10_true_md_m, well10_true_inc, well10_true_azi)
-    tvdss, mN, mE = loc_to_tvdss(
+    tvdss, mN, mE = to_tvdss(
         well10_tvd,
         well10_northing,
         well10_easting,

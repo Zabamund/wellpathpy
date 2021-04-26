@@ -133,7 +133,7 @@ class position_log:
         else:
             copy = self.copy()
 
-        depth, n, e = location.loc_to_wellhead(
+        depth, n, e = location.to_wellhead(
             copy.depth,
             copy.northing,
             copy.easting,
@@ -147,7 +147,7 @@ class position_log:
 
         return copy
 
-    def loc_to_zero(self, surface_northing, surface_easting, inplace = False):
+    def to_zero(self, surface_northing, surface_easting, inplace = False):
         """Create a new position log instance moved to 0m North and 0m East
 
         Parameters
@@ -161,7 +161,7 @@ class position_log:
         else:
             copy = self.copy()
 
-        depth, n, e = location.loc_to_zero(
+        depth, n, e = location.to_zero(
             copy.depth,
             copy.northing,
             copy.easting,
@@ -175,12 +175,12 @@ class position_log:
 
         return copy
 
-    def loc_to_tvdss(self, datum_elevation, inplace = False):
+    def to_tvdss(self, datum_elevation, inplace = False):
         """This function calls location.location_to_tvdss with self
 
         Notes
         -----
-            You can access help with `wp.location.loc_to_tvdss?`
+            You can access help with `wp.location.to_tvdss?`
             in `ipython`
         """
         if inplace:
@@ -188,7 +188,7 @@ class position_log:
         else:
             copy = self.copy()
 
-        depth, n, e = location.loc_to_tvdss(
+        depth, n, e = location.to_tvdss(
             copy.depth,
             copy.northing,
             copy.easting,

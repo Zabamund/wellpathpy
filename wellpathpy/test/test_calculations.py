@@ -6,7 +6,7 @@ import hypothesis
 from ..tan import tan_method
 from ..mincurve import minimum_curvature
 from ..rad_curv import radius_curvature
-from ..location import loc_to_wellhead
+from ..location import to_wellhead
 from ..position_log import deviation, position_log as mc
 
 # import test well data
@@ -39,8 +39,8 @@ well10_true_datum_elevation = 100 * 0.3048 # converting feet to meters
 def test_high_tan():
     tvd9, mN9, mE9 = tan_method(well9_true_md_m, well9_true_inc, well9_true_azi, choice='high')
     tvd10, mN10, mE10 = tan_method(well10_true_md_m, well10_true_inc, well10_true_azi, choice='high')
-    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
-    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    tvd9, mN9, mE9 = to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
     np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=12)
     np.testing.assert_allclose(mE9, well9_true_easting, atol=12)
     np.testing.assert_allclose(mN9, well9_true_northing, atol=12)
@@ -51,8 +51,8 @@ def test_high_tan():
 def test_low_tan():
     tvd9, mN9, mE9 = tan_method(well9_true_md_m, well9_true_inc, well9_true_azi, choice='low')
     tvd10, mN10, mE10 = tan_method(well10_true_md_m, well10_true_inc, well10_true_azi, choice='low')
-    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
-    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    tvd9, mN9, mE9 = to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
     np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=12)
     np.testing.assert_allclose(mE9, well9_true_easting, atol=12)
     np.testing.assert_allclose(mN9, well9_true_northing, atol=12)
@@ -63,8 +63,8 @@ def test_low_tan():
 def test_avg_tan():
     tvd9, mN9, mE9 = tan_method(well9_true_md_m, well9_true_inc, well9_true_azi, choice='avg')
     tvd10, mN10, mE10 = tan_method(well10_true_md_m, well10_true_inc, well10_true_azi, choice='avg')
-    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
-    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    tvd9, mN9, mE9 = to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
     np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=10)
     np.testing.assert_allclose(mE9, well9_true_easting, atol=10)
     np.testing.assert_allclose(mN9, well9_true_northing, atol=10)
@@ -75,8 +75,8 @@ def test_avg_tan():
 def test_bal_tan():
     tvd9, mN9, mE9 = tan_method(well9_true_md_m, well9_true_inc, well9_true_azi, choice='bal')
     tvd10, mN10, mE10 = tan_method(well10_true_md_m, well10_true_inc, well10_true_azi, choice='bal')
-    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
-    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    tvd9, mN9, mE9 = to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
     np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=10)
     np.testing.assert_allclose(mE9, well9_true_easting, atol=10)
     np.testing.assert_allclose(mN9, well9_true_northing, atol=10)
@@ -87,8 +87,8 @@ def test_bal_tan():
 def test_min_curve():
     tvd9, mN9, mE9, dls9 = minimum_curvature(well9_true_md_m, well9_true_inc, well9_true_azi)
     tvd10, mN10, mE10, dls10 = minimum_curvature(well10_true_md_m, well10_true_inc, well10_true_azi)
-    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
-    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    tvd9, mN9, mE9 = to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
     np.testing.assert_allclose(tvd9, well9_true_tvd_m)
     np.testing.assert_allclose(mE9, well9_true_easting, atol=0.5)
     np.testing.assert_allclose(mN9, well9_true_northing, atol=0.5)
@@ -148,8 +148,8 @@ def test_min_curve_rf():
 def test_rad_curve():
     tvd9, mN9, mE9 = radius_curvature(well9_true_md_m, well9_true_inc, well9_true_azi)
     tvd10, mN10, mE10 = radius_curvature(well10_true_md_m, well10_true_inc, well10_true_azi)
-    tvd9, mN9, mE9 = loc_to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
-    tvd10, mN10, mE10 = loc_to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
+    tvd9, mN9, mE9 = to_wellhead(tvd9, mN9, mE9, 39998.454, 655701.278)
+    tvd10, mN10, mE10 = to_wellhead(tvd10, mN10, mE10, 40004.564, 655701.377)
     np.testing.assert_allclose(tvd9, well9_true_tvd_m, atol=1)
     np.testing.assert_allclose(mE9, well9_true_easting, atol=1)
     np.testing.assert_allclose(mN9, well9_true_northing, atol=1)
