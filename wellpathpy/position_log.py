@@ -27,6 +27,12 @@ class deviation:
         self.inc = np.copy(inc)
         self.azi = np.copy(azi)
 
+    def __repr__(self):
+        with np.printoptions(threshold=5, edgeitems=2):
+            return """deviation(md  = {},
+          inc = {},
+          azi = {})""".format(repr(self.md), repr(self.inc), repr(self.azi))
+
     def copy(self):
         return deviation(self.md, self.inc, self.azi)
 
@@ -114,6 +120,12 @@ class position_log:
         self.depth = depth
         self.northing = northing
         self.easting = easting
+
+    def __repr__(self):
+        with np.printoptions(precision=3, threshold=5, edgeitems=2):
+            return """position(depth    = {},
+         northing = {},
+         easting  = {})""".format(repr(self.depth), repr(self.northing), repr(self.easting))
 
     def copy(self):
         l = position_log(self.source, np.copy(self.depth), np.copy(self.northing), np.copy(self.easting))
