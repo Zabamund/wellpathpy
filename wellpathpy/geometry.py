@@ -131,14 +131,14 @@ def normalize(v):
     yields a dot product of 1.0712553822854385, which is outside [-1, 1]. This
     should *really* only show up in testing scenarios and not real data.
 
-    Whenever norm values are less than eps, consider them zero. All zero norms
-    are assigned 1, to avoid divide-by-zero. The value for zero is chosen
-    arbitrarily as a something that shouldn't happen in real data, or when it
-    does is reasonable to consier as zero.
+    This function works on a single vector or a set of vectors. Numpy will
+    interpret any set of vectors as a matrix, so the type of norm is specified
+    explicitly [2].
 
     References
     ----------
     .. [1] https://mathworld.wolfram.com/NormalizedVector.html
+    .. [2] https://github.com/Zabamund/wellpathpy/issues/35
 
     Examples
     --------
@@ -151,10 +151,8 @@ def normalize(v):
      [0.47673129 0.57207755 0.66742381]]
     """
     v = np.asarray(v)
-    norm = np.atleast_1d(np.linalg.norm(v, axis = v.ndim - 1))
-
-    zero = 1e-15
-    norm.ravel()[np.abs(norm.ravel()) < zero] = 1.0
+    norm = np.atleast_1d(np.linalg.norm(v, ord = 2, axis = v.ndim - 1))
+    norm[norm == 0] = 1
 
     if v.ndim == 1:
         return v / norm[:]
