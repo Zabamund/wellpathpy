@@ -68,8 +68,8 @@ def to_zero(tvd, northing, easting, surface_northing, surface_easting):
 
     tvd, northing, easting = checkarrays_tvd(tvd, northing, easting)
 
-    northing -= surface_northing
-    easting -= surface_easting
+    northing = northing - surface_northing
+    easting = easting - surface_easting
 
     return tvd, northing, easting
 
