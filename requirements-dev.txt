@@ -2,3 +2,4 @@ pytest
 numpy
 setuptools-scm
 hypothesis
+wheel
