@@ -1,8 +1,5 @@
 # README
 
-[wellpathpy/master](https://github.com/Zabamund/wellpathpy/tree/master):
-[![Build Status](https://travis-ci.com/Zabamund/wellpathpy.svg?branch=master)](https://travis-ci.com/Zabamund/wellpathpy)
-
 ## Contributors:
 
 - [Robert Leckenby](https://github.com/Zabamund)
