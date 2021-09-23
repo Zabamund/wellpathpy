@@ -1,6 +1,10 @@
 name: Deploy to PyPI
 
-on: tags
+on:
+  push:
+    tags:
+      - '*'
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
