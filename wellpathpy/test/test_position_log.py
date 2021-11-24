@@ -38,3 +38,14 @@ def test_copy():
     copy = original.copy()
     original.depth += 10
     np.testing.assert_equal([1,2,3,4], copy.depth)
+
+@pytest.mark.xfail(strict = True)
+def test_straight_hole():
+    md = np.array([0, 10, 20]).reshape(3, 1)
+    inc = azi = np.zeros((3, 1))
+    dev = deviation(md=md, inc=inc, azi=azi)
+    step = 10
+    depths = list(range(0, int(dev.md[-1]) + 10, step))
+    with np.errstate(invalid='raise'):
+        pos = dev.minimum_curvature().resample(depths=depths)
+        dev2 = pos.deviation()
