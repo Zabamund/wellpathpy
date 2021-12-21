@@ -38,9 +38,9 @@ def checkarrays(md, inc, azi):
         If the md values are not strictly increasing
         If NaN values are included in md, inc or azi
     """
-    md = np.asarray(md, dtype = np.float)
-    inc = np.asarray(inc, dtype = np.float)
-    azi = np.asarray(azi, dtype = np.float)
+    md = np.asarray(md, dtype=float)
+    inc = np.asarray(inc, dtype=float)
+    azi = np.asarray(azi, dtype=float)
 
     for prop, arr in {'md': md, 'inc': inc, 'azi': azi}.items():
         if np.isnan(arr).any():
@@ -96,9 +96,9 @@ def checkarrays_tvd(tvd, northing, easting):
         If tvd, northing, or easting, are of different shapes
         If NaN values are included in tvd, easting or northing
     """
-    tvd = np.asarray(tvd, dtype = np.float)
-    northing = np.asarray(northing, dtype = np.float)
-    easting = np.asarray(easting, dtype = np.float)
+    tvd = np.asarray(tvd, dtype=float)
+    northing = np.asarray(northing, dtype=float)
+    easting = np.asarray(easting, dtype=float)
 
     for prop, arr in {'tvd': tvd, 'northing': northing, 'easting': easting}.items():
         if np.isnan(arr).any():
