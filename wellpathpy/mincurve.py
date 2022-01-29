@@ -31,8 +31,6 @@ def minimum_curvature_inner(md, inc, azi):
     dogleg : array_like of float
 
     """
-    md, inc, azi = checkarrays(md, inc, azi)
-
     # Compute the direction vectors for the surveys and organise them as
     # (upper, lower) pairs, by index in the arrays.
     dv = direction_vector_radians(inc, azi)
