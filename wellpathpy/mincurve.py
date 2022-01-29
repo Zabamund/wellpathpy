@@ -40,10 +40,9 @@ def minimum_curvature_inner(md, inc, azi):
     upper, lower = dv[:-1], dv[1:]
     dogleg = angle_between(upper, lower)
 
-    # ratio factor, correct for dogleg == 0 values
-    with np.errstate(divide = 'ignore', invalid = 'ignore'):
-        rf = 2 / dogleg * np.tan(dogleg / 2)
-        rf = np.where(dogleg == 0., 1, rf)
+    # ratio factor, correct for dogleg == 0 values to avoid divide-by-zero
+    dogleg[dogleg == 0] = 1.0
+    rf = 2 / dogleg * np.tan(dogleg / 2)
 
     md_diff  = md[1:] - md[:-1]
     halfmd   = md_diff / 2
