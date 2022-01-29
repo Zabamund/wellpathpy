@@ -1,6 +1,8 @@
 import numpy as np
 
 from .checkarrays import checkarrays
+from .geometry import angle_between
+from .geometry import direction_vector_radians
 
 def minimum_curvature_inner(md, inc, azi):
     """Calculate TVD, northing, easting, and dogleg, using the minimum curvature
@@ -36,11 +38,10 @@ def minimum_curvature_inner(md, inc, azi):
     inc_upper, inc_lower = inc[:-1], inc[1:]
     azi_upper, azi_lower = azi[:-1], azi[1:]
 
-    cos_inc = np.cos(inc_lower - inc_upper)
-    sin_inc = np.sin(inc_upper) * np.sin(inc_lower)
-    cos_azi = 1 - np.cos(azi_lower - azi_upper)
-
-    dogleg = np.arccos(cos_inc - (sin_inc * cos_azi))
+    dv = direction_vector_radians(inc, azi)
+    dv = np.column_stack(dv)
+    upper, lower = dv[:-1], dv[1:]
+    dogleg = angle_between(upper, lower)
 
     # ratio factor, correct for dogleg == 0 values
     with np.errstate(divide = 'ignore', invalid = 'ignore'):
