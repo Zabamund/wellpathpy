@@ -33,11 +33,8 @@ def minimum_curvature_inner(md, inc, azi):
     """
     md, inc, azi = checkarrays(md, inc, azi)
 
-    # extract upper and lower survey stations
-    md_upper, md_lower = md[:-1], md[1:]
-    inc_upper, inc_lower = inc[:-1], inc[1:]
-    azi_upper, azi_lower = azi[:-1], azi[1:]
-
+    # Compute the direction vectors for the surveys and organise them as
+    # (upper, lower) pairs, by index in the arrays.
     dv = direction_vector_radians(inc, azi)
     dv = np.column_stack(dv)
     upper, lower = dv[:-1], dv[1:]
@@ -48,18 +45,11 @@ def minimum_curvature_inner(md, inc, azi):
         rf = 2 / dogleg * np.tan(dogleg / 2)
         rf = np.where(dogleg == 0., 1, rf)
 
-    md_diff = md_lower - md_upper
-
-    upper = np.sin(inc_upper) * np.cos(azi_upper)
-    lower = np.sin(inc_lower) * np.cos(azi_lower)
-    northing = np.cumsum((md_diff / 2) * (upper + lower) * rf)
-
-    upper = np.sin(inc_upper) * np.sin(azi_upper)
-    lower = np.sin(inc_lower) * np.sin(azi_lower)
-    easting = np.cumsum((md_diff / 2) * (upper + lower) * rf)
-
-    tvd = np.cumsum((md_diff / 2) * (np.cos(inc_upper) + np.cos(inc_lower)) * rf)
-
+    md_diff  = md[1:] - md[:-1]
+    halfmd   = md_diff / 2
+    northing = np.cumsum(halfmd * (upper[:, 0] + lower[:, 0]) * rf)
+    easting  = np.cumsum(halfmd * (upper[:, 1] + lower[:, 1]) * rf)
+    tvd      = np.cumsum(halfmd * (upper[:, 2] + lower[:, 2]) * rf)
     return tvd, northing, easting, dogleg
 
 def minimum_curvature(md, inc, azi, course_length=30):
