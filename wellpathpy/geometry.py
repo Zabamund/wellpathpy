@@ -1,5 +1,35 @@
 import numpy as np
 
+def direction_vector_radians(inc, azi):
+    """(inc, azi) -> [N E V]
+
+    Convert spherical coordinates (inc, azi) in radians to cubic coordinates
+    (northing, easting, vertical depth), a unit length direction vector in a
+    right handed coordinate system.
+
+    Parameters
+    ----------
+    inc : array_like of float
+        inclination in radians
+    azi : array_like of float
+        azimuth in radians
+
+    Returns
+    -------
+    northing : array_like of float
+    easting : array_like of float
+    vd : array_like of float
+        vertial direction
+
+    See also
+    --------
+    direction_vector
+    """
+    vd = np.cos(inc)
+    northing = np.sin(inc) * np.cos(azi)
+    easting  = np.sin(inc) * np.sin(azi)
+    return northing, easting, vd
+
 def direction_vector(inc, azi):
     """(inc, azi) -> [N E V]
 
@@ -38,13 +68,8 @@ def direction_vector(inc, azi):
 
     """
     inc = np.deg2rad(inc)
-    az = np.deg2rad(azi)
-
-    vd = np.cos(inc)
-    northing = np.sin(inc) * np.cos(az)
-    easting  = np.sin(inc) * np.sin(az)
-
-    return northing, easting, vd
+    azi = np.deg2rad(azi)
+    return direction_vector_radians(inc, azi)
 
 def spherical(northing, easting, depth):
     """[N E V] -> (inc, azi)
