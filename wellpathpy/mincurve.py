@@ -1,6 +1,8 @@
 import numpy as np
 
 from .checkarrays import checkarrays
+from .geometry import angle_between
+from .geometry import direction_vector_radians
 
 def minimum_curvature_inner(md, inc, azi):
     """Calculate TVD, northing, easting, and dogleg, using the minimum curvature
@@ -29,36 +31,22 @@ def minimum_curvature_inner(md, inc, azi):
     dogleg : array_like of float
 
     """
-    md, inc, azi = checkarrays(md, inc, azi)
+    # Compute the direction vectors for the surveys and organise them as
+    # (upper, lower) pairs, by index in the arrays.
+    dv = direction_vector_radians(inc, azi)
+    dv = np.column_stack(dv)
+    upper, lower = dv[:-1], dv[1:]
+    dogleg = angle_between(upper, lower)
 
-    # extract upper and lower survey stations
-    md_upper, md_lower = md[:-1], md[1:]
-    inc_upper, inc_lower = inc[:-1], inc[1:]
-    azi_upper, azi_lower = azi[:-1], azi[1:]
+    # ratio factor, correct for dogleg == 0 values to avoid divide-by-zero
+    dogleg[dogleg == 0] = 1.0
+    rf = 2 / dogleg * np.tan(dogleg / 2)
 
-    cos_inc = np.cos(inc_lower - inc_upper)
-    sin_inc = np.sin(inc_upper) * np.sin(inc_lower)
-    cos_azi = 1 - np.cos(azi_lower - azi_upper)
-
-    dogleg = np.arccos(cos_inc - (sin_inc * cos_azi))
-
-    # ratio factor, correct for dogleg == 0 values
-    with np.errstate(divide = 'ignore', invalid = 'ignore'):
-        rf = 2 / dogleg * np.tan(dogleg / 2)
-        rf = np.where(dogleg == 0., 1, rf)
-
-    md_diff = md_lower - md_upper
-
-    upper = np.sin(inc_upper) * np.cos(azi_upper)
-    lower = np.sin(inc_lower) * np.cos(azi_lower)
-    northing = np.cumsum((md_diff / 2) * (upper + lower) * rf)
-
-    upper = np.sin(inc_upper) * np.sin(azi_upper)
-    lower = np.sin(inc_lower) * np.sin(azi_lower)
-    easting = np.cumsum((md_diff / 2) * (upper + lower) * rf)
-
-    tvd = np.cumsum((md_diff / 2) * (np.cos(inc_upper) + np.cos(inc_lower)) * rf)
-
+    md_diff  = md[1:] - md[:-1]
+    halfmd   = md_diff / 2
+    northing = np.cumsum(halfmd * (upper[:, 0] + lower[:, 0]) * rf)
+    easting  = np.cumsum(halfmd * (upper[:, 1] + lower[:, 1]) * rf)
+    tvd      = np.cumsum(halfmd * (upper[:, 2] + lower[:, 2]) * rf)
     return tvd, northing, easting, dogleg
 
 def minimum_curvature(md, inc, azi, course_length=30):

@@ -1,5 +1,35 @@
 import numpy as np
 
+def direction_vector_radians(inc, azi):
+    """(inc, azi) -> [N E V]
+
+    Convert spherical coordinates (inc, azi) in radians to cubic coordinates
+    (northing, easting, vertical depth), a unit length direction vector in a
+    right handed coordinate system.
+
+    Parameters
+    ----------
+    inc : array_like of float
+        inclination in radians
+    azi : array_like of float
+        azimuth in radians
+
+    Returns
+    -------
+    northing : array_like of float
+    easting : array_like of float
+    vd : array_like of float
+        vertial direction
+
+    See also
+    --------
+    direction_vector
+    """
+    vd = np.cos(inc)
+    northing = np.sin(inc) * np.cos(azi)
+    easting  = np.sin(inc) * np.sin(azi)
+    return northing, easting, vd
+
 def direction_vector(inc, azi):
     """(inc, azi) -> [N E V]
 
@@ -38,13 +68,8 @@ def direction_vector(inc, azi):
 
     """
     inc = np.deg2rad(inc)
-    az = np.deg2rad(azi)
-
-    vd = np.cos(inc)
-    northing = np.sin(inc) * np.cos(az)
-    easting  = np.sin(inc) * np.sin(az)
-
-    return northing, easting, vd
+    azi = np.deg2rad(azi)
+    return direction_vector_radians(inc, azi)
 
 def spherical(northing, easting, depth):
     """[N E V] -> (inc, azi)
@@ -168,13 +193,13 @@ def unit_vector(v):
     """
     return normalize(v)
 
-def angle_between(v1, v2):
+def angle_between(u, v):
     """Return the angle between (arrays of) vectors
 
     Parameters
     ----------
-    v1 : array_like
-    v2 : array_like
+    u : array_like
+    v : array_like
 
     Returns
     -------
@@ -194,20 +219,14 @@ def angle_between(v1, v2):
     >>> angle_between(a, b)
     [1.5707963267948966]
     """
-    # The angle between vectors is computed from the dot-product, but we want
-    # to also do this for arrays-of-vectors, and np.dot() interprets that as
-    # matrix multiplication.
-    v1 = normalize(v1)
-    v2 = normalize(v2)
-    if v1.ndim == 1:
-        dot = np.dot(v1, v2)
-    else:
-        # This is just a way of writing dot(v1,v2) for an array-of-vectors
-        dot = np.einsum('ij,ij->i', v1, v2)
-
-    # arccos is only defined [-1,1], dot can _sometimes_ go outside this domain
-    # because of floating points
-    return np.arccos(np.clip(dot, -1.0, 1.0))
+    ndims = np.ndim(u)
+    is_1d = ndims == 1
+    u = np.atleast_2d(normalize(u))
+    v = np.atleast_2d(normalize(v))
+    norm_sub = np.linalg.norm(v - u, axis = 1)
+    norm_add = np.linalg.norm(v + u, axis = 1)
+    angle = 2.0 * np.arctan(norm_sub / norm_add)
+    return angle[0] if is_1d else angle
 
 def normal_vector(v1, v2):
     """Normal vector to plane given by vectors v1 and v2

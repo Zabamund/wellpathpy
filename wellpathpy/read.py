@@ -49,5 +49,8 @@ def read_csv(fname, delimiter=',', skiprows=1, **kwargs):
     dev = np.loadtxt(fname, delimiter=delimiter, skiprows=skiprows, **kwargs)
     md, inc, azi = np.split(dev[:,0:3], 3, 1)
     md, inc, azi = checkarrays(md, inc, azi)
+    md  = md.flatten()
+    inc = inc.flatten()
+    azi = azi.flatten()
 
     return md, inc, azi
