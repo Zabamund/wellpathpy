@@ -41,7 +41,7 @@ def deviation_to_csv(fname, md, inc, azi, fmt='%.3f', delimiter=',', header='md,
     md, inc, azi = checkarrays(md, inc, azi)
 
     a = np.asarray([md, inc, azi])
-    np.savetxt(fname, a, fmt=fmt, delimiter=delimiter, header=header, **kwargs)
+    np.savetxt(fname, a.T, fmt=fmt, delimiter=delimiter, header=header, **kwargs)
 
     return None
 
@@ -85,6 +85,6 @@ def position_to_csv(fname, depth, northing, easting, fmt='%.3f', delimiter=',', 
     depth, northing, easting = checkarrays_tvd(depth, northing, easting)
 
     a = np.asarray([easting, northing, depth])
-    np.savetxt(fname, a, fmt=fmt, delimiter=delimiter, header=header, **kwargs)
+    np.savetxt(fname, a.T, fmt=fmt, delimiter=delimiter, header=header, **kwargs)
 
     return None
