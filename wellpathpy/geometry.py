@@ -107,7 +107,7 @@ def spherical(northing, easting, depth):
 def normalize(v):
     """Normalize vector or compute unit vector
 
-    Compute the normalized (unit vector) [1]_ of v, a vector with the same
+    Compute the normalized (unit vector) [vector]_ of v, a vector with the same
     direction, but a length of 1.
 
     Parameters
@@ -133,12 +133,12 @@ def normalize(v):
 
     This function works on a single vector or a set of vectors. Numpy will
     interpret any set of vectors as a matrix, so the type of norm is specified
-    explicitly [2].
+    explicitly [wp35]_.
 
     References
     ----------
-    .. [1] https://mathworld.wolfram.com/NormalizedVector.html
-    .. [2] https://github.com/Zabamund/wellpathpy/issues/35
+    .. [vector] https://mathworld.wolfram.com/NormalizedVector.html
+    .. [wp35] https://github.com/Zabamund/wellpathpy/issues/35
 
     Examples
     --------
