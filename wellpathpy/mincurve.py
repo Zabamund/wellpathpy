@@ -75,26 +75,26 @@ def minimum_curvature(md, inc, azi, course_length=30):
     .. math::
         dls = arccos[
                   cos(inc_l - inc_u)
-                - sin(inc_u) \cdot sin(inc_l) \cdot (1 - cos(azi_l - azi_u))
+                - sin(inc_u) \\cdot sin(inc_l) \\cdot (1 - cos(azi_l - azi_u))
                 ]
 
     .. math::
-        rf = \\frac{2}{dls} \cdot tan(\\frac{dls}{2})
+        rf = \\frac{2}{dls} \\cdot tan(\\frac{dls}{2})
 
     .. math::
         northing = \\frac{md_l - md_u}{2}
-                   \cdot [sin(inc_u)cos(azi_u) + sin(inc_l)cos(azi_l)]
-                   \cdot rf
+                   \\cdot [sin(inc_u)cos(azi_u) + sin(inc_l)cos(azi_l)]
+                   \\cdot rf
 
     .. math::
         easting = \\frac{md_l - md_u}{2}
-                  \cdot [sin(inc_u)sin(azi_u) + sin(inc_l)sin(azi_l)]
-                  \cdot rf
+                  \\cdot [sin(inc_u)sin(azi_u) + sin(inc_l)sin(azi_l)]
+                  \\cdot rf
 
     .. math::
         tvd = \\frac{md_l - md_u}{2}
-              \cdot [cos(inc_l) + cos(inc_u)]
-              \cdot rf
+              \\cdot [cos(inc_l) + cos(inc_u)]
+              \\cdot rf
 
     where:
 
