@@ -5,25 +5,7 @@ API reference
 Classes
 -------
 
-.. module:: wellpathpy.position_log
-
-.. autoclass:: deviation
-   :members:
-
-   deviation(md = self.md, inc = self.inc, azi = self.azi)
-
-.. autoclass:: position_log
-   :members:
-
-   position(depth = self.depth, northing = self.northing, easting = self.easting)
-
-.. autoclass:: minimum_curvature
-   :members:
-
-.. autoclass:: radius_curvature
-   :members:
-
-.. autoclass:: tan_method
+.. automodule:: wellpathpy.position_log
    :members:
 
 Functions
