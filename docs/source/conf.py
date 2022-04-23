@@ -102,6 +102,8 @@ html_static_path = ['nstatic']
 #
 # html_sidebars = {}
 
+# Order functions and methods following source code, NOT alphabetically
+autodoc_member_order = 'bysource'
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
