@@ -14,12 +14,10 @@ class deviation:
     The deviation is a glorified triple (md, inc, azi), with some interesting
     operations.
 
-    Notes
-    -----
-    Glossary:
-    md : measured depth
-    inc : inclination (in degrees)
-    azi : azimuth (in degrees)
+    .. note::
+        * md : measured depth
+        * inc : inclination (in degrees)
+        * azi : azimuth (in degrees)
     """
     def __init__(self, md, inc, azi):
         md, inc, azi = checkarrays(md, inc, azi)
@@ -39,8 +37,7 @@ class deviation:
     def minimum_curvature(self, course_length = 30):
         """This function calls mincurve.minimum_curvature with self
 
-        Notes
-        -----
+        .. note::
             You can access help with `wp.mincurve.minimum_curvature?`
             in `ipython`
         """
@@ -55,8 +52,7 @@ class deviation:
     def radius_curvature(self):
         """This function calls rad_curv.radius_curvature with self
 
-        Notes
-        -----
+        .. note::
             You can access help with `wp.rad_curv.radius_curvature?`
             in `ipython`
         """
@@ -70,8 +66,7 @@ class deviation:
     def tan_method(self, choice = 'avg'):
         """This function calls tan.tan_method with self
 
-        Notes
-        -----
+        .. note::
             You can access help with `wp.tan.tan_method?`
             in `ipython`
         """
@@ -86,8 +81,7 @@ class deviation:
     def to_csv(self, fname, **kwargs):
         """This function calls write.deviation_to_csv with self
 
-        Notes
-        -----
+        .. note::
             You can access help with `wp.write.deviation_to_csv?`
             in `ipython`
         """
@@ -101,8 +95,7 @@ class position_log:
     from. In its essence, it's a glorified triplet (tvd, northing, easting)
     with some interesting operations.
 
-    Notes
-    -----
+    .. note::
     Glossary:
     tvd : true vertical depth
     """
@@ -190,8 +183,7 @@ class position_log:
     def to_tvdss(self, datum_elevation, inplace = False):
         """This function calls location.location_to_tvdss with self
 
-        Notes
-        -----
+        .. note::
             You can access help with `wp.location.to_tvdss?`
             in `ipython`
         """
@@ -222,8 +214,7 @@ class position_log:
     def to_csv(self, fname, **kwargs):
         """This function calls write.position_to_csv with self
 
-        Notes
-        -----
+        .. notes::
             You can access help with `wp.write.position_to_csv?`
             in `ipython`
         """
