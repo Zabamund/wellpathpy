@@ -66,14 +66,3 @@ def test_straight_nonvertical_segment():
     delta_md = md[1:] - md[:-1]
     delta_vd = pos.depth[1:] - pos.depth[:-1]
     assert (delta_md > delta_vd).all()
-
-@pytest.mark.xfail(strict = True)
-def test_straight_hole():
-    md = np.array([0, 10, 20]).reshape(3, 1)
-    inc = azi = np.zeros((3, 1))
-    dev = deviation(md=md, inc=inc, azi=azi)
-    step = 10
-    depths = list(range(0, int(dev.md[-1]) + 10, step))
-    with np.errstate(invalid='raise'):
-        pos = dev.minimum_curvature().resample(depths=depths)
-        dev2 = pos.deviation()
