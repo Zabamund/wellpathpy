@@ -39,6 +39,34 @@ def test_copy():
     original.depth += 10
     np.testing.assert_equal([1,2,3,4], copy.depth)
 
+def test_straight_down_segment_preserves_depth():
+    """
+    When the well is straight down, the vertical depth and measured depth
+    should increase at the same rate.
+    """
+    md  = [0, 3, 7]
+    inc = [0, 0, 0]
+    azi = [0, 0, 0]
+
+    pos = deviation(md, inc, azi).minimum_curvature()
+    np.testing.assert_array_equal(md, pos.depth)
+    np.testing.assert_array_equal([0, 0, 0], pos.northing)
+    np.testing.assert_array_equal([0, 0, 0], pos.easting)
+
+def test_straight_nonvertical_segment():
+    """
+    The well has a constant inclination which means delta(md) > delta(vd), the
+    path is not straight down. This doesn't test for the path going back up.
+    """
+    md  = np.array([1,  3,  7])
+    inc = np.array([30, 30, 30])
+    azi = np.array([0, 0, 0])
+
+    pos = deviation(md, inc, azi).minimum_curvature()
+    delta_md = md[1:] - md[:-1]
+    delta_vd = pos.depth[1:] - pos.depth[:-1]
+    assert (delta_md > delta_vd).all()
+
 @pytest.mark.xfail(strict = True)
 def test_straight_hole():
     md = np.array([0, 10, 20]).reshape(3, 1)
