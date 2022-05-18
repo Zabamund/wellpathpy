@@ -483,7 +483,10 @@ class minimum_curvature(position_log):
             d = np.linalg.norm(v1)
             incs.append(i2)
             azis.append(a2)
-            mds.append(d * alpha / np.sin(alpha))
+            if alpha == 0:
+                mds.append(d)
+            else:
+                mds.append(d * alpha / np.sin(alpha))
             # The current lower station is the upper station in the next
             # segment.
             i1 = i2

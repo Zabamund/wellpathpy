@@ -12,6 +12,9 @@ from ..position_log import deviation, position_log as mc
 # import test well data
 well9 = np.loadtxt('./wellpathpy/test/fixtures/well9.csv', delimiter=",", skiprows=1)
 well10 = np.loadtxt('./wellpathpy/test/fixtures/well10.csv', delimiter=",", skiprows=1)
+straight_vert = np.loadtxt('./wellpathpy/test/fixtures/straight_vert_section.csv', delimiter=",", skiprows=1)
+straight_deviated = np.loadtxt('./wellpathpy/test/fixtures/straight_dev_section.csv', delimiter=",", skiprows=1)
+
 # get data series
 well9_true_md_m = well9[:,0] * 0.3048 # converting feet to meters
 well9_true_inc = well9[:,1]
@@ -196,3 +199,60 @@ def test_roundtrip(atol = 0.01):
     np.testing.assert_allclose(pos.depth,    well9_true_tvd_m,    atol=1)
     np.testing.assert_allclose(pos.northing, well9_true_northing, atol=1)
     np.testing.assert_allclose(pos.easting,  well9_true_easting,  atol=1)
+
+def test_roundtrip_vertical_straight_hole(atol = 0.01):
+    """
+    This pretty much only tests the mincurve, but packed in the
+    deviation+position_log interface
+
+    For a vertical straight hole, the inclination stays 0, but
+    azimuth can rotate freely.
+    """
+    md_m = straight_vert[:, 0] * 0.3048 # converting feet to meters
+    inc  = straight_vert[:, 1]
+    azi  = straight_vert[:, 2]
+    tvd_m    = straight_vert[:, 0] * 0.3048 # converting feet to meters
+    easting  = [0, 0, 0, 0, 0, 0]
+    northing = [0, 0, 0, 0, 0, 0]
+
+    # the hole is vertical
+    assert np.all(inc) == 0
+
+    dev = deviation(md_m, inc, azi)
+    pos = dev.minimum_curvature()
+    dev2 = pos.deviation()
+    np.testing.assert_allclose(dev.md,  dev2.md,  atol = atol)
+    np.testing.assert_allclose(dev.inc, dev2.inc, atol = atol)
+    np.testing.assert_allclose(dev.azi, dev2.azi, atol = atol)
+
+    pos.to_wellhead(surface_northing = 0.0, surface_easting = 0.0, inplace = True)
+    np.testing.assert_allclose(pos.depth,    tvd_m,    atol=1)
+    np.testing.assert_allclose(pos.northing, northing, atol=1)
+    np.testing.assert_allclose(pos.easting,  easting,  atol=1)
+
+def test_roundtrip_deviated_straight_hole(atol = 0.01):
+    """
+    This pretty much only tests the mincurve, but packed in the
+    deviation+position_log interface
+
+    For a deviated straight hole, MD should increase, but inc
+    and azi must remain constant.
+    """
+    md_m  = straight_deviated[:, 0]
+    inc   = straight_deviated[:, 1]
+    azi   = straight_deviated[:, 2]
+    tvd_m = np.array([0., 50., 99.989847, 149.959388, 199.928929, 249.898471])
+    easting = [0, 0, 0, 0, 0, 0]
+    northing = np.array([0., 0., 0.872576, 2.617551, 4.362526, 6.107501])
+
+    dev = deviation(md_m, inc, azi)
+    pos = dev.minimum_curvature()
+    dev2 = pos.deviation()
+    np.testing.assert_allclose(dev.md,  dev2.md,  atol = atol)
+    np.testing.assert_allclose(dev.inc, dev2.inc, atol = atol)
+    np.testing.assert_allclose(dev.azi, dev2.azi, atol = atol)
+
+    pos.to_wellhead(surface_northing = 0.0, surface_easting = 0.0, inplace = True)
+    np.testing.assert_allclose(pos.depth,    tvd_m,    atol=1)
+    np.testing.assert_allclose(pos.northing, northing, atol=1)
+    np.testing.assert_allclose(pos.easting,  easting,  atol=1)
