@@ -237,7 +237,10 @@ You can then run the following methods once you've imported your :ref:`deviation
 .. code-block:: python
 
     # The recommended method for most use-cases
-    tvd, northing, easting, dls = dev.mininum_curvature(course_length=30)
+    pos = dev.mininum_curvature(course_length=30)
+    tvd = pos.depth
+    northing = pos.northing
+    easting = pos.easting
 
     # Comparison methods to contrast with older deviation surveys
     tvd, northing, easting      = dev.radius_curvature()
