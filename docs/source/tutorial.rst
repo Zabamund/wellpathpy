@@ -7,6 +7,7 @@ This document aims to provide a sample workthrough using wellpathpy showing:
 - `Abbreviations`_
 - `Imports`_
 - `Loading a deviation`_
+- `Plotting deviation in polar plot`_
 - `Loading the well header`_
 - `Converting deviation surveys to positional logs`_
 - `Well location and tvdss`_
@@ -137,6 +138,34 @@ First we see an overview of the well in 3D, followed by plots of inclination and
 .. image:: ./figures/Deviation_resampling_example_step30.png
     :width: 600
     :alt: Deviation_resampling_example_step30
+
+
+Plotting deviation in polar plot
+################################
+
+The deviation of a borehole can be illustrated in map view using a polar plot. We are using the ``matplotlib`` package
+and its polar projection. Additionally, we set the ``theta_zero_location`` to north, meaning that 0° will at the top
+of the plot. Further, we are setting the ``theta_direction`` to count clockwise.
+
+.. code-block:: python
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    ax.set_theta_zero_location('N')
+    ax.set_theta_direction(-1)
+
+    azimuth = np.arctan2(pos.easting,
+                         pos.northing)
+
+    radius = np.sqrt(pos.northing ** 2 + pos.easting ** 2)
+
+    ax.plot(azimuth, radius)
+
+.. image:: ./figures/Deviation_polar_plot.PNG
+    :width: 600
+    :alt: Deviation_polar_plot
 
 Loading the well header
 #######################
