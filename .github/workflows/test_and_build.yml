@@ -24,7 +24,7 @@ jobs:
         pip install -r requirements-dev.txt
     - name: Run tests
       run: |
-        python setup.py pytest
+        python -m pytest
     - name: Build wheel
       run: |
-        python setup.py bdist_wheel
+        python -m build --wheel
