@@ -3,3 +3,4 @@ numpy
 setuptools-scm
 hypothesis
 wheel
+build
