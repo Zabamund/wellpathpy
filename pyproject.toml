@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling>=1.0", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wellpathpy"
+dynamic = ["version"]
+description = "Light package to load well deviations"
+readme = "README.md"
+authors = [
+    { name = "Robert Leckenby", email = "fracgeol@gmail.com" },
+    { name = "Brendon Hall", email = "fracgeol@gmail.com" },
+    { name = "Jørgen Kvalsvik", email = "fracgeol@gmail.com" }
+]
+maintainers = [
+    { name = "Robert Leckenby", email = "fracgeol@gmail.com" }
+]
+license = { file = "LICENSE" }
+platforms = "any"
+
+dependencies = [
+    "numpy >=1.10",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "hypothesis",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Zabamund/wellpathpy"
+"Repository" = "https://github.com/Zabamund/wellpathpy"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.metadata]
+license = "LGPL-3.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+
