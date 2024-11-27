@@ -1,7 +1,15 @@
+import sys
+if sys.version_info >= (3, 8):
+    from importlib import metadata
+else:
+    import importlib_metadata as metadata
+
 try:
-    import pkg_resources
-    __version__ = pkg_resources.get_distribution(__name__).version
-except pkg_resources.DistributionNotFound:
+    __version__ = metadata.version(__name__)
+except: # PackageNotFoundError
+    # Don't hard crash when the the version cannot be looked up from the
+    # metadata, probably because the tests are running from the source dir and
+    # the module has not been packaged yet.
     pass
 
 __all__ = [
