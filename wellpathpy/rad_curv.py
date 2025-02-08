@@ -3,7 +3,7 @@ import numpy as np
 from .checkarrays import checkarrays
 
 def radius_curvature(md, inc, azi):
-    """Calculate TVD using radius or curvature method.
+    r"""Calculate TVD using radius or curvature method.
 
     This method uses angles from upper and lower end of survey interval to
     calculate a curve that passes through both survey points.

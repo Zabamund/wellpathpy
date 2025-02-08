@@ -65,7 +65,7 @@ def tan_method(md, inc, azi, choice='avg'):
     return tvd, northing, easting
 
 def high_tan(md, inc, azi):
-    """Calculate TVD using high tangential method.
+    r"""Calculate TVD using high tangential method.
 
     This method takes the sines and cosines of the inclination and azimuth
     at the bottom of the survey interval to estimate tvd.
@@ -112,7 +112,7 @@ def high_tan(md, inc, azi):
     return tan_method(md, inc, azi, choice='high')
 
 def low_tan(md, inc, azi):
-    """Calculate TVD using low tangential method.
+    r"""Calculate TVD using low tangential method.
 
     This method takes the sines and cosines of the inclination and azimuth
     at the top of the survey interval to estimate tvd.
@@ -159,7 +159,7 @@ def low_tan(md, inc, azi):
     return tan_method(md, inc, azi, choice='low')
 
 def average_tan(md, inc, azi):
-    """Calculate TVD using average tangential method.
+    r"""Calculate TVD using average tangential method.
 
     This method averages the inclination and azimuth at the top and
     bottom of the survey interval before taking their sine and cosine,
@@ -206,7 +206,7 @@ def average_tan(md, inc, azi):
     return tan_method(md, inc, azi, choice='avg')
 
 def balanced_tan(md, inc, azi):
-    """Calculate TVD using balanced tangential method.
+    r"""Calculate TVD using balanced tangential method.
 
     This method takes the sines and cosines of the inclination and azimuth
     at the top and bottom of the survey interval before averaging them,

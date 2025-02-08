@@ -57,7 +57,7 @@ def minimum_curvature_inner(md, inc, azi):
     return tvd, northing, easting, dogleg
 
 def minimum_curvature(md, inc, azi, course_length=30):
-    """Calculate TVD using minimum curvature method.
+    r"""Calculate TVD using minimum curvature method.
 
     This method uses angles from upper and lower end of survey interval to
     calculate a curve that passes through both survey points. This curve is
